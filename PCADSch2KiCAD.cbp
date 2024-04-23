@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="PCADSch2KiCAD" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/PCADSch2KiCAD" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters='&quot;..\Controller 3&quot; *.sch_cvt' />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/PCADSch2KiCAD" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="KiCADOutputSchematic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="KiCADOutputSchematic.h" />
+		<Unit filename="Lexic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Lexic.h" />
+		<Unit filename="PCADEnums.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PCADEnums.h" />
+		<Unit filename="PCADOutputSchematic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PCADOutputSchematic.h" />
+		<Unit filename="PCADParser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PCADParser.h" />
+		<Unit filename="PCADProcessSchematic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="PCADProcessSchematic.h" />
+		<Unit filename="PCADStructs.h" />
+		<Unit filename="Parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Parser.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
