@@ -80,7 +80,7 @@ void SplitPath( const char *pFullPath, char *pPath, char *pName, char *pExt )
 #define	OUTPUTFORMAT_KICAD		1
 #define	OUTPUTFORMAT_PCAD		2
 /*============================================================================*/
-//static const char KiCADExtension[]	= ".kicad_sch";
+static const char KiCADExtension[]	= ".kicad_sch";
 static const char PCADExtension[]	= ".sch";
 //static const char BackUpExtension[]	= ".cvt_bak";
 /*============================================================================*/
@@ -136,7 +136,7 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 				strcpy( ExtOut, ExtIn );
 			}
 		else
-			strcpy( ExtOut, "" );
+			strcpy( ExtOut, KiCADExtension );
 		}
 	else
 		{
@@ -159,8 +159,8 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 			strcpy( NameOut, NameIn );
 			if( OutputFormat == OUTPUTFORMAT_PCAD )
 				strcpy( ExtOut, ExtIn );
-//			else
-//				strcpy( ExtOut, KiCADExtension );
+			else
+				strcpy( ExtOut, KiCADExtension );
 			}
 		else
 			{
@@ -172,8 +172,8 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 				{
 				if( OutputFormat == OUTPUTFORMAT_PCAD )
 					strcpy( ExtOut, PCADExtension );
-//				else
-//					strcpy( ExtOut, KiCADExtension );
+				else
+					strcpy( ExtOut, KiCADExtension );
 				}
 			}
 		}
@@ -272,13 +272,12 @@ int main( int ArgC, char *ArgV[] )
 
 	if(( f = fopen( PathIn, "rb" )) == NULL )
 		{
-		char	NameIn[256], ExtIn[256];
+		char	ExtIn[256];
 
-		SplitPath( ArgV[FirstArg], PathIn, NameIn, ExtIn );
-		strcat( PathIn, NameIn );
+		SplitPath( ArgV[FirstArg], NULL, NULL, ExtIn );
 		strcat( PathIn, PCADExtension );
 
-		if( strcmp( ExtIn, "" ) != 0 || ( f = fopen( PathIn, "rb" )) == NULL )
+		if( strcmp( ExtIn, PCADExtension ) == 0 || ( f = fopen( PathIn, "rb" )) == NULL )
 			{
 			PrintUsage( OutputFormat );
 			fprintf( stderr, "\nError opening file \"%s\".\n\n", ArgV[FirstArg] );
