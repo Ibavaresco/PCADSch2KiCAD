@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -29,9 +29,9 @@
 #if			!defined __PARSER2_H__
 #define __PARSER2_H__
 /*============================================================================*/
-#define FLAG_NAKED          0
-#define FLAG_WRAPPED        1
-#define FLAG_CASESENSITIVE  2
+#define FLAG_NAKED			0
+#define FLAG_WRAPPED		1
+#define FLAG_CASESENSITIVE	2
 /*============================================================================*/
 typedef struct parsefield_tag		parsefield_t;
 typedef struct parsestruct_tag		parsestruct_t;
@@ -66,27 +66,27 @@ typedef struct parsestruct_tag
 	const ssize_t					OffsetNext;
 	} parsestruct_t;
 /*============================================================================*/
-void    			*Allocate           ( cookie_t *Cookie, size_t Size );
+void				*Allocate			( cookie_t *Cookie, size_t Size );
 
-pcad_unsigned_t		GetUnsigned         ( cookie_t *Cookie );
+pcad_unsigned_t		GetUnsigned			( cookie_t *Cookie );
 int					GetName				( cookie_t *Cookie, char *Buffer, size_t BufferLength );
-int         		GetString           ( cookie_t *Cookie, char *Buffer, size_t BufferSize );
-char        		*GetAndStoreString  ( cookie_t *Cookie );
+int					GetString			( cookie_t *Cookie, char *Buffer, size_t BufferSize );
+char				*GetAndStoreString	( cookie_t *Cookie );
 
-int					ExpectName          ( cookie_t *Cookie, const char *Name );
-int					ExpectString        ( cookie_t *Cookie, const char *String );
-token_t 			ExpectToken         ( cookie_t *Cookie, token_t Token );
+int					ExpectName			( cookie_t *Cookie, const char *Name );
+int					ExpectString		( cookie_t *Cookie, const char *String );
+token_t				ExpectToken			( cookie_t *Cookie, token_t Token );
 
-int     			ParseDimmension		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseReal			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseBoolean		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseUnsigned		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseEnum			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseName			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseString			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
-int     			ParseGeneric		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseDimmension		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseReal			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseBoolean		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseUnsigned		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseEnum			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseName			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseString			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseGeneric		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
 
-pcad_units_t    	TranslateUnits      ( cookie_t *Cookie, const char *Buffer );
+pcad_units_t		TranslateUnits		( cookie_t *Cookie, const char *Buffer );
 pcad_dimmension_t	ProcessDimmension	( cookie_t *Cookie, const char *Buffer, pcad_units_t Unit );
 /*============================================================================*/
 int __attribute__((format(printf, 3, 4),noreturn))	Error		( cookie_t *Cookie, int ErrorCode, const char *Message, ... );

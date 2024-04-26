@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -85,18 +85,18 @@ static const char PCADExtension[]	= ".sch";
 //static const char BackUpExtension[]	= ".cvt_bak";
 /*============================================================================*/
 static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int OutputFormat )
-    {
+	{
 	pcad_schematicfile_t	*s;
 	char					NameIn[256], ExtIn[256], PathOut[256], NameOut[256], ExtOut[256] /*, PathBkp[256]*/;
 	cookie_t				Cookie;
-	size_t  				size;
-	uint8_t 				*heap;
+	size_t					size;
+	uint8_t					*heap;
 
-    fseek( f, 0, SEEK_END );
-    size					= sizeof( void* ) * ftell( f );
-    fseek( f, 0, SEEK_SET );
+	fseek( f, 0, SEEK_END );
+	size					= sizeof( void* ) * ftell( f );
+	fseek( f, 0, SEEK_SET );
 
-    heap					= malloc( size );
+	heap					= malloc( size );
 	if( heap == NULL )
 		{
 		printf( "\nError: Not enough memory.\n\n" );
@@ -118,9 +118,9 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 	if( setjmp( Cookie.JumpBuffer ) != 0 )
 		return -1;
 
-    memset( heap, 0x00, size );
+	memset( heap, 0x00, size );
 
-    s	= ParsePCAD( &Cookie, pNameIn, pNameOut );
+	s	= ParsePCAD( &Cookie, pNameIn, pNameOut );
 
 	SplitPath( pNameIn, NULL, NameIn, ExtIn );
 
@@ -196,8 +196,8 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 
 	free( heap );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 void PrintUsage( int OutputFormat )
 	{
@@ -208,7 +208,7 @@ void PrintUsage( int OutputFormat )
 		__DATE__ " " __TIME__ "\n\n"
 		"%2$s.\n\n"
 		"Usage: %1$s [--kicadout|--pcadout] [<pathin>]<filenamein>[.<extin>] [<pathout>][<filenameout|*>[.<extout|*>]]\n\n"
-		"\"--pcadout\"  forces the output file to be in P-CAD format.\n"
+		"\"--pcadout\"	forces the output file to be in P-CAD format.\n"
 		"\"--kicadout\" forces the output file to be in KiCAD format.\n"
 		"If the executable file name is \"PCADSch2KiCAD.exe\", the default output format is KiCAD.\n"
 		"If it is \"PCADSchSort.exe\", the default output format is P-CAD.\n\n"
@@ -226,13 +226,13 @@ void PrintUsage( int OutputFormat )
 
 	}
 /*============================================================================*/
-/* Black magic, necessary so C runtime won't expand the '*' in the command-line arguments.  */
-int _CRT_glob = 0;
+/* Black magic, necessary so C runtime won't expand the '*' in the command-line arguments.	*/
+int	_CRT_glob	= 0;
 /*============================================================================*/
 int main( int ArgC, char *ArgV[] )
 	{
 	char	PathIn[256];
-	FILE    *f;
+	FILE	*f;
 	int		Result, OutputFormat	= OUTPUTFORMAT_INVALID, FirstArg	= 1;
 
 	if( ArgC > 1 )
@@ -260,7 +260,7 @@ int main( int ArgC, char *ArgV[] )
 			}
 		}
 
-    if( ArgC - FirstArg < 1 || ArgC - FirstArg > 2 )
+	if( ArgC - FirstArg < 1 || ArgC - FirstArg > 2 )
 		{
 		PrintUsage( OutputFormat );
 		if( ArgC != 1 )

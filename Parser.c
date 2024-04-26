@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -31,74 +31,74 @@
 #include "PCADEnums.h"
 /*============================================================================*/
 pcad_dimmension_t ProcessDimmension( cookie_t *Cookie, const char *Buffer, pcad_units_t Unit )
-    {
-    pcad_dimmension_t    Value   = 0;
-    int             Sign    = 0;
-    const char      *p      = Buffer;
-    int             Exp, Scale;
+	{
+	pcad_dimmension_t	Value	= 0;
+	int					Sign	= 0;
+	const char			*p		= Buffer;
+	int					Exp, Scale;
 
-    switch( Unit )
-        {
+	switch( Unit )
+		{
 		case PCAD_UNITS_NONE:
 			Error( Cookie, -1, "Invalid unit \"%s\"", Units.items[Unit] );
-        case PCAD_UNITS_MM:
-            Exp     =   6;
-            Scale   =   1;
-            break;
-        case PCAD_UNITS_MIL:
-            Exp     =   2;
-            Scale   = 254;
-            break;
-        case PCAD_UNITS_IN:
-            Exp     =   5;
-            Scale   = 254;
-            break;
-        }
+		case PCAD_UNITS_MM:
+			Exp	=	6;
+			Scale	=	1;
+			break;
+		case PCAD_UNITS_MIL:
+			Exp	=	2;
+			Scale	= 254;
+			break;
+		case PCAD_UNITS_IN:
+			Exp	=	5;
+			Scale	= 254;
+			break;
+		}
 
-    if( *p == '+' || *p == '-' )
-        {
-        Sign    = *p == '-';
-        p++;
-        }
+	if( *p == '+' || *p == '-' )
+		{
+		Sign	= *p == '-';
+		p++;
+		}
 
-    // Convert the integer part.
-    while( isdigit( *p ))
-        Value   = Value * 10 + *p++ - '0';
+	// Convert the integer part.
+	while( isdigit( *p ))
+		Value	= Value * 10 + *p++ - '0';
 
-    // Convert the decimal part (if any).
-    if( *p == '.' || *p == ',' )
-        for( p++; isdigit( *p ) && Exp > 0; Exp-- )
-            Value   = Value * 10 + *p++ - '0';
+	// Convert the decimal part (if any).
+	if( *p == '.' || *p == ',' )
+		for( p++; isdigit( *p ) && Exp > 0; Exp-- )
+			Value	= Value * 10 + *p++ - '0';
 
-    // Finishing rising to the correct exponent.
-    for( ; Exp > 0; Exp-- )
-        Value   = Value * 10;
+	// Finishing rising to the correct exponent.
+	for( ; Exp > 0; Exp-- )
+		Value	= Value * 10;
 
-    // Scale the result to mm.
-    Value   *= Scale;
+	// Scale the result to mm.
+	Value	*= Scale;
 
-    if( Sign != 0 )
-        Value   = -Value;
+	if( Sign != 0 )
+		Value	= -Value;
 
-    return Value;
-    }
+	return Value;
+	}
 /*============================================================================*/
 pcad_units_t TranslateUnits( cookie_t *Cookie, const char *Buffer )
-    {
-	static const char	*Units[] 	= { [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
+	{
+	static const char	*Units[]	= { [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
 	int					i;
 
 	if( Buffer == NULL || Buffer[0] == '\0' )
-        return Cookie->FileUnits;
+		return Cookie->FileUnits;
 
-    for( i = 0; i < LENGTH( Units ) && stricmp( Buffer, Units[i] ) != 0; i++ )
-        {}
+	for( i = 0; i < LENGTH( Units ) && stricmp( Buffer, Units[i] ) != 0; i++ )
+		{}
 
-    if( i >= LENGTH( Units ))
-        Error( Cookie, -1, "Unknown unit" );
+	if( i >= LENGTH( Units ))
+		Error( Cookie, -1, "Unknown unit" );
 
-    return i;
-    }
+	return i;
+	}
 /*============================================================================*/
 int ExpectName( cookie_t *Cookie, const char *Name )
 	{
@@ -115,84 +115,81 @@ int ExpectName( cookie_t *Cookie, const char *Name )
 /*============================================================================*/
 pcad_real_t GetReal( cookie_t *Cookie )
 	{
-    char        Buffer[BUFFER_SIZE], *p = Buffer;
-    int32_t     Value   = 0;
-    int         Sign    = 0;
-    int         Exp;
-    token_t     Token   = GetToken( Cookie, Buffer, sizeof Buffer );
+	char	Buffer[BUFFER_SIZE], *p = Buffer;
+	int32_t	Value	= 0;
+	int		Sign	= 0;
+	int		Exp;
+	token_t	Token	= GetToken( Cookie, Buffer, sizeof Buffer );
 
 	if( Token != TOKEN_INTEGER && Token != TOKEN_UNSIGNED && Token != TOKEN_FLOAT )
 		Error( Cookie, -1, "Expecting number" );
 
-    if( *p == '+' || *p == '-' )
-        {
-        Sign    = *p == '-';
-        p++;
-        }
+	if( *p == '+' || *p == '-' )
+		Sign	= *p++ == '-';
 
-    // Convert the integer part.
-    while( isdigit( *p ))
-        Value   = Value * 10 + *p++ - '0';
+	// Convert the integer part.
+	while( isdigit( *p ))
+		Value	= Value * 10 + *p++ - '0';
 
-    // Convert the decimal part (if any).
-    if( *p == '.' || *p == ',' )
-        for( p++, Exp = 6; isdigit( *p ) && Exp > 0; Exp-- )
-            Value   = Value * 10 + *p++ - '0';
+	// Convert the decimal part (if any).
+	if( *p == '.' || *p == ',' )
+		for( p++, Exp = 6; isdigit( *p ) && Exp > 0; Exp-- )
+			Value	= Value * 10 + *p++ - '0';
 
-    // Finishing rising to the correct exponent.
-    for( ; Exp > 0; Exp-- )
-        Value   = Value * 10;
+	// Finishing rising to the correct exponent.
+	for( ; Exp > 0; Exp-- )
+		Value	= Value * 10;
 
-    if( Sign != 0 )
-        Value   = -Value;
+	if( Sign != 0 )
+		Value	= -Value;
 
-    return Value;
+	return Value;
 	}
 /*============================================================================*/
 int ParseReal( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    pcad_real_t	*Real   = (pcad_real_t*)Argument;
+	{
+	pcad_real_t	*Real	= (pcad_real_t*)Argument;
 
-    *Real    = GetReal( Cookie );
+	*Real	= GetReal( Cookie );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 pcad_dimmension_t GetDimmension( cookie_t *Cookie )
-    {
-    char            Buffer1[BUFFER_SIZE];
-    char            Buffer2[BUFFER_SIZE];
-    token_t         Token;
-    pcad_dimmension_t    Dimmension;
+	{
+	char				Buffer1[BUFFER_SIZE];
+	char				Buffer2[BUFFER_SIZE];
+	token_t				Token;
+	pcad_dimmension_t	Dimmension;
 
-    Token   = GetToken( Cookie, Buffer1, sizeof Buffer1 );
-    if( Token != TOKEN_FLOAT && Token != TOKEN_INTEGER && Token != TOKEN_UNSIGNED )
-        Error( Cookie, -1, "Expecting a number" );
+	Token	= GetToken( Cookie, Buffer1, sizeof Buffer1 );
+	if( Token != TOKEN_FLOAT && Token != TOKEN_INTEGER && Token != TOKEN_UNSIGNED )
+		Error( Cookie, -1, "Expecting a number" );
 
-    Token	= GetToken( Cookie, Buffer2, sizeof Buffer2 );
-    if( Token == TOKEN_NAME )
-        Dimmension  = ProcessDimmension( Cookie, Buffer1, TranslateUnits( Cookie, Buffer2 ));
-    else
-        {
-        UngetToken( Cookie, Token, Buffer2 );
-        Dimmension  = ProcessDimmension( Cookie, Buffer1, Cookie->FileUnits );
-        }
+	Token	= GetToken( Cookie, Buffer2, sizeof Buffer2 );
+	if( Token == TOKEN_NAME )
+		Dimmension	= ProcessDimmension( Cookie, Buffer1, TranslateUnits( Cookie, Buffer2 ));
+	else
+		{
+		UngetToken( Cookie, Token, Buffer2 );
+		Dimmension	= ProcessDimmension( Cookie, Buffer1, Cookie->FileUnits );
+		}
 
-    return Dimmension;
-    }
+	return Dimmension;
+	}
 /*============================================================================*/
 int ParseDimmension( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    pcad_dimmension_t    *Dimmension = (pcad_dimmension_t*)Argument;
+	{
+	pcad_dimmension_t	*Dimmension = (pcad_dimmension_t*)Argument;
 
-    *Dimmension = GetDimmension( Cookie );
+	*Dimmension = GetDimmension( Cookie );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 pcad_boolean_t GetBoolean( cookie_t *Cookie )
 	{
-	char    Buffer[BUFFER_SIZE];
+	char	Buffer[BUFFER_SIZE];
 
 	if( GetToken( Cookie, Buffer, sizeof Buffer ) != TOKEN_NAME )
 		Error( Cookie, -1, "Expecting boolean value" );
@@ -205,37 +202,37 @@ pcad_boolean_t GetBoolean( cookie_t *Cookie )
 	}
 /*============================================================================*/
 int ParseBoolean( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    pcad_boolean_t  *Boolean    = (pcad_unsigned_t*)Argument;
+	{
+	pcad_boolean_t	*Boolean	= (pcad_unsigned_t*)Argument;
 
-    *Boolean    = GetBoolean( Cookie );
+	*Boolean	= GetBoolean( Cookie );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 uint32_t GetUnsigned( cookie_t *Cookie )
 	{
-    char        Buffer[BUFFER_SIZE], *p = Buffer;
-    uint32_t    Value   = 0;
-    token_t     Token   = GetToken( Cookie, Buffer, sizeof Buffer );
+	char		Buffer[BUFFER_SIZE], *p = Buffer;
+	uint32_t	Value	= 0;
+	token_t		Token	= GetToken( Cookie, Buffer, sizeof Buffer );
 
 	if( Token != TOKEN_UNSIGNED )
 		Error( Cookie, -1, "Expecting unsigned integer number" );
 
-    while( isdigit( *p ))
-        Value   = Value * 10 + *p++ - '0';
+	while( isdigit( *p ))
+		Value	= Value * 10 + *p++ - '0';
 
-    return Value;
+	return Value;
 	}
 /*============================================================================*/
 int ParseUnsigned( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    pcad_unsigned_t  *Unsigned    = (pcad_unsigned_t*)Argument;
+	{
+	pcad_unsigned_t	*Unsigned	= (pcad_unsigned_t*)Argument;
 
-    *Unsigned   = GetUnsigned( Cookie );
+	*Unsigned	= GetUnsigned( Cookie );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 int GetName( cookie_t *Cookie, char *Buffer, size_t BufferLength )
 	{
@@ -246,25 +243,25 @@ int GetName( cookie_t *Cookie, char *Buffer, size_t BufferLength )
 	}
 /*============================================================================*/
 int ParseEnum( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    char        	Buffer[BUFFER_SIZE];
-    pcad_unsigned_t	*Enum       = (pcad_unsigned_t*)Argument;
-    parseenum_t		*EnumStruct = (parseenum_t*)ParseStruct;
-    int         i;
+	{
+	char			Buffer[BUFFER_SIZE];
+	pcad_unsigned_t	*Enum		= (pcad_unsigned_t*)Argument;
+	parseenum_t		*EnumStruct = (parseenum_t*)ParseStruct;
+	int				i;
 
-    *Enum   = 0;
-    GetName( Cookie, Buffer, sizeof Buffer );
-    for( i = 0; i < EnumStruct->numitems; i++ )
+	*Enum	= 0;
+	GetName( Cookie, Buffer, sizeof Buffer );
+	for( i = 0; i < EnumStruct->numitems; i++ )
 		if( stricmp( Buffer, EnumStruct->items[i] ) == 0 )
 			{
-			*Enum   = i;
+			*Enum	= i;
 			return 0;
 			}
 
 	Warning( Cookie, "Unrecognized enumeration value \"%s\"", Buffer );
 
 	return 0;
-    }
+	}
 /*============================================================================*/
 int GetString( cookie_t *Cookie, char *Buffer, size_t BufferLength )
 	{
@@ -275,25 +272,25 @@ int GetString( cookie_t *Cookie, char *Buffer, size_t BufferLength )
 	}
 /*============================================================================*/
 char *StoreString( cookie_t *Cookie, const char *Buffer )
-    {
-    void    *Address;
-    size_t  size    = strlen( Buffer ) + 1;
+	{
+	void	*Address;
+	size_t	size	= strlen( Buffer ) + 1;
 
-    if( Cookie->HeapTop >= Cookie->HeapSize || Cookie->HeapTop + size >= Cookie->HeapSize )
+	if( Cookie->HeapTop >= Cookie->HeapSize || Cookie->HeapTop + size >= Cookie->HeapSize )
 		Error( Cookie, -1, "Not enough memory" );
 
-    Address = &Cookie->Heap[Cookie->HeapTop];
+	Address = &Cookie->Heap[Cookie->HeapTop];
 
-    memcpy( Address, Buffer, size );
+	memcpy( Address, Buffer, size );
 
-    Cookie->HeapTop += size;
+	Cookie->HeapTop += size;
 
-    return Address;
-    }
+	return Address;
+	}
 /*============================================================================*/
 char *GetAndStoreString( cookie_t *Cookie )
 	{
-    char    Buffer[BUFFER_SIZE];
+	char	Buffer[BUFFER_SIZE];
 
 	if( GetToken( Cookie, Buffer, sizeof Buffer ) != TOKEN_STRING )
 		Error( Cookie, -1, "Expecting quoted string" );
@@ -302,47 +299,47 @@ char *GetAndStoreString( cookie_t *Cookie )
 	}
 /*============================================================================*/
 int ParseName( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    char    Buffer[256];
+	{
+	char	Buffer[256];
 	char	**p	= (char**)Argument;
 
-    GetName( Cookie, Buffer, sizeof Buffer );
+	GetName( Cookie, Buffer, sizeof Buffer );
 
-    if( p != NULL )
-        *p  = StoreString( Cookie, Buffer );
+	if( p != NULL )
+		*p	= StoreString( Cookie, Buffer );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 int ParseString( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    char    Buffer[256];
+	{
+	char	Buffer[256];
 	char	**p	= (char**)Argument;
 
-    GetString( Cookie, Buffer, sizeof Buffer );
+	GetString( Cookie, Buffer, sizeof Buffer );
 
-    if( p != NULL )
-        *p  = StoreString( Cookie, Buffer );
+	if( p != NULL )
+		*p	= StoreString( Cookie, Buffer );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 void *Allocate( cookie_t *Cookie, size_t size )
-    {
-    void    *Address;
+	{
+	void	*Address;
 
 	if( Cookie->HeapTop >= Cookie->HeapSize || Cookie->HeapTop + size >= Cookie->HeapSize )
 		Error( Cookie, -1, "Not enough memory" );
 
-	Cookie->HeapTop = ( Cookie->HeapTop + sizeof( void* ) - 1 ) & -sizeof( void* );
-	Address = &Cookie->Heap[ Cookie->HeapTop ];
+	Cookie->HeapTop	= ( Cookie->HeapTop + sizeof( void* ) - 1 ) & -sizeof( void* );
+	Address			= &Cookie->Heap[ Cookie->HeapTop ];
 
 	memset( Address, 0x00, size );
 
 	Cookie->HeapTop += size;
 
 	return Address;
-    }
+	}
 /*============================================================================*/
 token_t ExpectToken( cookie_t *Cookie, token_t tk )
 	{
@@ -360,11 +357,8 @@ int SkipAll( cookie_t *Cookie )
 	Token	= GetToken( Cookie, Buffer, sizeof Buffer );
 	do
 		{
-		if( Token == TOKEN_OPEN_PAR )
-			{
-			if( SkipAll( Cookie ) < RESULT_OK )
-				Error( Cookie, -1, "Unknown error" );
-			}
+		if( Token == TOKEN_OPEN_PAR && SkipAll( Cookie ) < RESULT_OK )
+			Error( Cookie, -1, "Unknown error" );
 		Token	= GetToken( Cookie, Buffer, sizeof Buffer );
 		}
 	while( Token != TOKEN_CLOSE_PAR && Token != TOKEN_INVALID && Token != TOKEN_EOF );
@@ -382,130 +376,128 @@ static const char Bkpt[]	= "schematicPrintSettings";
 #endif	/*	defined BREAKPOINT */
 /*============================================================================*/
 int ParseGeneric( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
-    {
-    char    Buffer[256];
-    void    *Object;
-	int     i;
+	{
+	char	Buffer[256];
+	void	*Object;
+	int		i;
 
 //	fprintf( stderr, "(%u,%u)", Cookie->LineNumber, Cookie->Column );
 	if( ParseStruct == NULL )
 		Error( Cookie, -1, "Internal error, \"ParseStruct\" is NULL" );
 
 	if( ParseField != NULL && ParseField->Length > 0 )
-        {
-        void    ***Parent;
+		{
+		void	***Parent;
 
-        Object      = Allocate( Cookie, ParseField->Length );
-        Parent      = Argument;
-        **Parent    = Object;
-        if( ParseStruct != NULL && ParseStruct->OffsetNext >= 0 )
-            *Parent = (void*)( (char*)Object + ParseStruct->OffsetNext );
-        }
-    else
-        Object  = Argument;
+		Object		= Allocate( Cookie, ParseField->Length );
+		Parent		= Argument;
+		**Parent	= Object;
+		if( ParseStruct != NULL && ParseStruct->OffsetNext >= 0 )
+			*Parent = (void*)( (char*)Object + ParseStruct->OffsetNext );
+		}
+	else
+		Object	= Argument;
 
 	/* Initialize all the lists of this object. */
-    if( ParseStruct->NumLists > 0 && ParseStruct->Lists != NULL )
-        {
-        for( i = 0; i < ParseStruct->NumLists; i++ )
-            {
-            const listhead_t *List  = &ParseStruct->Lists[i];
-            *(void**)( (char*)Object + List->OffsetHead )   = NULL;
-            *(void**)( (char*)Object + List->OffsetLink )   = (void*)( (char*)Object + List->OffsetHead );
-            }
-        }
+	if( ParseStruct->NumLists > 0 && ParseStruct->Lists != NULL )
+		{
+		for( i = 0; i < ParseStruct->NumLists; i++ )
+			{
+			const listhead_t *List	= &ParseStruct->Lists[i];
+			*(void**)( (char*)Object + List->OffsetHead )	= NULL;
+			*(void**)( (char*)Object + List->OffsetLink )	= (void*)( (char*)Object + List->OffsetHead );
+			}
+		}
 
-    /* Process all the fixed fields of this object. */
+	/* Process all the fixed fields of this object. */
 	if( ParseStruct->NumFixedFields > 0 && ParseStruct->FixedFields != NULL )
 		{
 		for( i = 0; i < ParseStruct->NumFixedFields; i++ )
 			{
-			const parsefield_t   *Field	= &ParseStruct->FixedFields[i];
+			const parsefield_t	*Field	= &ParseStruct->FixedFields[i];
 
 			if( Field->Flags & FLAG_WRAPPED )
-                {
-                ExpectToken( Cookie, TOKEN_OPEN_PAR );
-                GetName( Cookie, Buffer, sizeof Buffer );
+				{
+				ExpectToken( Cookie, TOKEN_OPEN_PAR );
+				GetName( Cookie, Buffer, sizeof Buffer );
 
 #if			defined BREAKPOINT
-                if( stricmp( Bkpt, Buffer ) == 0 )
+				if( stricmp( Bkpt, Buffer ) == 0 )
 					asm volatile( "int3" );
 #endif	/*	defined BREAKPOINT */
 
-                if( Field->TagString != NULL && strcmp( Buffer, Field->TagString ) != 0 )
-                    Error( Cookie, -1, "Expecting name" );
-                Field->ParseFunc( Cookie, Field, Field->ParseStruct, Field->Offset < 0 ? NULL : (char*)Object + Field->Offset );
-                ExpectToken( Cookie, TOKEN_CLOSE_PAR );
-                }
-            else
-                Field->ParseFunc( Cookie, Field, Field->ParseStruct, Field->Offset < 0 ? NULL : (char*)Object + Field->Offset );
+				if( Field->TagString != NULL && strcmp( Buffer, Field->TagString ) != 0 )
+					Error( Cookie, -1, "Expecting name" );
+				Field->ParseFunc( Cookie, Field, Field->ParseStruct, Field->Offset < 0 ? NULL : (char*)Object + Field->Offset );
+				ExpectToken( Cookie, TOKEN_CLOSE_PAR );
+				}
+			else
+				Field->ParseFunc( Cookie, Field, Field->ParseStruct, Field->Offset < 0 ? NULL : (char*)Object + Field->Offset );
 			}
 		}
 
 	if( ParseStruct->NumFields > 0 && ParseStruct->Fields != NULL )
 		{
-        token_t Token;
+		token_t Token;
 
-        while(( Token = GetToken( Cookie, Buffer, sizeof Buffer )) == TOKEN_OPEN_PAR )
-            {
-            if(( Token = GetToken( Cookie, Buffer, sizeof Buffer )) != TOKEN_NAME )
-                Error( Cookie, -1, "Expecting tag at" );
+		while(( Token = GetToken( Cookie, Buffer, sizeof Buffer )) == TOKEN_OPEN_PAR )
+			{
+			if(( Token = GetToken( Cookie, Buffer, sizeof Buffer )) != TOKEN_NAME )
+				Error( Cookie, -1, "Expecting tag at" );
 
 #if			defined BREAKPOINT
 			if( stricmp( Bkpt, Buffer ) == 0 )
 				asm volatile( "int3" );
 #endif	/*	defined BREAKPOINT */
 
-            for( i = 0; i < ParseStruct->NumFields && (( ParseStruct->Fields[i].Flags & FLAG_CASESENSITIVE ) ? ( strcmp( Buffer, ParseStruct->Fields[i].TagString ) != 0 ) : ( stricmp( Buffer, ParseStruct->Fields[i].TagString ) != 0 )); i++ )
-                {}
+			for( i = 0; i < ParseStruct->NumFields && (( ParseStruct->Fields[i].Flags & FLAG_CASESENSITIVE ) ? ( strcmp( Buffer, ParseStruct->Fields[i].TagString ) != 0 ) : ( stricmp( Buffer, ParseStruct->Fields[i].TagString ) != 0 )); i++ )
+				{}
 
-            if( i < ParseStruct->NumFields )
-                {
-                const parsefield_t   *Field  = &ParseStruct->Fields[i];
-                Field->ParseFunc( Cookie, Field, Field->ParseStruct, Field->Offset < 0 ? NULL : (char*)Object + Field->Offset );
-                ExpectToken( Cookie, TOKEN_CLOSE_PAR );
-                }
-            else
-                {
-                Warning( Cookie, "Skipping \"%s\"", Buffer );
-                SkipAll( Cookie );
-                }
-            }
-        UngetToken( Cookie, Token, Buffer );
+			if( i < ParseStruct->NumFields )
+				{
+				const parsefield_t	*Field	= &ParseStruct->Fields[i];
+				Field->ParseFunc( Cookie, Field, Field->ParseStruct, Field->Offset < 0 ? NULL : (char*)Object + Field->Offset );
+				ExpectToken( Cookie, TOKEN_CLOSE_PAR );
+				}
+			else
+				{
+				Warning( Cookie, "Skipping \"%s\"", Buffer );
+				SkipAll( Cookie );
+				}
+			}
+		UngetToken( Cookie, Token, Buffer );
 		}
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/
 int Error( cookie_t *Cookie, int ErrorCode, const char *Message, ... )
-    {
-    va_list ap;
+	{
+	va_list ap;
 
-    va_start( ap, Message );
+	va_start( ap, Message );
 
-    fprintf( stderr, "Error in line %u column %u: ", Cookie->LineNumber, Cookie->Column );
-    vfprintf( stderr, Message, ap );
-    fprintf( stderr, "\n" );
+	fprintf( stderr, "Error in line %u column %u: ", Cookie->LineNumber, Cookie->Column );
+	vfprintf( stderr, Message, ap );
+	fprintf( stderr, "\n" );
 
-    va_end( ap );
+	va_end( ap );
 
-
-    longjmp( Cookie->JumpBuffer, ErrorCode );
-
-    }
+	longjmp( Cookie->JumpBuffer, ErrorCode );
+	}
 /*============================================================================*/
 int Warning( cookie_t *Cookie, const char *Message, ... )
-    {
-    va_list ap;
+	{
+	va_list ap;
 
-    va_start( ap, Message );
+	va_start( ap, Message );
 
-    fprintf( stderr, "Warning in line %u column %u: ", Cookie->LineNumber, Cookie->Column );
-    vfprintf( stderr, Message, ap );
-    fprintf( stderr, "\n" );
+	fprintf( stderr, "Warning in line %u column %u: ", Cookie->LineNumber, Cookie->Column );
+	vfprintf( stderr, Message, ap );
+	fprintf( stderr, "\n" );
 
-    va_end( ap );
+	va_end( ap );
 
-    return 0;
-    }
+	return 0;
+	}
 /*============================================================================*/

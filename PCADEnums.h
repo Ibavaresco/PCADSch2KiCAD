@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -30,48 +30,48 @@
 /*============================================================================*/
 /*============================================================================*/
 typedef struct
-    {
-    size_t  numitems;
-    char    *items[];
-    } parseenum_t;
+	{
+	size_t	numitems;
+	char	*items[];
+	} parseenum_t;
 /*============================================================================*/
 /*============================================================================*/
 typedef enum
-    {
-    PCAD_BOOLEAN_ABSENT,
-    PCAD_BOOLEAN_FALSE,
-    PCAD_BOOLEAN_TRUE
-    } pcad_boolean_t;
+	{
+	PCAD_BOOLEAN_ABSENT,
+	PCAD_BOOLEAN_FALSE,
+	PCAD_BOOLEAN_TRUE
+	} pcad_boolean_t;
 /*============================================================================*/
 typedef enum
-    {
-    PCAD_UNITS_NONE,
-    PCAD_UNITS_MM,
-    PCAD_UNITS_MIL,
-    PCAD_UNITS_IN
-    } pcad_units_t;
+	{
+	PCAD_UNITS_NONE,
+	PCAD_UNITS_MM,
+	PCAD_UNITS_MIL,
+	PCAD_UNITS_IN
+	} pcad_units_t;
 /*============================================================================*/
 typedef enum
-    {
+	{
 	PCAD_NOTEANNOTATION_NONE,
 	PCAD_NOTEANNOTATION_BOX,
 	PCAD_NOTEANNOTATION_CIRCLE,
 	PCAD_NOTEANNOTATION_TRIANGLE
-    } pcad_noteannotation_t;
+	} pcad_noteannotation_t;
 /*============================================================================*/
 typedef enum
-    {
-    PCAD_CONSTRAINTUNITS_NONE,
-    PCAD_CONSTRAINTUNITS_MM,
-    PCAD_CONSTRAINTUNITS_MIL,
-    PCAD_CONSTRAINTUNITS_IN,
-    PCAD_CONSTRAINTUNITS_BOOL,
-    PCAD_CONSTRAINTUNITS_DEGREE,
-    PCAD_CONSTRAINTUNITS_LAYERNAME,
-    PCAD_CONSTRAINTUNITS_QUANTITY,
-    PCAD_CONSTRAINTUNITS_STRING,
-    PCAD_CONSTRAINTUNITS_VIASTYLE
-    } pcad_constraintunits_t;
+	{
+	PCAD_CONSTRAINTUNITS_NONE,
+	PCAD_CONSTRAINTUNITS_MM,
+	PCAD_CONSTRAINTUNITS_MIL,
+	PCAD_CONSTRAINTUNITS_IN,
+	PCAD_CONSTRAINTUNITS_BOOL,
+	PCAD_CONSTRAINTUNITS_DEGREE,
+	PCAD_CONSTRAINTUNITS_LAYERNAME,
+	PCAD_CONSTRAINTUNITS_QUANTITY,
+	PCAD_CONSTRAINTUNITS_STRING,
+	PCAD_CONSTRAINTUNITS_VIASTYLE
+	} pcad_constraintunits_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -90,11 +90,11 @@ typedef enum
 	PCAD_IEEESYMBOL_HYSTERESIS,
 	PCAD_IEEESYMBOL_MULTIPLIER,
 	PCAD_IEEESYMBOL_ASTABLE
-    } pcad_enum_ieeesymbol_t;
+	} pcad_enum_ieeesymbol_t;
 /*============================================================================*/
 typedef enum
 	{
-	PCAD_JUSTIFY_LOWERLEFT,   	/* Note: "LowerLeft" doesn't exist, it is the default by omission. */
+	PCAD_JUSTIFY_LOWERLEFT,		/* Note: "LowerLeft" doesn't exist, it is the default by omission. */
 	PCAD_JUSTIFY_LOWERCENTER,
 	PCAD_JUSTIFY_LOWERRIGHT,
 	PCAD_JUSTIFY_LEFT,
@@ -134,7 +134,7 @@ typedef enum
 	PCAD_PORTTYPE_RIGHTANGLE_SGL_VERT,
 	PCAD_PORTTYPE_BOTHANGLE_SGL_VERT,
 	PCAD_PORTTYPE_VERTLINE_SGL_VERT,
-	PCAD_PORTTYPE_NOOUTLINE_SGL_VERT,   /* Up to here, it is possible to replace a P-CAD port with a KiCAD one without losing conectivity. */
+	PCAD_PORTTYPE_NOOUTLINE_SGL_VERT,	/* Up to here, it is possible to replace a P-CAD port with a KiCAD one without losing conectivity. */
 
 	PCAD_PORTTYPE_NOANGLE_DBL_HORZ,
 	PCAD_PORTTYPE_LEFTANGLE_DBL_HORZ,
@@ -321,10 +321,10 @@ extern const parseenum_t	ReportDestinations;
 extern const parseenum_t	ReportPropertyTypes;
 extern const parseenum_t	NoteAnnotations;
 extern const parseenum_t	Tokens;
-extern const parseenum_t    ConstraintUnits;
+extern const parseenum_t	ConstraintUnits;
 extern const parseenum_t	Orients;
-extern const parseenum_t    Units;
-extern const parseenum_t   	IEEESymbols;
+extern const parseenum_t	Units;
+extern const parseenum_t	IEEESymbols;
 extern const parseenum_t	Justify;
 /*----------------------------------------------------------------------------*/
 extern const parseenum_t	LineStyles;
@@ -333,19 +333,19 @@ extern const parseenum_t	EndStyles;
 extern const parseenum_t	PortTypes;
 extern const parseenum_t	PortPinLengths;
 /*----------------------------------------------------------------------------*/
-extern const parseenum_t    PinType;
+extern const parseenum_t	PinType;
 extern const parseenum_t	InsideStyle;
 extern const parseenum_t	InsideEdgeStyle;
 extern const parseenum_t	OutsideEdgeStyle;
-extern const parseenum_t    OutsideStyle;
+extern const parseenum_t	OutsideStyle;
 /*----------------------------------------------------------------------------*/
-extern const parseenum_t    FontType;
+extern const parseenum_t	FontType;
 /*----------------------------------------------------------------------------*/
-extern const parseenum_t    NumType;
-extern const parseenum_t    NumDirection;
-extern const parseenum_t    Composition;
-extern const parseenum_t    CompType;
-extern const parseenum_t    PageSize;
+extern const parseenum_t	NumType;
+extern const parseenum_t	NumDirection;
+extern const parseenum_t	Composition;
+extern const parseenum_t	CompType;
+extern const parseenum_t	PageSize;
 /*============================================================================*/
 #endif	/*	!defined __PCADENUMS_H__ */
 /*============================================================================*/

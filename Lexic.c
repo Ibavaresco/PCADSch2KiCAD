@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,12 +27,12 @@
 #include <ctype.h>
 #include "Lexic.h"
 /*============================================================================*/
-static int	GetChar( cookie_t *Cookie )
+static int GetChar( cookie_t *Cookie )
 	{
 	return fgetc( Cookie->File );
 	}
 /*============================================================================*/
-static int	UngetChar( cookie_t *Cookie, int c )
+static int UngetChar( cookie_t *Cookie, int c )
 	{
 	return ungetc( c, Cookie->File );
 	}
@@ -42,13 +42,13 @@ token_t GetToken( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 	int	c;
 
 	if( Cookie->UngettedToken != TOKEN_NONE )
-        {
-        token_t Temp    = Cookie->UngettedToken;
-        if( Buffer != NULL )
-            strncpy( Buffer, Cookie->UngetBuffer, BufferSize );
-        Cookie->UngettedToken   = TOKEN_NONE;
-        return Temp;
-        }
+		{
+		token_t Temp	= Cookie->UngettedToken;
+		if( Buffer != NULL )
+			strncpy( Buffer, Cookie->UngetBuffer, BufferSize );
+		Cookie->UngettedToken	= TOKEN_NONE;
+		return Temp;
+		}
 
 	do
 		{
@@ -62,7 +62,7 @@ token_t GetToken( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 				c	= GetChar( Cookie );
 				if( c != '\n' )
 					{
-					UngetChar(  Cookie, c );
+					UngetChar(	Cookie, c );
 					c	= '\r';
 					}
 				Cookie->LineNumber++;
@@ -100,28 +100,28 @@ token_t GetToken( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 		case ')':
 			Cookie->Column++;
 			return TOKEN_CLOSE_PAR;
-        case EOF:
-            return TOKEN_EOF;
+		case EOF:
+			return TOKEN_EOF;
 		}
 
 	if( c == '"' )
 		{
 		int Length;
-        Cookie->Column++;
+		Cookie->Column++;
 		for( Length = 0, c = GetChar( Cookie ); c != '\r' && c != '\n' && c != EOF && c != '"'; c = GetChar( Cookie ) )
 			{
 			Cookie->Column++;
 #if 0
 			if( c == '\\' )
-                {
-                c = GetChar( Cookie );
-                if( Buffer != NULL && c != '\"' && c != '\\' && Length < BufferSize - 1 )
-                    {
-                    *Buffer++	= '\\';
-                    Length++;
-                    }
-                Cookie->Column++;
-                }
+				{
+				c = GetChar( Cookie );
+				if( Buffer != NULL && c != '\"' && c != '\\' && Length < BufferSize - 1 )
+					{
+					*Buffer++	= '\\';
+					Length++;
+					}
+				Cookie->Column++;
+				}
 #endif
 			if( Buffer != NULL && Length < BufferSize - 1 )
 				{
@@ -129,7 +129,7 @@ token_t GetToken( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 				Length++;
 				}
 			}
-        Cookie->Column++;
+		Cookie->Column++;
 		Buffer != NULL && ( *Buffer	= '\0' );
 		if( c != '"' )
 			return TOKEN_INVALID;
@@ -159,18 +159,18 @@ token_t GetToken( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 
 	if( isdigit( c ) || c == '+' || c == '-' )
 		{
-		int	Length  = 0;
-        int Signed  = c == '+' || c == '-';
-        int Float   = 0;
+		int	Length	= 0;
+		int Signed	= c == '+' || c == '-';
+		int Float	= 0;
 
 		do
 			{
-            if( c == '.' || c == ',' )
-                {
-                if( Float != 0 )
-                    longjmp( Cookie->JumpBuffer, -1 );
-                Float = 1;
-                }
+			if( c == '.' || c == ',' )
+				{
+				if( Float != 0 )
+					longjmp( Cookie->JumpBuffer, -1 );
+				Float = 1;
+				}
 
 			if( Buffer != NULL && Length < BufferSize - 1 )
 				{
@@ -191,12 +191,12 @@ token_t GetToken( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 	}
 /*============================================================================*/
 void UngetToken( cookie_t *Cookie, token_t Token, const char *TokenString )
-    {
-    if( TokenString != NULL )
-        strncpy( Cookie->UngetBuffer, TokenString, sizeof Cookie->UngetBuffer );
-    else
-        Cookie->UngetBuffer[0]  = '\0';
+	{
+	if( TokenString != NULL )
+		strncpy( Cookie->UngetBuffer, TokenString, sizeof Cookie->UngetBuffer );
+	else
+		Cookie->UngetBuffer[0]	= '\0';
 
-    Cookie->UngettedToken   = Token;
-    }
+	Cookie->UngettedToken	= Token;
+	}
 /*============================================================================*/

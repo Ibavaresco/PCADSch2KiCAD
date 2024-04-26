@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -23,7 +23,7 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /*============================================================================*/
-#if         !defined __OUTPUTKICAD_H__
+#if			!defined __OUTPUTKICAD_H__
 #define __OUTPUTKICAD_H__
 /*=============================================================================*/
 #include "PCADStructs.h"
@@ -31,5 +31,5 @@
 /*=============================================================================*/
 int OutputKiCAD ( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const char *Name );
 /*=============================================================================*/
-#endif  /*  !defined __OUTPUTKICAD_H__ */
+#endif	/*	!defined __OUTPUTKICAD_H__ */
 /*=============================================================================*/

@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,7 +37,7 @@
 /*===========================================================================*/
 typedef enum
 	{
-	TOKEN_NONE      = EOF - 2,
+	TOKEN_NONE		= EOF - 2,
 	TOKEN_INVALID	= EOF - 1,
 	TOKEN_EOF		= EOF,
 	RESULT_OK,
@@ -61,8 +61,8 @@ typedef struct
 	size_t			HeapTop;
 	uint8_t			*Heap;
 	pcad_units_t	FileUnits;
-	token_t  		UngettedToken;
-	char     		UngetBuffer[BUFFER_SIZE];
+	token_t			UngettedToken;
+	char			UngetBuffer[BUFFER_SIZE];
 	int				Sort;
 	} cookie_t;
 /*===========================================================================*/

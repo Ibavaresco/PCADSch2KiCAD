@@ -5,11 +5,11 @@
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
-     * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
-     * Neither the name of the author nor the
-       names of its contributors may be used to endorse or promote products
-       derived from this software without specific prior written permission.
+	 * Redistributions of source code must retain the above copyright
+	   notice, this list of conditions and the following disclaimer.
+	 * Neither the name of the author nor the
+	   names of its contributors may be used to endorse or promote products
+	   derived from this software without specific prior written permission.
 
  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -33,66 +33,66 @@
 #include "Parser.h"
 /*=============================================================================*/
 typedef struct
-    {
+	{
 	cookie_t			*Cookie;
-    FILE				*File;
-    } parameters_t;
+	FILE				*File;
+	} parameters_t;
 /*=============================================================================*/
 static int FormatReal( const parameters_t *Params, unsigned FracDigs, pcad_dimmension_t Origin, pcad_real_t Scale, pcad_real_t v, char *Buffer, size_t BufferSize )
-    {
-    int         Sign;
-    uint32_t    Int;
-    uint32_t    Frac;
-    int         Res, Dig;
+	{
+	int			Sign;
+	uint32_t	Int;
+	uint32_t	Frac;
+	int			Res, Dig;
 
-    if( Scale < 0 )
-        v       = Origin - v;
-    else
-        v       = v - Origin;
+	if( Scale < 0 )
+		v	= Origin - v;
+	else
+		v	= v - Origin;
 
-    Sign    = v < 0;
+	Sign	= v < 0;
 
-    Int     = abs( v ) / 1000000ul;
-    Frac    = abs( v ) % 1000000ul;
+	Int		= abs( v ) / 1000000ul;
+	Frac	= abs( v ) % 1000000ul;
 
 	for( Dig = 6; Dig > 1 && Dig > FracDigs && Frac % 10 == 0 /*&& Frac >= 100*/; Dig-- )
 		Frac /= 10;
 
-    Res = snprintf( Buffer, BufferSize, "%s%u.%0*u", Sign ? "-" : "", Int, Dig, Frac );
-    if( Res <= 0 || Res >= BufferSize )
-        Error( Params->Cookie, -1, "Invalid number" );
+	Res		= snprintf( Buffer, BufferSize, "%s%u.%0*u", Sign ? "-" : "", Int, Dig, Frac );
+	if( Res <= 0 || Res >= BufferSize )
+		Error( Params->Cookie, -1, "Invalid number" );
 
-    return Res;
-    }
+	return Res;
+	}
 /*=============================================================================*/
 static int __attribute__((format(printf, 3, 4))) OutputToFile( const parameters_t *Params, unsigned Level, const char *s, ... )
-    {
-    va_list ap;
-    int     CharsWritten;
+	{
+	va_list	ap;
+	int		CharsWritten;
 
-    va_start( ap, s );
+	va_start( ap, s );
 
-    fprintf( Params->File, "%.*s", Level, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" );
-    CharsWritten    = vfprintf( Params->File, s, ap );
+	fprintf( Params->File, "%.*s", Level, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" );
+	CharsWritten	= vfprintf( Params->File, s, ap );
 
-    va_end( ap );
+	va_end( ap );
 
-    return CharsWritten + Params->Cookie->TabSize * Level;
-    }
+	return CharsWritten + Params->Cookie->TabSize * Level;
+	}
 /*=============================================================================*/
 #if 0
 static void Rotate( pcad_dimmension_t *xRes, pcad_dimmension_t *yRes, const pcad_dimmension_t *x, const pcad_dimmension_t *y, pcad_dimmension_t xc, pcad_dimmension_t yc, float_t angle )
-    {
-    double  sinA, cosA;
-    double  dX, dY;
+	{
+	double	sinA, cosA;
+	double	dX, dY;
 
-    sincos( angle / 1.0e6, &sinA, &cosA );
-    dX  = ( *( x != NULL ? x : xRes ) - xc ) / 1.0e6;
-    dY  = ( *( y != NULL ? y : yRes ) - yc ) / 1.0e6;
+	sincos( angle / 1.0e6, &sinA, &cosA );
+	dX		= ( *( x != NULL ? x : xRes ) - xc ) / 1.0e6;
+	dY		= ( *( y != NULL ? y : yRes ) - yc ) / 1.0e6;
 
-    *xRes  = (int)(( dX * cosA - dY * sinA ) * 1.0e6 ) + xc;   //10000 ) * 100 + xc;
-    *yRes  = (int)(( dY * cosA + dX * sinA ) * 1.0e6 ) + yc;   //10000 ) * 100 + yc;
-    }
+	*xRes	= (int)(( dX * cosA - dY * sinA ) * 1.0e6 ) + xc;	//10000 ) * 100 + xc;
+	*yRes	= (int)(( dY * cosA + dX * sinA ) * 1.0e6 ) + yc;	//10000 ) * 100 + yc;
+	}
 #endif
 /*=============================================================================*/
 /*=============================================================================*/
@@ -102,7 +102,7 @@ static int OutputFont( parameters_t *Params, int Level, const pcad_font_t *Font 
 	{
 	char	Buffer[32];
 
-	OutputToFile( Params, Level,	 "(font\r\n" );
+	OutputToFile( Params, Level,	"(font\r\n" );
 
 	OutputToFile( Params, Level + 1, "(fontType %s)\r\n", FontType.items[Font->fonttype%FontType.numitems] );
 	OutputToFile( Params, Level + 1, "(fontFamily %s)\r\n", Font->fontfamily );
@@ -124,7 +124,7 @@ static int OutputFont( parameters_t *Params, int Level, const pcad_font_t *Font 
 		OutputToFile( Params, Level + 1, "(fontPitchAndFamily %u)\r\n", Font->fontpitchandfamily );
 		}
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -133,7 +133,7 @@ static int OutputTextStyleDef( parameters_t *Params, int Level, const pcad_texts
 	{
 	int	i;
 
-	OutputToFile( Params, Level,	 "(textStyleDef \"%s\"\r\n", TextStyleDef->name );
+	OutputToFile( Params, Level,	"(textStyleDef \"%s\"\r\n", TextStyleDef->name );
 
 	for( i = 0; i < TextStyleDef->numfonts; i++ )
 		OutputFont( Params, Level + 1, TextStyleDef->viofonts[i] );
@@ -142,7 +142,7 @@ static int OutputTextStyleDef( parameters_t *Params, int Level, const pcad_texts
 
 	OutputToFile( Params, Level + 1, "(textStyleDisplayTType %s)\r\n", TextStyleDef->displayttype == PCAD_BOOLEAN_TRUE ? "True" : "False" );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -218,21 +218,21 @@ static int OutputPin( parameters_t *Params, int Level, const pcad_pin_t *Pin )
 
 	FormatReal( Params, 0, 0, 1, Pin->point.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Pin->point.y, y, sizeof y );
-	OutputToFile( Params, Level,	 "(pin (pinNum %u) (pt %s %s)", Pin->pinnum, x, y );
+	OutputToFile( Params, Level,	"(pin (pinNum %u) (pt %s %s)", Pin->pinnum, x, y );
 
 	if( Pin->rotation > 0 )
 		{
 		FormatReal( Params, 0, 0, 1, Pin->rotation, x, sizeof x );
-		OutputToFile( Params, 0,	 " (rotation %s)", x );
+		OutputToFile( Params, 0,	" (rotation %s)", x );
 		}
 
 	if( Pin->isflipped == PCAD_BOOLEAN_TRUE )
-		OutputToFile( Params, 0,	 " (isFlipped True)" );
+		OutputToFile( Params, 0,	" (isFlipped True)" );
 
 	if( Pin->pinlength != 7620000000 && Pin->pinlength != 0 )
 		{
 		FormatReal( Params, 0, 0, 1, Pin->pinlength, x, sizeof x );
-		OutputToFile( Params, 0,	 " (pinLength %s)", x );
+		OutputToFile( Params, 0,	" (pinLength %s)", x );
 		}
 
 	OutputToFile( Params, 0, "\r\n" );
@@ -263,21 +263,21 @@ static int OutputPin( parameters_t *Params, int Level, const pcad_pin_t *Pin )
 	if( Pin->defaultpindes != NULL )
 		OutputToFile( Params, Level + 1, "(defaultPinDes \"%s\")\r\n", Pin->defaultpindes );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
 /*=============================================================================*/
 static int OutputLine( const parameters_t *Params, unsigned Level, pcad_line_t *Line )
-    {
-	char    x1[32], y1[32], x2[32], y2[32];
+	{
+	char	x1[32], y1[32], x2[32], y2[32];
 
 	FormatReal( Params, 0, 0, 1, Line->pt1.x, x1, sizeof x1 );
 	FormatReal( Params, 0, 0, 1, Line->pt1.y, y1, sizeof y1 );
 	FormatReal( Params, 0, 0, 1, Line->pt2.x, x2, sizeof x2 );
 	FormatReal( Params, 0, 0, 1, Line->pt2.y, y2, sizeof y2 );
 
-	OutputToFile( Params, Level,	 "(line (pt %s %s) (pt %s %s)", x1, y1, x2, y2 );
+	OutputToFile( Params, Level,	"(line (pt %s %s) (pt %s %s)", x1, y1, x2, y2 );
 
 	if( Line->width != 0 )
 		{
@@ -293,26 +293,26 @@ static int OutputLine( const parameters_t *Params, unsigned Level, pcad_line_t *
 
 	OutputToFile( Params, 0, ")\r\n" );
 
-    return 0;
-    }
+	return 0;
+	}
 /*=============================================================================*/
 static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepointarc_t *Arc )
-    {
-    char    x[32], y[32];
+	{
+	char	x[32], y[32];
 
 	FormatReal( Params, 0, 0, 1, Arc->point1.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Arc->point1.y, y, sizeof y );
-    OutputToFile( Params, Level, "(triplePointArc (pt %s %s)", x, y );
+	OutputToFile( Params, Level, "(triplePointArc (pt %s %s)", x, y );
 
 	FormatReal( Params, 0, 0, 1, Arc->point2.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Arc->point2.y, y, sizeof y );
-    OutputToFile( Params, 0,	 " (pt %s %s)", x, y );
+	OutputToFile( Params, 0,	" (pt %s %s)", x, y );
 
 	FormatReal( Params, 0, 0, 1, Arc->point3.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Arc->point3.y, y, sizeof y );
-    OutputToFile( Params, 0,	 " (pt %s %s)", x, y );
+	OutputToFile( Params, 0,	" (pt %s %s)", x, y );
 
-    if( Arc->width != 0 )
+	if( Arc->width != 0 )
 		{
 		FormatReal( Params, 0, 0, 1, Arc->width, x, sizeof x );
 		OutputToFile( Params, 0, " (width %s)", x );
@@ -320,47 +320,47 @@ static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepoi
 
 	OutputToFile( Params, 0, ")\r\n" );
 
-    return 0;
-    }
+	return 0;
+	}
 /*=============================================================================*/
 static int OutputIEEESymbol( const parameters_t *Params, unsigned Level, pcad_ieeesymbol_t *IEEESymbol )
-    {
-    char    x[32], y[32], Height[32];
+	{
+	char	x[32], y[32], Height[32];
 
 	FormatReal( Params, 0, 0, 1, IEEESymbol->point.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, IEEESymbol->point.y, y, sizeof y );
 	FormatReal( Params, 0, 0, 1, IEEESymbol->height, Height, sizeof Height );
-    OutputToFile( Params, Level, "(ieeeSymbol %s (pt %s %s) (height %s)%s)\r\n", IEEESymbols.items[IEEESymbol->type], x, y, Height, IEEESymbol->isflipped == PCAD_BOOLEAN_TRUE ? "(isFlipped True)" : "" );
+	OutputToFile( Params, Level, "(ieeeSymbol %s (pt %s %s) (height %s)%s)\r\n", IEEESymbols.items[IEEESymbol->type], x, y, Height, IEEESymbol->isflipped == PCAD_BOOLEAN_TRUE ? "(isFlipped True)" : "" );
 
-    return 0;
-    }
+	return 0;
+	}
 /*=============================================================================*/
 static int OutputPoly( const parameters_t *Params, unsigned Level, pcad_poly_t *Poly )
-    {
-    char    x[32], y[32];
-    int		i;
+	{
+	char	x[32], y[32];
+	int		i;
 
-    OutputToFile( Params, Level, "(poly\r\n" );
-    OutputToFile( Params, Level + 1, "" );
+	OutputToFile( Params, Level, "(poly\r\n" );
+	OutputToFile( Params, Level + 1, "" );
 
-    for( i = 0; i < Poly->numpoints; i++ )
+	for( i = 0; i < Poly->numpoints; i++ )
 		{
 		FormatReal( Params, 0, 0, 1, Poly->viopoints[i]->x, x, sizeof x );
 		FormatReal( Params, 0, 0, 1, Poly->viopoints[i]->y, y, sizeof y );
 		OutputToFile( Params, 0, " (pt %s %s)", x, y );
 		}
 
-    OutputToFile( Params, Level + 1, "\r\n" );
-    OutputToFile( Params, Level, ")\r\n" );
+	OutputToFile( Params, Level + 1, "\r\n" );
+	OutputToFile( Params, Level, ")\r\n" );
 
-    return 0;
-    }
+	return 0;
+	}
 /*=============================================================================*/
 static int OutputSymbolDef( parameters_t *Params, int Level, const pcad_symboldef_t *SymbolDef )
 	{
 	int		i;
 
-	OutputToFile( Params, Level,	 "(symbolDef \"%s\"\r\n", SymbolDef->name );
+	OutputToFile( Params, Level,	"(symbolDef \"%s\"\r\n", SymbolDef->name );
 
 	OutputToFile( Params, Level + 1, "(originalName \"%s\")\r\n", SymbolDef->originalname );
 
@@ -388,16 +388,16 @@ static int OutputSymbolDef( parameters_t *Params, int Level, const pcad_symbolde
 	for( i = 0; i < SymbolDef->numpolys; i++ )
 		OutputPoly( Params, Level + 1, SymbolDef->viopolys[i] );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
 /*=============================================================================*/
 static int OutputCompPin( parameters_t *Params, int Level, const pcad_comppin_t *CompPin )
 	{
-    OutputToFile( Params, Level, "(compPin \"%s\"", CompPin->name );
+	OutputToFile( Params, Level, "(compPin \"%s\"", CompPin->name );
 
-    if( CompPin->pinname != NULL )
+	if( CompPin->pinname != NULL )
 		OutputToFile( Params, 0, " (pinName \"%s\")", CompPin->pinname );
 
 	OutputToFile( Params, 0, " (partNum %u) (symPinNum %u) (gateEq %u) (pinEq %u)",
@@ -430,15 +430,15 @@ static int OutputAttachedPattern( parameters_t *Params, int Level, const pcad_at
 	{
 	int i;
 
-	OutputToFile( Params, Level,	 "(attachedPattern (patternNum %u) (patternName \"%s\")\r\n", AttachedPattern->patternnum, AttachedPattern->patternname );
-	OutputToFile( Params, Level + 1, 	"(numPads %u)\r\n", AttachedPattern->numpads );
+	OutputToFile( Params, Level,	"(attachedPattern (patternNum %u) (patternName \"%s\")\r\n", AttachedPattern->patternnum, AttachedPattern->patternname );
+	OutputToFile( Params, Level + 1,	"(numPads %u)\r\n", AttachedPattern->numpads );
 
-	OutputToFile( Params, Level + 1, 	"(padPinMap\r\n" );
+	OutputToFile( Params, Level + 1,	"(padPinMap\r\n" );
 	for( i = 0; i < AttachedPattern->numpadpinmaps; i++ )
 		OutputPadPinMap( Params, Level + 2, AttachedPattern->viopadpinmaps[i] );
-	OutputToFile( Params, Level + 1, 	")\r\n" );
+	OutputToFile( Params, Level + 1,	")\r\n" );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -446,31 +446,24 @@ static int OutputAttachedPattern( parameters_t *Params, int Level, const pcad_at
 static int OutputCompDef( parameters_t *Params, int Level, const pcad_compdef_t *CompDef )
 	{
 	int		i;
-/*
-	char                    		*name;
-	char                    		*originalname;
-	pcad_compheader_t       		compheader;
-	pcad_comppin_t          		*comppin;
-	pcad_attachedsymbol_t   		*attachedsymbol;
-	pcad_attachedpattern_t  		attachedpattern;
-*/
+
 	OutputToFile( Params, Level,	"(compDef \"%s\"\r\n", CompDef->name );
 	OutputToFile( Params, Level + 1,	"(originalName \"%s\")\r\n", CompDef->originalname );
 
 	OutputToFile( Params, Level + 1,	"(compHeader\r\n" );
-	OutputToFile( Params, Level + 2, 		"(sourceLibrary \"%s\")\r\n", CompDef->compheader.sourcelibrary );
+	OutputToFile( Params, Level + 2,		"(sourceLibrary \"%s\")\r\n", CompDef->compheader.sourcelibrary );
 
 	if( CompDef->compheader.comptype != PCAD_COMPTYPE_NORMAL )
-		OutputToFile( Params, Level + 2, 		"(compType %s)\r\n", CompType.items[CompDef->compheader.comptype] );
+		OutputToFile( Params, Level + 2,		"(compType %s)\r\n", CompType.items[CompDef->compheader.comptype] );
 
-	OutputToFile( Params, Level + 2, 		"(numPins %u)\r\n", CompDef->compheader.numpins );
-	OutputToFile( Params, Level + 2, 		"(numParts %u)\r\n", CompDef->compheader.numparts );
+	OutputToFile( Params, Level + 2,		"(numPins %u)\r\n", CompDef->compheader.numpins );
+	OutputToFile( Params, Level + 2,		"(numParts %u)\r\n", CompDef->compheader.numparts );
 
 	if( CompDef->compheader.composition == PCAD_COMPOSITION_HETEROGENEOUS )
-		OutputToFile( Params, Level + 2, 	"(composition Heterogeneous)\r\n" );
+		OutputToFile( Params, Level + 2,	"(composition Heterogeneous)\r\n" );
 
-	OutputToFile( Params, Level + 2, 		"(alts (ieeeAlt %s) (deMorganAlt %s))\r\n", CompDef->compheader.alts.ieeealt == PCAD_BOOLEAN_TRUE ? "True" : "False", CompDef->compheader.alts.demorganalt == PCAD_BOOLEAN_TRUE ? "True" : "False" );
-	OutputToFile( Params, Level + 2, 		"(refDesPrefix \"%s\")\r\n", CompDef->compheader.refdesprefix );
+	OutputToFile( Params, Level + 2,		"(alts (ieeeAlt %s) (deMorganAlt %s))\r\n", CompDef->compheader.alts.ieeealt == PCAD_BOOLEAN_TRUE ? "True" : "False", CompDef->compheader.alts.demorganalt == PCAD_BOOLEAN_TRUE ? "True" : "False" );
+	OutputToFile( Params, Level + 2,		"(refDesPrefix \"%s\")\r\n", CompDef->compheader.refdesprefix );
 	OutputToFile( Params, Level + 1,	")\r\n" );
 
 	for( i = 0; i < CompDef->numcomppins; i++ )
@@ -491,8 +484,8 @@ static int OutputLibrary( parameters_t *Params, int Level, const pcad_library_t 
 	{
 	int	i;
 
-	OutputToFile( Params, 0,		 "\r\n" );
-	OutputToFile( Params, Level,	 "(library \"%s\"\r\n", Library->name );
+	OutputToFile( Params, 0,		"\r\n" );
+	OutputToFile( Params, Level,	"(library \"%s\"\r\n", Library->name );
 
 	for( i = 0; i < Library->numtextstyledefs; i++ )
 		OutputTextStyleDef( Params, Level + 1, Library->viotextstyledefs[i] );
@@ -503,15 +496,15 @@ static int OutputLibrary( parameters_t *Params, int Level, const pcad_library_t 
 	for( i = 0; i < Library->numcompdefs; i++ )
 		OutputCompDef( Params, Level + 1, Library->viocompdefs[i] );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
 /*=============================================================================*/
 static int OutputASCIIHeader( parameters_t *Params, int Level, const pcad_asciiheader_t *ASCIIHeader )
 	{
-	OutputToFile( Params, 0,		 "\r\n" );
-	OutputToFile( Params, Level,	 "(asciiHeader\r\n" );
+	OutputToFile( Params, 0,		"\r\n" );
+	OutputToFile( Params, Level,	"(asciiHeader\r\n" );
 	OutputToFile( Params, Level + 1, "(asciiVersion %u %u)\r\n", ASCIIHeader->asciiversion.high, ASCIIHeader->asciiversion.low );
 	OutputToFile( Params, Level + 1, "(timeStamp %u %u %u %u %u %u)\r\n", ASCIIHeader->timestamp.year, ASCIIHeader->timestamp.month, ASCIIHeader->timestamp.day, ASCIIHeader->timestamp.hour, ASCIIHeader->timestamp.minute, ASCIIHeader->timestamp.second );
 	OutputToFile( Params, Level + 1, "(program \"%s\" \"%s\")\r\n", ASCIIHeader->program.name, ASCIIHeader->program.version );
@@ -520,7 +513,7 @@ static int OutputASCIIHeader( parameters_t *Params, int Level, const pcad_asciih
 	OutputToFile( Params, Level + 1, "(headerString \"%s\")\r\n", ASCIIHeader->headerstring );
 	OutputToFile( Params, Level + 1, "(fileUnits mm)\r\n" );
 	OutputToFile( Params, Level + 1, "(guidString \"%s\")\r\n", ASCIIHeader->guidstring );
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -529,7 +522,7 @@ static int OutputCompInst( parameters_t *Params, int Level, const pcad_compinst_
 	{
 	int	i;
 
-	OutputToFile( Params, Level,	 "(compInst \"%s\"\r\n", CompInst->name );
+	OutputToFile( Params, Level,	"(compInst \"%s\"\r\n", CompInst->name );
 
 	OutputToFile( Params, Level + 1, "(compRef \"%s\")\r\n", CompInst->compref );
 	OutputToFile( Params, Level + 1, "(originalName \"%s\")\r\n", CompInst->originalname );
@@ -543,14 +536,14 @@ static int OutputCompInst( parameters_t *Params, int Level, const pcad_compinst_
 	for( i = 0; i < CompInst->numattrs; i++ )
 		OutputAttr( 0, Params, Level + 1, CompInst->vioattrs[i] );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
 /*=============================================================================*/
 static int OutputNode( parameters_t *Params, int Level, const pcad_node_t *Node )
 	{
-	OutputToFile( Params, Level,	 "(node \"%s\" \"%s\")\r\n", Node->component, Node->pin );
+	OutputToFile( Params, Level,	"(node \"%s\" \"%s\")\r\n", Node->component, Node->pin );
 
 	return 0;
 	}
@@ -559,12 +552,12 @@ static int OutputNet( parameters_t *Params, int Level, const pcad_net_t *Net )
 	{
 	int	i;
 
-	OutputToFile( Params, Level,	 "(net \"%s\"\r\n", Net->name );
+	OutputToFile( Params, Level,	"(net \"%s\"\r\n", Net->name );
 
 	for( i = 0; i < Net->numnodes; i++ )
 		OutputNode( Params, Level + 1, Net->vionodes[i] );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -573,8 +566,8 @@ static int OutputNetList( parameters_t *Params, int Level, const pcad_netlist_t 
 	{
 	int	i;
 
-	OutputToFile( Params, 0,		 "\r\n" );
-	OutputToFile( Params, Level,	 "(netlist \"%s\"\r\n", NetList->name );
+	OutputToFile( Params, 0,		"\r\n" );
+	OutputToFile( Params, Level,	"(netlist \"%s\"\r\n", NetList->name );
 
 	if( NetList->globalattrs.numattr > 0 )
 		{
@@ -590,7 +583,7 @@ static int OutputNetList( parameters_t *Params, int Level, const pcad_netlist_t 
 	for( i = 0; i < NetList->numnets; i++ )
 		OutputNet( Params, Level + 1, NetList->vionets[i] );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -625,7 +618,7 @@ static int OutputSchDesignHeader( parameters_t *Params, int Level, const pcad_sc
 	char	x[32], y[32];
 	int		i;
 
-	OutputToFile( Params, Level,	 "(schDesignHeader\r\n" );
+	OutputToFile( Params, Level,	"(schDesignHeader\r\n" );
 
 	FormatReal( Params, 0, 0, 1, SchDesignHeader->workspacesize.extentx, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, SchDesignHeader->workspacesize.extenty, y, sizeof y );
@@ -658,7 +651,7 @@ static int OutputSchDesignHeader( parameters_t *Params, int Level, const pcad_sc
 	FormatReal( Params, 0, 0, 1, SchDesignHeader->junctionsizeprint, x, sizeof x );
 	OutputToFile( Params, Level + 1, "(junctionSizePrint %s)\r\n", x );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -696,27 +689,27 @@ static int OutputTitleSheet( parameters_t *Params, int Level, const pcad_titlesh
 	OutputToFile( Params, Level + 1,	"(offset %s %s)\r\n", x, y );
 
 	OutputToFile( Params, Level + 1,	"(border\r\n" );
-	OutputToFile( Params, Level + 2, 		"(isVisible %s)\r\n", TitleSheet->border.isvisible == PCAD_BOOLEAN_TRUE ? "True" : "False" );
+	OutputToFile( Params, Level + 2,		"(isVisible %s)\r\n", TitleSheet->border.isvisible == PCAD_BOOLEAN_TRUE ? "True" : "False" );
 	FormatReal( Params, 0, 0, 1, TitleSheet->border.height, x, sizeof x );
-	OutputToFile( Params, Level + 2, 		"(height %s)\r\n", x );
+	OutputToFile( Params, Level + 2,		"(height %s)\r\n", x );
 	FormatReal( Params, 0, 0, 1, TitleSheet->border.width, x, sizeof x );
-	OutputToFile( Params, Level + 2, 		"(width %s)\r\n", x );
+	OutputToFile( Params, Level + 2,		"(width %s)\r\n", x );
 	FormatReal( Params, 0, 0, 1, TitleSheet->border.offset.offsetx, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, TitleSheet->border.offset.offsety, y, sizeof y );
 	OutputToFile( Params, Level + 2,		"(offset %s %s)\r\n", x, y );
 	OutputToFile( Params, Level + 1,	")\r\n" );
 
 	OutputToFile( Params, Level + 1,	"(zones\r\n" );
-	OutputToFile( Params, Level + 2, 		"(isVisible %s)\r\n", TitleSheet->zones.isvisible == PCAD_BOOLEAN_TRUE ? "True" : "False" );
-	OutputToFile( Params, Level + 2, 		"(textStyleRef \"%s\")\r\n", TitleSheet->zones.textstyleref );
-	OutputToFile( Params, Level + 2, 		"(horizontalZones %u\r\n", TitleSheet->zones.horizontalzones.count );
-	OutputToFile( Params, Level + 3, 			"(numDirection %s)\r\n", NumDirection.items[TitleSheet->zones.horizontalzones.numdirection] );
-	OutputToFile( Params, Level + 3, 			"(numType %s)\r\n", NumType.items[TitleSheet->zones.horizontalzones.numtype] );
-	OutputToFile( Params, Level + 2, 		")\r\n" );
-	OutputToFile( Params, Level + 2, 		"(verticalZones %u\r\n", TitleSheet->zones.verticalzones.count );
-	OutputToFile( Params, Level + 3, 			"(numDirection %s)\r\n", NumDirection.items[TitleSheet->zones.verticalzones.numdirection] );
-	OutputToFile( Params, Level + 3, 			"(numType %s)\r\n", NumType.items[TitleSheet->zones.verticalzones.numtype] );
-	OutputToFile( Params, Level + 2, 		")\r\n" );
+	OutputToFile( Params, Level + 2,		"(isVisible %s)\r\n", TitleSheet->zones.isvisible == PCAD_BOOLEAN_TRUE ? "True" : "False" );
+	OutputToFile( Params, Level + 2,		"(textStyleRef \"%s\")\r\n", TitleSheet->zones.textstyleref );
+	OutputToFile( Params, Level + 2,		"(horizontalZones %u\r\n", TitleSheet->zones.horizontalzones.count );
+	OutputToFile( Params, Level + 3,			"(numDirection %s)\r\n", NumDirection.items[TitleSheet->zones.horizontalzones.numdirection] );
+	OutputToFile( Params, Level + 3,			"(numType %s)\r\n", NumType.items[TitleSheet->zones.horizontalzones.numtype] );
+	OutputToFile( Params, Level + 2,		")\r\n" );
+	OutputToFile( Params, Level + 2,		"(verticalZones %u\r\n", TitleSheet->zones.verticalzones.count );
+	OutputToFile( Params, Level + 3,			"(numDirection %s)\r\n", NumDirection.items[TitleSheet->zones.verticalzones.numdirection] );
+	OutputToFile( Params, Level + 3,			"(numType %s)\r\n", NumType.items[TitleSheet->zones.verticalzones.numtype] );
+	OutputToFile( Params, Level + 2,		")\r\n" );
 	OutputToFile( Params, Level + 1,	")\r\n" );
 
 	for( i = 0; i < TitleSheet->numtexts; i++ )
@@ -740,7 +733,7 @@ static int OutputSymbol( parameters_t *Params, int Level, const pcad_symbol_t *S
 
 	FormatReal( Params, 0, 0, 1, Symbol->pt.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Symbol->pt.y, y, sizeof y );
-    OutputToFile( Params, Level,	"(symbol (symbolRef \"%s\") (refDesRef \"%s\") (partNum %u) (pt %s %s)",
+	OutputToFile( Params, Level,	"(symbol (symbolRef \"%s\") (refDesRef \"%s\") (partNum %u) (pt %s %s)",
 		Symbol->symbolref, Symbol->refdesref, Symbol->partnum, x, y );
 
 	if( Symbol->rotation != 0 )
@@ -775,11 +768,11 @@ static int OutputWire( parameters_t *Params, int Level, const pcad_wire_t *Wire 
 	FormatReal( Params, 0, 0, 1, Wire->pt2.y, y2, sizeof y2 );
 	FormatReal( Params, 0, 0, 1, Wire->width, Width, sizeof Width );
 
-    OutputToFile( Params, Level, "(wire (line (pt %s %s)", x1, y1 );
-    if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE )
+	OutputToFile( Params, Level, "(wire (line (pt %s %s)", x1, y1 );
+	if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE )
 		OutputToFile( Params, 0, " (endStyle %s)", EndStyles.items[Wire->endstyle1] );
 	OutputToFile( Params, 0, " (pt %s %s)", x2, y2 );
-    if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE )
+	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE )
 		OutputToFile( Params, 0, " (endStyle %s)", EndStyles.items[Wire->endstyle2] );
 
 	OutputToFile( Params, 0, " (width %s) (netNameRef \"%s\"))", Width, Wire->netnameref );
@@ -804,12 +797,12 @@ static int OutputBus( parameters_t *Params, int Level, const pcad_bus_t *Bus )
 	FormatReal( Params, 0, 0, 1, Bus->pt2.x, x2, sizeof x2 );
 	FormatReal( Params, 0, 0, 1, Bus->pt2.y, y2, sizeof y2 );
 
-    OutputToFile( Params, Level, "(bus \"%s\" (pt %s %s) (pt %s %s)", Bus->name, x1, y1, x2, y2 );
-    if( Bus->dispname == PCAD_BOOLEAN_TRUE )
+	OutputToFile( Params, Level, "(bus \"%s\" (pt %s %s) (pt %s %s)", Bus->name, x1, y1, x2, y2 );
+	if( Bus->dispname == PCAD_BOOLEAN_TRUE )
 		OutputToFile( Params, 0, " (dispName True)" );
 	if( Bus->text != NULL )
 		OutputText( Params, 0, Bus->text );
-    OutputToFile( Params, 0, ")\r\n" );
+	OutputToFile( Params, 0, ")\r\n" );
 
 	return 0;
 	}
@@ -833,7 +826,7 @@ static int OutputJunction( parameters_t *Params, int Level, const pcad_junction_
 	FormatReal( Params, 0, 0, 1, Junction->point.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Junction->point.y, y, sizeof y );
 
-    OutputToFile( Params, Level, "(junction (pt %s %s) (netNameRef \"%s\"))\r\n", x, y, Junction->netnameref );
+	OutputToFile( Params, Level, "(junction (pt %s %s) (netNameRef \"%s\"))\r\n", x, y, Junction->netnameref );
 
 	return 0;
 	}
@@ -845,7 +838,7 @@ static int OutputPort( parameters_t *Params, int Level, const pcad_port_t *Port 
 	FormatReal( Params, 0, 0, 1, Port->point.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Port->point.y, y, sizeof y );
 
-    OutputToFile( Params, Level, "(port (pt %s %s) (portType %s) (portPinLength %s) (netNameRef \"%s\")",
+	OutputToFile( Params, Level, "(port (pt %s %s) (portType %s) (portPinLength %s) (netNameRef \"%s\")",
 		x, y, PortTypes.items[Port->porttype], PortPinLengths.items[Port->portpinlength], Port->netnameref );
 
 	if( Port->rotation != 0 )
@@ -878,7 +871,7 @@ static int OutputField( parameters_t *Params, int Level, const pcad_field_t *Fie
 
 	OutputToFile( Params, 0, ")\r\n" );
 
-    return 0;
+	return 0;
 	}
 /*=============================================================================*/
 static int OutputRefPoint( parameters_t *Params, int Level, const pcad_refpoint_t *RefPoint )
@@ -890,7 +883,7 @@ static int OutputRefPoint( parameters_t *Params, int Level, const pcad_refpoint_
 
 	OutputToFile( Params, Level, "(refPoint (pt %s %s))\r\n", x, y );
 
-    return 0;
+	return 0;
 	}
 /*=============================================================================*/
 static int OutputSheet( parameters_t *Params, int Level, const pcad_sheet_t *Sheet )
@@ -903,75 +896,75 @@ static int OutputSheet( parameters_t *Params, int Level, const pcad_sheet_t *She
 	if( Sheet->titlesheet.zones.textstyleref != NULL )
 		OutputTitleSheet( Params, Level + 1, &Sheet->titlesheet );
 
-    OutputToFile( Params, Level + 1, "(fieldSetRef \"%s\")\r\n", Sheet->fieldsetref );
+	OutputToFile( Params, Level + 1, "(fieldSetRef \"%s\")\r\n", Sheet->fieldsetref );
 
-    for( i = 0; i < Sheet->numsymbols; i++ )
+	for( i = 0; i < Sheet->numsymbols; i++ )
 		OutputSymbol( Params, Level + 1, Sheet->viosymbols[i] );
 
-    for( i = 0; i < Sheet->numbuses; i++ )
+	for( i = 0; i < Sheet->numbuses; i++ )
 		OutputBus( Params, Level + 1, Sheet->viobuses[i] );
 
-    for( i = 0; i < Sheet->numbusentries; i++ )
+	for( i = 0; i < Sheet->numbusentries; i++ )
 		OutputBusEntry( Params, Level + 1, Sheet->viobusentries[i] );
 
-    for( i = 0; i < Sheet->numwires; i++ )
+	for( i = 0; i < Sheet->numwires; i++ )
 		OutputWire( Params, Level + 1, Sheet->viowires[i] );
 
-    for( i = 0; i < Sheet->numjunctions; i++ )
+	for( i = 0; i < Sheet->numjunctions; i++ )
 		OutputJunction( Params, Level + 1, Sheet->viojunctions[i] );
 
-    for( i = 0; i < Sheet->numports; i++ )
+	for( i = 0; i < Sheet->numports; i++ )
 		OutputPort( Params, Level + 1, Sheet->vioports[i] );
 
-    for( i = 0; i < Sheet->numtexts; i++ )
+	for( i = 0; i < Sheet->numtexts; i++ )
 		{
 		OutputText( Params, Level + 1, Sheet->viotexts[i] );
 		OutputToFile( Params, 0, "\r\n" );
 		}
 
-    for( i = 0; i < Sheet->numieeesymbols; i++ )
+	for( i = 0; i < Sheet->numieeesymbols; i++ )
 		OutputIEEESymbol( Params, Level + 1, Sheet->vioieeesymbols[i] );
 
-    for( i = 0; i < Sheet->numlines; i++ )
+	for( i = 0; i < Sheet->numlines; i++ )
 		OutputLine( Params, Level + 1, Sheet->violines[i] );
 
-    for( i = 0; i < Sheet->numtriplepointarcs; i++ )
+	for( i = 0; i < Sheet->numtriplepointarcs; i++ )
 		OutputArc( Params, Level + 1, Sheet->viotriplepointarcs[i] );
 
-    for( i = 0; i < Sheet->numpolys; i++ )
+	for( i = 0; i < Sheet->numpolys; i++ )
 		OutputPoly( Params, Level + 1, Sheet->viopolys[i] );
 
-    for( i = 0; i < Sheet->numpins; i++ )
+	for( i = 0; i < Sheet->numpins; i++ )
 		OutputPin( Params, Level + 1, Sheet->viopins[i] );
 
-    for( i = 0; i < Sheet->numattrs; i++ )
+	for( i = 0; i < Sheet->numattrs; i++ )
 		OutputAttr( 1, Params, Level + 1, Sheet->vioattrs[i] );
 
-    for( i = 0; i < Sheet->numfields; i++ )
+	for( i = 0; i < Sheet->numfields; i++ )
 		OutputField( Params, Level + 1, Sheet->viofields[i] );
 
-    for( i = 0; i < Sheet->numrefpoints; i++ )
+	for( i = 0; i < Sheet->numrefpoints; i++ )
 		OutputRefPoint( Params, Level + 1, Sheet->viorefpoints[i] );
 
-    OutputToFile( Params, Level + 1, "(drawBorder %s)\r\n", Sheet->drawborder == PCAD_BOOLEAN_TRUE ? "True" : "False" );
-    OutputToFile( Params, Level + 1, "(EntireDesign %s)\r\n", Sheet->entiredesign == PCAD_BOOLEAN_TRUE ? "True" : "False" );
-    OutputToFile( Params, Level + 1, "(isRotated %s)\r\n", Sheet->isrotated == PCAD_BOOLEAN_TRUE ? "True" : "False" );
-    OutputToFile( Params, Level + 1, "(pageSize %s)\r\n", PageSize.items[Sheet->pagesize] );
+	OutputToFile( Params, Level + 1, "(drawBorder %s)\r\n", Sheet->drawborder == PCAD_BOOLEAN_TRUE ? "True" : "False" );
+	OutputToFile( Params, Level + 1, "(EntireDesign %s)\r\n", Sheet->entiredesign == PCAD_BOOLEAN_TRUE ? "True" : "False" );
+	OutputToFile( Params, Level + 1, "(isRotated %s)\r\n", Sheet->isrotated == PCAD_BOOLEAN_TRUE ? "True" : "False" );
+	OutputToFile( Params, Level + 1, "(pageSize %s)\r\n", PageSize.items[Sheet->pagesize] );
 
 	FormatReal( Params, 2, 0, 1, Sheet->scalefactor, x, sizeof x );
-    OutputToFile( Params, Level + 1, "(scaleFactor %s)\r\n", x );
+	OutputToFile( Params, Level + 1, "(scaleFactor %s)\r\n", x );
 	FormatReal( Params, 0, 0, 1, Sheet->offset.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Sheet->offset.y, y, sizeof y );
-    OutputToFile( Params, Level + 1, "(offset %s %s)\r\n", x, y );
+	OutputToFile( Params, Level + 1, "(offset %s %s)\r\n", x, y );
 	FormatReal( Params, 0, 0, 1, Sheet->printregion.p1.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Sheet->printregion.p1.y, y, sizeof y );
-    OutputToFile( Params, Level + 1, "(PrintRegion\r\n" );
-    OutputToFile( Params, Level + 2, "(pt %s %s)", x, y );
+	OutputToFile( Params, Level + 1, "(PrintRegion\r\n" );
+	OutputToFile( Params, Level + 2, "(pt %s %s)", x, y );
 	FormatReal( Params, 0, 0, 1, Sheet->printregion.p2.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Sheet->printregion.p2.y, y, sizeof y );
-    OutputToFile( Params, 0, " (pt %s %s)\r\n", x, y );
-    OutputToFile( Params, Level + 1, ")\r\n" );
-    OutputToFile( Params, Level + 1, "(sheetOrderNum %u)\r\n", Sheet->sheetordernum );
+	OutputToFile( Params, 0, " (pt %s %s)\r\n", x, y );
+	OutputToFile( Params, Level + 1, ")\r\n" );
+	OutputToFile( Params, Level + 1, "(sheetOrderNum %u)\r\n", Sheet->sheetordernum );
 
 	OutputToFile( Params, Level,	")\r\n" );
 
@@ -1144,8 +1137,8 @@ static int OutputSchematicDesign( parameters_t *Params, int Level, const pcad_sc
 	{
 	int	i;
 
-	OutputToFile( Params, 0,		 "\r\n" );
-	OutputToFile( Params, Level,	 "(schematicDesign \"%s\"\r\n", SchematicDesign->name );
+	OutputToFile( Params, 0,		"\r\n" );
+	OutputToFile( Params, Level,	"(schematicDesign \"%s\"\r\n", SchematicDesign->name );
 
 	OutputSchDesignHeader( Params, Level + 1, &SchematicDesign->schdesignheader );
 	if( SchematicDesign->titlesheet.zones.textstyleref != NULL )
@@ -1158,7 +1151,7 @@ static int OutputSchematicDesign( parameters_t *Params, int Level, const pcad_sc
 	OutputProgramState( Params, Level + 1, &SchematicDesign->programstate );
 	OutputReportSettings( Params, Level + 1, &SchematicDesign->reportsettings );
 
-	OutputToFile( Params, Level,	 ")\r\n" );
+	OutputToFile( Params, Level,	")\r\n" );
 
 	return 0;
 	}
@@ -1166,14 +1159,14 @@ static int OutputSchematicDesign( parameters_t *Params, int Level, const pcad_sc
 void SplitPath( const char *pFullPath, char *pPath, char *pName, char *pExt );
 /*=============================================================================*/
 int OutputPCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const char *pName )
-    {
-    parameters_t    Params;
-    char            Path[256], Name[256], Ext[256], BkpPath[256], TmpPath[256];
+	{
+	parameters_t	Params;
+	char			Path[256], Name[256], Ext[256], BkpPath[256], TmpPath[256];
 
-    Params.Cookie               = Cookie;
+	Params.Cookie	= Cookie;
 
-    SplitPath( pName, Path, Name, Ext );
-    if( stricmp( Ext, "" ) == 0 )
+	SplitPath( pName, Path, Name, Ext );
+	if( stricmp( Ext, "" ) == 0 )
 		strcpy( Ext, ".kicad_sch" );
 
 	strcat( Path, Name );
@@ -1203,6 +1196,6 @@ int OutputPCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const cha
 	rename( Path, BkpPath );
 	rename( TmpPath, Path );
 
-    return 0;
-    }
+	return 0;
+	}
 /*=============================================================================*/
