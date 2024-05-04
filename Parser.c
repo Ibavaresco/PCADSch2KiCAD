@@ -385,15 +385,30 @@ int ParseGeneric( cookie_t *Cookie, const parsefield_t *ParseField, const parses
 	if( ParseStruct == NULL )
 		Error( Cookie, -1, "Internal error, \"ParseStruct\" is NULL" );
 
+	/* This field is a pointer inside its data structure, it does not have an area reserved for it... */
 	if( ParseField != NULL && ParseField->Length > 0 )
 		{
-		void	***Parent;
-
+		/* ...so let's allocate memory for it. */
 		Object		= Allocate( Cookie, ParseField->Length );
-		Parent		= Argument;
-		**Parent	= Object;
-		if( ParseStruct != NULL && ParseStruct->OffsetNext >= 0 )
-			*Parent = (void*)( (char*)Object + ParseStruct->OffsetNext );
+
+		/* This field is a list, possibly with multiple instances... */
+		if( ParseField->Flags & FLAG_LIST )
+			{
+			/* ...let's link it to its list. */
+			void	***Parent;
+			Parent		= Argument;
+			**Parent	= Object;
+			if( ParseStruct != NULL && ParseStruct->OffsetNext >= 0 )
+				*Parent = (void*)( (char*)Object + ParseStruct->OffsetNext );
+			}
+		/* This field is a simple pointer to a single element... */
+		else
+			{
+			/* ...let's make the pointer point to the memory area just allocated. */
+			void	**Parent;
+			Parent		= Argument;
+			*Parent		= Object;
+			}
 		}
 	else
 		Object	= Argument;

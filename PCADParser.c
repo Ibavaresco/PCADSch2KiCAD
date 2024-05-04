@@ -480,8 +480,8 @@ static const listhead_t	Poly_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	Poly_Fields[]	=
 	{
-	/*	Flags			TagString	ParseFunction	Size					Offset								ParseStruct */
-		{ FLAG_WRAPPED, "pt",		ParseGeneric,	sizeof( pcad_point_t ), offsetof( pcad_poly_t, viopoints ), &Point_ParseStruct }
+	/*	Flags						TagString	ParseFunction	Size					Offset								ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"pt",		ParseGeneric,	sizeof( pcad_point_t ), offsetof( pcad_poly_t, viopoints ), &Point_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Poly_ParseStruct	=
@@ -588,14 +588,14 @@ static const parsefield_t	SymbolDef_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	SymbolDef_Fields[]	=
 	{
-	/*	Flags			TagString			ParseFunction	Size								Offset												ParseStruct */
-		{ FLAG_WRAPPED, "pin",				ParseGeneric,	sizeof( pcad_pin_t ),				offsetof( pcad_symboldef_t, viopins ),				&Pin_ParseStruct },
-		{ FLAG_WRAPPED, "text",				ParseGeneric,	sizeof( pcad_text_t ),				offsetof( pcad_symboldef_t, viotexts ),			&Text_ParseStruct },
-		{ FLAG_WRAPPED, "poly",				ParseGeneric,	sizeof( pcad_poly_t ),				offsetof( pcad_symboldef_t, viopolys ),			&Poly_ParseStruct },
-		{ FLAG_WRAPPED, "line",				ParseGeneric,	sizeof( pcad_line_t ),				offsetof( pcad_symboldef_t, violines ),			&Line_ParseStruct },
-		{ FLAG_WRAPPED, "ieeeSymbol",		ParseGeneric,	sizeof( pcad_ieeesymbol_t ),		offsetof( pcad_symboldef_t, vioieeesymbols ),		&IEEESymbol_ParseStruct },
-		{ FLAG_WRAPPED, "triplePointArc",	ParseGeneric,	sizeof( pcad_triplepointarc_t ),	offsetof( pcad_symboldef_t, viotriplepointarcs ),	&TriplePointArc_ParseStruct },
-		{ FLAG_WRAPPED, "attr",				ParseGeneric,	sizeof( pcad_attr_t ),				offsetof( pcad_symboldef_t, vioattrs ),			&Attr_ParseStruct }
+	/*	Flags						TagString			ParseFunction	Size								Offset												ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "pin",				ParseGeneric,	sizeof( pcad_pin_t ),				offsetof( pcad_symboldef_t, viopins ),				&Pin_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "text",				ParseGeneric,	sizeof( pcad_text_t ),				offsetof( pcad_symboldef_t, viotexts ),			&Text_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "poly",				ParseGeneric,	sizeof( pcad_poly_t ),				offsetof( pcad_symboldef_t, viopolys ),			&Poly_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "line",				ParseGeneric,	sizeof( pcad_line_t ),				offsetof( pcad_symboldef_t, violines ),			&Line_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "ieeeSymbol",		ParseGeneric,	sizeof( pcad_ieeesymbol_t ),		offsetof( pcad_symboldef_t, vioieeesymbols ),		&IEEESymbol_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "triplePointArc",	ParseGeneric,	sizeof( pcad_triplepointarc_t ),	offsetof( pcad_symboldef_t, viotriplepointarcs ),	&TriplePointArc_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "attr",				ParseGeneric,	sizeof( pcad_attr_t ),				offsetof( pcad_symboldef_t, vioattrs ),			&Attr_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	SymbolDef_ParseStruct	=
@@ -623,10 +623,10 @@ static const parsefield_t	TextStyleDef_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	TextStyleDef_Fields[]	=
 	{
-	/*	Flags			TagString					ParseFunction		Size					Offset											ParseStruct */
-		{ FLAG_WRAPPED, "font",						ParseGeneric,		sizeof( pcad_font_t ),	offsetof( pcad_textstyledef_t, viofonts ),		&Font_ParseStruct },
-		{ FLAG_WRAPPED, "textStyleAllowTType",		ParseBoolean,		0,						offsetof( pcad_textstyledef_t, allowttype ),	NULL },
-		{ FLAG_WRAPPED, "textStyleDisplayTType",	ParseBoolean,		0,						offsetof( pcad_textstyledef_t, displayttype ),	NULL }
+	/*	Flags						TagString					ParseFunction		Size					Offset											ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "font",						ParseGeneric,		sizeof( pcad_font_t ),	offsetof( pcad_textstyledef_t, viofonts ),		&Font_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "textStyleAllowTType",		ParseBoolean,		0,						offsetof( pcad_textstyledef_t, allowttype ),	NULL },
+		{ FLAG_WRAPPED | FLAG_LIST, "textStyleDisplayTType",	ParseBoolean,		0,						offsetof( pcad_textstyledef_t, displayttype ),	NULL }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	TextStyleDef_ParseStruct	=
@@ -760,11 +760,11 @@ static const listhead_t	AttachedPattern_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	AttachedPattern_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction		Size						Offset												ParseStruct */
-		{ FLAG_WRAPPED, "patternNum",	ParseUnsigned,		0,							offsetof( pcad_attachedpattern_t, patternnum ),		NULL },
-		{ FLAG_WRAPPED, "patternName",	ParseString,		0,							offsetof( pcad_attachedpattern_t, patternname ),	NULL },
-		{ FLAG_WRAPPED, "numPads",		ParseUnsigned,		0,							offsetof( pcad_attachedpattern_t, numpads ),		NULL },
-		{ FLAG_WRAPPED, "padPinMap",	Parse_PadPinMap,	sizeof( pcad_padpinmap_t ),	offsetof( pcad_attachedpattern_t, viopadpinmaps ),	&PadPinMap_ParseStruct }
+	/*	Flags						TagString		ParseFunction		Size						Offset												ParseStruct */
+		{ FLAG_WRAPPED, 			"patternNum",	ParseUnsigned,		0,							offsetof( pcad_attachedpattern_t, patternnum ),		NULL },
+		{ FLAG_WRAPPED, 			"patternName",	ParseString,		0,							offsetof( pcad_attachedpattern_t, patternname ),	NULL },
+		{ FLAG_WRAPPED, 			"numPads",		ParseUnsigned,		0,							offsetof( pcad_attachedpattern_t, numpads ),		NULL },
+		{ FLAG_WRAPPED | FLAG_LIST, "padPinMap",	Parse_PadPinMap,	sizeof( pcad_padpinmap_t ),	offsetof( pcad_attachedpattern_t, viopadpinmaps ),	&PadPinMap_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	AttachedPattern_ParseStruct	=
@@ -793,12 +793,12 @@ static const parsefield_t	CompDef_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	CompDef_Fields[]	=
 	{
-	/*	Flags			TagString			ParseFunction	Size								Offset											ParseStruct */
-		{ FLAG_WRAPPED, "originalName",		ParseString,	0,									offsetof( pcad_compdef_t, originalname ),		NULL },
-		{ FLAG_WRAPPED, "compHeader",		ParseGeneric,	0,									offsetof( pcad_compdef_t, compheader ),			&CompHeader_ParseStruct },
-		{ FLAG_WRAPPED, "compPin",			ParseGeneric,	sizeof( pcad_comppin_t ),			offsetof( pcad_compdef_t, viocomppins ),		&CompPin_ParseStruct },
-		{ FLAG_WRAPPED, "attachedSymbol",	ParseGeneric,	sizeof( pcad_attachedsymbol_t ),	offsetof( pcad_compdef_t, vioattachedsymbols ), &AttachedSymbol_ParseStruct },
-		{ FLAG_WRAPPED, "attachedPattern",	ParseGeneric,	0,									offsetof( pcad_compdef_t, attachedpattern ),	&AttachedPattern_ParseStruct }
+	/*	Flags						TagString			ParseFunction	Size								Offset											ParseStruct */
+		{ FLAG_WRAPPED,				"originalName",		ParseString,	0,									offsetof( pcad_compdef_t, originalname ),		NULL },
+		{ FLAG_WRAPPED,				"compHeader",		ParseGeneric,	0,									offsetof( pcad_compdef_t, compheader ),			&CompHeader_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"compPin",			ParseGeneric,	sizeof( pcad_comppin_t ),			offsetof( pcad_compdef_t, viocomppins ),		&CompPin_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "attachedSymbol",	ParseGeneric,	sizeof( pcad_attachedsymbol_t ),	offsetof( pcad_compdef_t, vioattachedsymbols ), &AttachedSymbol_ParseStruct },
+		{ FLAG_WRAPPED,				"attachedPattern",	ParseGeneric,	0,									offsetof( pcad_compdef_t, attachedpattern ),	&AttachedPattern_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	CompDef_ParseStruct	=
@@ -828,10 +828,10 @@ static const parsefield_t	Library_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	Library_Fields[]	=
 	{
-	/*	Flags			TagString			ParseFunction		Size							Offset											ParseStruct */
-		{ FLAG_WRAPPED, "textStyleDef",		ParseGeneric,		sizeof( pcad_textstyledef_t ),	offsetof( pcad_library_t, viotextstyledefs ),	&TextStyleDef_ParseStruct },
-		{ FLAG_WRAPPED, "symbolDef",		ParseGeneric,		sizeof( pcad_symboldef_t ),		offsetof( pcad_library_t, viosymboldefs ),		&SymbolDef_ParseStruct },
-		{ FLAG_WRAPPED, "compDef",			ParseGeneric,		sizeof( pcad_compdef_t ),		offsetof( pcad_library_t, viocompdefs ),		&CompDef_ParseStruct }
+	/*	Flags						TagString			ParseFunction		Size							Offset											ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "textStyleDef",		ParseGeneric,		sizeof( pcad_textstyledef_t ),	offsetof( pcad_library_t, viotextstyledefs ),	&TextStyleDef_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "symbolDef",		ParseGeneric,		sizeof( pcad_symboldef_t ),		offsetof( pcad_library_t, viosymboldefs ),		&SymbolDef_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "compDef",			ParseGeneric,		sizeof( pcad_compdef_t ),		offsetof( pcad_library_t, viocompdefs ),		&CompDef_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Library_ParseStruct	=
@@ -859,12 +859,12 @@ static const parsefield_t	CompInst_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	CompInst_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction	Size					Offset										ParseStruct */
-		{ FLAG_WRAPPED, "compRef",		ParseString,	0,						offsetof( pcad_compinst_t, compref ),		NULL },
-		{ FLAG_WRAPPED, "originalName", ParseString,	0,						offsetof( pcad_compinst_t, originalname ),	NULL },
-		{ FLAG_WRAPPED, "compValue",	ParseString,	0,						offsetof( pcad_compinst_t, compvalue ),		NULL },
-		{ FLAG_WRAPPED, "patternName",	ParseString,	0,						offsetof( pcad_compinst_t, patternname ),	NULL },
-		{ FLAG_WRAPPED, "attr",			ParseGeneric,	sizeof( pcad_attr_t ),	offsetof( pcad_compinst_t, vioattrs ),		&Attr_ParseStruct }
+	/*	Flags						TagString		ParseFunction	Size					Offset										ParseStruct */
+		{ FLAG_WRAPPED,				"compRef",		ParseString,	0,						offsetof( pcad_compinst_t, compref ),		NULL },
+		{ FLAG_WRAPPED,				"originalName", ParseString,	0,						offsetof( pcad_compinst_t, originalname ),	NULL },
+		{ FLAG_WRAPPED,				"compValue",	ParseString,	0,						offsetof( pcad_compinst_t, compvalue ),		NULL },
+		{ FLAG_WRAPPED,				"patternName",	ParseString,	0,						offsetof( pcad_compinst_t, patternname ),	NULL },
+		{ FLAG_WRAPPED | FLAG_LIST, "attr",			ParseGeneric,	sizeof( pcad_attr_t ),	offsetof( pcad_compinst_t, vioattrs ),		&Attr_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	CompInst_ParseStruct	=
@@ -911,8 +911,8 @@ static const parsefield_t	Net_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	Net_Fields[]	=
 	{
-	/*	Flags			TagString	ParseFunction	Size					Offset								ParseStruct */
-		{ FLAG_WRAPPED, "node",		ParseGeneric,	sizeof( pcad_node_t ),	offsetof( pcad_net_t, vionodes ),	&Node_ParseStruct }
+	/*	Flags						TagString	ParseFunction	Size					Offset								ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "node",		ParseGeneric,	sizeof( pcad_node_t ),	offsetof( pcad_net_t, vionodes ),	&Node_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Net_ParseStruct	=
@@ -934,8 +934,8 @@ static const listhead_t	GlobalAttrs_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	GlobalAttrs_Fields[]	=
 	{
-	/*	Flags			TagString	ParseFunction	Size					Offset										ParseStruct */
-		{ FLAG_WRAPPED, "attr",		ParseGeneric,	sizeof( pcad_attr_t ),	offsetof( pcad_globalattrs_t, vioattrs ),	&Attr_ParseStruct }
+	/*	Flags						TagString	ParseFunction	Size					Offset										ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "attr",		ParseGeneric,	sizeof( pcad_attr_t ),	offsetof( pcad_globalattrs_t, vioattrs ),	&Attr_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	GlobalAttrs_ParseStruct	=
@@ -964,10 +964,10 @@ static const parsefield_t	NetList_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	NetList_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction	Size						Offset										ParseStruct */
-		{ FLAG_WRAPPED,	"globalAttrs",	ParseGeneric,	0,							offsetof( pcad_netlist_t, globalattrs ),	&GlobalAttrs_ParseStruct },
-		{ FLAG_WRAPPED,	"compInst",		ParseGeneric,	sizeof( pcad_compinst_t ),	offsetof( pcad_netlist_t, viocompinsts ),	&CompInst_ParseStruct },
-		{ FLAG_WRAPPED,	"net",			ParseGeneric,	sizeof( pcad_net_t ),		offsetof( pcad_netlist_t, vionets ),		&Net_ParseStruct }
+	/*	Flags						TagString		ParseFunction	Size						Offset										ParseStruct */
+		{ FLAG_WRAPPED,				"globalAttrs",	ParseGeneric,	0,							offsetof( pcad_netlist_t, globalattrs ),	&GlobalAttrs_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"compInst",		ParseGeneric,	sizeof( pcad_compinst_t ),	offsetof( pcad_netlist_t, viocompinsts ),	&CompInst_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"net",			ParseGeneric,	sizeof( pcad_net_t ),		offsetof( pcad_netlist_t, vionets ),		&Net_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	NetList_ParseStruct	=
@@ -1061,11 +1061,6 @@ static const parsestruct_t	Wire_ParseStruct	=
 	.OffsetNext		= offsetof( pcad_wire_t, next )
 	};
 /*===========================================================================*/
-static const listhead_t	Bus_Lists[]		=
-	{
-		{ .OffsetHead = offsetof( pcad_bus_t, text ),	.OffsetLink = offsetof( pcad_bus_t, viotexts ) }
-	};
-/*----------------------------------------------------------------------------*/
 static const parsefield_t	Bus_FixedFields[]	=
 	{
 	/*	Flags			TagString	ParseFunction	Size					Offset								ParseStruct */
@@ -1078,7 +1073,7 @@ static const parsefield_t	Bus_Fields[]	=
 	{
 	/*	Flags			TagString	ParseFunction	Size					Offset								ParseStruct */
 		{ FLAG_WRAPPED,	"dispName",	ParseBoolean,	0,						offsetof( pcad_bus_t, dispname ),	NULL },
-		{ FLAG_WRAPPED,	"text",		ParseGeneric,	sizeof( pcad_text_t ),	offsetof( pcad_bus_t, viotexts ),	&Text_ParseStruct }
+		{ FLAG_WRAPPED,	"text",		ParseGeneric,	sizeof( pcad_text_t ),	offsetof( pcad_bus_t, text ),		&Text_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Bus_ParseStruct	=
@@ -1088,8 +1083,8 @@ static const parsestruct_t	Bus_ParseStruct	=
 	.FixedFields	= Bus_FixedFields,
 	.NumFields		= LENGTH( Bus_Fields ),
 	.Fields			= Bus_Fields,
-	.NumLists		= LENGTH( Bus_Lists ),
-	.Lists			= Bus_Lists,
+	.NumLists		=  0,
+	.Lists			= NULL,
 	.OffsetNext		= offsetof( pcad_bus_t, next )
 	};
 /*===========================================================================*/
@@ -1148,10 +1143,10 @@ static const parsefield_t	Symbol_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	Symbol_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction		Size					Offset									ParseStruct */
-		{ FLAG_WRAPPED,	"rotation",		ParseReal,			0,						offsetof( pcad_symbol_t, rotation ),	NULL },
-		{ FLAG_WRAPPED,	"isFlipped",	ParseBoolean,		0,						offsetof( pcad_symbol_t, isflipped ),	NULL },
-		{ FLAG_WRAPPED,	"attr",			ParseGeneric,		sizeof( pcad_attr_t ),	offsetof( pcad_symbol_t, vioattrs ),	&Attr_ParseStruct }
+	/*	Flags						TagString		ParseFunction		Size					Offset									ParseStruct */
+		{ FLAG_WRAPPED,				"rotation",		ParseReal,			0,						offsetof( pcad_symbol_t, rotation ),	NULL },
+		{ FLAG_WRAPPED,				"isFlipped",	ParseBoolean,		0,						offsetof( pcad_symbol_t, isflipped ),	NULL },
+		{ FLAG_WRAPPED | FLAG_LIST,	"attr",			ParseGeneric,		sizeof( pcad_attr_t ),	offsetof( pcad_symbol_t, vioattrs ),	&Attr_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Symbol_ParseStruct	=
@@ -1314,9 +1309,9 @@ static const parsefield_t	TitleSheet_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	TitleSheet_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction		Size					Offset										ParseStruct */
-		{ FLAG_WRAPPED,	"line",			ParseGeneric,		sizeof( pcad_line_t ),	offsetof( pcad_titlesheet_t, violines ),	&Line_ParseStruct },
-		{ FLAG_WRAPPED,	"text",			ParseGeneric,		sizeof( pcad_text_t ),	offsetof( pcad_titlesheet_t, viotexts ),	&Text_ParseStruct }
+	/*	Flags						TagString		ParseFunction		Size					Offset										ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"line",			ParseGeneric,		sizeof( pcad_line_t ),	offsetof( pcad_titlesheet_t, violines ),	&Line_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"text",			ParseGeneric,		sizeof( pcad_text_t ),	offsetof( pcad_titlesheet_t, viotexts ),	&Text_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	TitleSheet_ParseStruct	=
@@ -1382,32 +1377,32 @@ static const parsefield_t	Sheet_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	Sheet_Fields[]	=
 	{
-	/*	Flags			TagString			ParseFunction		Size								Offset											ParseStruct */
-		{ FLAG_WRAPPED,	"titleSheet",		ParseGeneric,		0,									offsetof( pcad_sheet_t, titlesheet ),			&TitleSheet_ParseStruct },
-		{ FLAG_WRAPPED,	"fieldSetRef",		ParseString,		0,									offsetof( pcad_sheet_t, fieldsetref ),			NULL },
-		{ FLAG_WRAPPED,	"junction",			ParseGeneric,		sizeof( pcad_junction_t ),			offsetof( pcad_sheet_t, viojunctions ),			&Junction_ParseStruct },
-		{ FLAG_WRAPPED,	"refPoint",			ParseGeneric,		sizeof( pcad_refpoint_t ),			offsetof( pcad_sheet_t, viorefpoints ),			&RefPoint_ParseStruct },
-		{ FLAG_WRAPPED,	"wire",				ParseGeneric,		sizeof( pcad_wire_t ),				offsetof( pcad_sheet_t, viowires ),				&Wire_ParseStruct },
-		{ FLAG_WRAPPED,	"busEntry",			ParseGeneric,		sizeof( pcad_busentry_t ),			offsetof( pcad_sheet_t, viobusentries ),		&BusEntry_ParseStruct },
-		{ FLAG_WRAPPED,	"bus",				ParseGeneric,		sizeof( pcad_bus_t ),				offsetof( pcad_sheet_t, viobuses ),				&Bus_ParseStruct },
-		{ FLAG_WRAPPED,	"port",				ParseGeneric,		sizeof( pcad_port_t ),				offsetof( pcad_sheet_t, vioports ),				&Port_ParseStruct },
-		{ FLAG_WRAPPED,	"pin",				ParseGeneric,		sizeof( pcad_pin_t ),				offsetof( pcad_sheet_t, viopins ),				&Pin_ParseStruct },
-		{ FLAG_WRAPPED,	"text",				ParseGeneric,		sizeof( pcad_text_t ),				offsetof( pcad_sheet_t, viotexts ),				&Text_ParseStruct },
-		{ FLAG_WRAPPED,	"triplePointArc",	ParseGeneric,		sizeof( pcad_triplepointarc_t ),	offsetof( pcad_sheet_t, viotriplepointarcs ),		&TriplePointArc_ParseStruct },
-		{ FLAG_WRAPPED,	"attr",				ParseGeneric,		sizeof( pcad_attr_t ),				offsetof( pcad_sheet_t, vioattrs ),				&Attr_ParseStruct },
-		{ FLAG_WRAPPED,	"symbol",			ParseGeneric,		sizeof( pcad_symbol_t ),			offsetof( pcad_sheet_t, viosymbols ),			&Symbol_ParseStruct },
-		{ FLAG_WRAPPED,	"poly",				ParseGeneric,		sizeof( pcad_poly_t ),				offsetof( pcad_sheet_t, viopolys ),				&Poly_ParseStruct },
-		{ FLAG_WRAPPED,	"line",				ParseGeneric,		sizeof( pcad_line_t ),				offsetof( pcad_sheet_t, violines ),				&Line_ParseStruct },
-		{ FLAG_WRAPPED,	"ieeeSymbol",		ParseGeneric,		sizeof( pcad_ieeesymbol_t ),		offsetof( pcad_sheet_t, vioieeesymbols ),			&IEEESymbol_ParseStruct },
-		{ FLAG_WRAPPED,	"field",			ParseGeneric,		sizeof( pcad_field_t ),				offsetof( pcad_sheet_t, viofields ),				&Field_ParseStruct },
-		{ FLAG_WRAPPED,	"drawBorder",		ParseBoolean,		0,									offsetof( pcad_sheet_t, drawborder ),			NULL },
-		{ FLAG_WRAPPED,	"EntireDesign",		ParseBoolean,		0,									offsetof( pcad_sheet_t, entiredesign ),			NULL },
-		{ FLAG_WRAPPED,	"isRotated",		ParseBoolean,		0,									offsetof( pcad_sheet_t, isrotated ),			NULL },
-		{ FLAG_WRAPPED,	"pageSize",			ParseEnum,			0,									offsetof( pcad_sheet_t, pagesize ),				(const parsestruct_t*)&PageSize },
-		{ FLAG_WRAPPED,	"scaleFactor",		ParseReal,			0,									offsetof( pcad_sheet_t, scalefactor ),			NULL },
-		{ FLAG_WRAPPED,	"offset",			ParseGeneric,		0,									offsetof( pcad_sheet_t, offset),				&Offset_ParseStruct },
-		{ FLAG_WRAPPED,	"PrintRegion",		ParseGeneric,		0,									offsetof( pcad_sheet_t, printregion),			&PrintRegion_ParseStruct },
-		{ FLAG_WRAPPED,	"sheetOrderNum",	ParseUnsigned,		0,									offsetof( pcad_sheet_t, sheetordernum ),		NULL }
+	/*	Flags						TagString			ParseFunction		Size								Offset											ParseStruct */
+		{ FLAG_WRAPPED,				"titleSheet",		ParseGeneric,		0,									offsetof( pcad_sheet_t, titlesheet ),			&TitleSheet_ParseStruct },
+		{ FLAG_WRAPPED,				"fieldSetRef",		ParseString,		0,									offsetof( pcad_sheet_t, fieldsetref ),			NULL },
+		{ FLAG_WRAPPED | FLAG_LIST,	"junction",			ParseGeneric,		sizeof( pcad_junction_t ),			offsetof( pcad_sheet_t, viojunctions ),			&Junction_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"refPoint",			ParseGeneric,		sizeof( pcad_refpoint_t ),			offsetof( pcad_sheet_t, viorefpoints ),			&RefPoint_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"wire",				ParseGeneric,		sizeof( pcad_wire_t ),				offsetof( pcad_sheet_t, viowires ),				&Wire_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"busEntry",			ParseGeneric,		sizeof( pcad_busentry_t ),			offsetof( pcad_sheet_t, viobusentries ),		&BusEntry_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"bus",				ParseGeneric,		sizeof( pcad_bus_t ),				offsetof( pcad_sheet_t, viobuses ),				&Bus_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"port",				ParseGeneric,		sizeof( pcad_port_t ),				offsetof( pcad_sheet_t, vioports ),				&Port_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"pin",				ParseGeneric,		sizeof( pcad_pin_t ),				offsetof( pcad_sheet_t, viopins ),				&Pin_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"text",				ParseGeneric,		sizeof( pcad_text_t ),				offsetof( pcad_sheet_t, viotexts ),				&Text_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"triplePointArc",	ParseGeneric,		sizeof( pcad_triplepointarc_t ),	offsetof( pcad_sheet_t, viotriplepointarcs ),		&TriplePointArc_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"attr",				ParseGeneric,		sizeof( pcad_attr_t ),				offsetof( pcad_sheet_t, vioattrs ),				&Attr_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"symbol",			ParseGeneric,		sizeof( pcad_symbol_t ),			offsetof( pcad_sheet_t, viosymbols ),			&Symbol_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"poly",				ParseGeneric,		sizeof( pcad_poly_t ),				offsetof( pcad_sheet_t, viopolys ),				&Poly_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"line",				ParseGeneric,		sizeof( pcad_line_t ),				offsetof( pcad_sheet_t, violines ),				&Line_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"ieeeSymbol",		ParseGeneric,		sizeof( pcad_ieeesymbol_t ),		offsetof( pcad_sheet_t, vioieeesymbols ),			&IEEESymbol_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"field",			ParseGeneric,		sizeof( pcad_field_t ),				offsetof( pcad_sheet_t, viofields ),				&Field_ParseStruct },
+		{ FLAG_WRAPPED,				"drawBorder",		ParseBoolean,		0,									offsetof( pcad_sheet_t, drawborder ),			NULL },
+		{ FLAG_WRAPPED,				"EntireDesign",		ParseBoolean,		0,									offsetof( pcad_sheet_t, entiredesign ),			NULL },
+		{ FLAG_WRAPPED,				"isRotated",		ParseBoolean,		0,									offsetof( pcad_sheet_t, isrotated ),			NULL },
+		{ FLAG_WRAPPED,				"pageSize",			ParseEnum,			0,									offsetof( pcad_sheet_t, pagesize ),				(const parsestruct_t*)&PageSize },
+		{ FLAG_WRAPPED,				"scaleFactor",		ParseReal,			0,									offsetof( pcad_sheet_t, scalefactor ),			NULL },
+		{ FLAG_WRAPPED,				"offset",			ParseGeneric,		0,									offsetof( pcad_sheet_t, offset),				&Offset_ParseStruct },
+		{ FLAG_WRAPPED,				"PrintRegion",		ParseGeneric,		0,									offsetof( pcad_sheet_t, printregion),			&PrintRegion_ParseStruct },
+		{ FLAG_WRAPPED,				"sheetOrderNum",	ParseUnsigned,		0,									offsetof( pcad_sheet_t, sheetordernum ),		NULL }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Sheet_ParseStruct	=
@@ -1447,8 +1442,8 @@ static const listhead_t	SheetList_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	SheetList_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction		Size						Offset										ParseStruct */
-		{ FLAG_WRAPPED,	"sheetRef",		ParseGeneric,		sizeof( pcad_sheetref_t ),	offsetof( pcad_sheetlist_t, viosheetrefs ),	&SheetRef_ParseStruct },
+	/*	Flags						TagString		ParseFunction		Size						Offset										ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"sheetRef",		ParseGeneric,		sizeof( pcad_sheetref_t ),	offsetof( pcad_sheetlist_t, viosheetrefs ),	&SheetRef_ParseStruct },
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	SheetList_ParseStruct	=
@@ -1607,8 +1602,8 @@ static const listhead_t	ReportFieldConditions_Lists[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	ReportFieldConditions_Fields[]	=
 	{
-	/*	Flags			TagString					ParseFunction	Size									Offset																ParseStruct */
-		{ FLAG_WRAPPED,	"reportFieldCondition",		ParseGeneric,	sizeof( pcad_reportfieldcondition_t ),	offsetof( pcad_reportfieldconditions_t, vioreportfieldconditions ),	&ReportFieldCondition_ParseStruct },
+	/*	Flags						TagString					ParseFunction	Size									Offset																ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"reportFieldCondition",		ParseGeneric,	sizeof( pcad_reportfieldcondition_t ),	offsetof( pcad_reportfieldconditions_t, vioreportfieldconditions ),	&ReportFieldCondition_ParseStruct },
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	ReportFieldConditions_ParseStruct	=
@@ -1659,8 +1654,8 @@ static const listhead_t	ReportFields_Lists[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	ReportFields_Fields[]	=
 	{
-	/*	Flags			TagString					ParseFunction	Size							Offset												ParseStruct */
-		{ FLAG_WRAPPED,	"reportField",				ParseGeneric,	sizeof( pcad_reportfield_t ),	offsetof( pcad_reportfields_t, vioreportfields ),	&ReportField_ParseStruct },
+	/*	Flags						TagString					ParseFunction	Size							Offset												ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"reportField",				ParseGeneric,	sizeof( pcad_reportfield_t ),	offsetof( pcad_reportfields_t, vioreportfields ),	&ReportField_ParseStruct },
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	ReportFields_ParseStruct	=
@@ -1683,8 +1678,8 @@ static const listhead_t	ReportFieldsSections_Lists[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	ReportFieldsSections_Fields[]	=
 	{
-	/*	Flags			TagString					ParseFunction	Size							Offset													ParseStruct */
-		{ FLAG_WRAPPED,	"reportFields",				ParseGeneric,	sizeof( pcad_reportfields_t ),	offsetof( pcad_reportfieldssection_t, vioreportfieldss ),	&ReportFields_ParseStruct },
+	/*	Flags						TagString					ParseFunction	Size							Offset													ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"reportFields",				ParseGeneric,	sizeof( pcad_reportfields_t ),	offsetof( pcad_reportfieldssection_t, vioreportfieldss ),	&ReportFields_ParseStruct },
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	ReportFieldsSections_ParseStruct	=
@@ -1740,8 +1735,8 @@ static const listhead_t	ReportDefinitions_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	ReportDefinitions_Fields[]	=
 	{
-	/*	Flags			TagString				ParseFunction	Size								Offset														ParseStruct */
-		{ FLAG_WRAPPED,	"reportDefinition",		ParseGeneric,	sizeof( pcad_reportdefinition_t ),	offsetof( pcad_reportdefinitions_t, vioreportdefinitions ),	&ReportDefinition_ParseStruct }
+	/*	Flags						TagString				ParseFunction	Size								Offset														ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST,	"reportDefinition",		ParseGeneric,	sizeof( pcad_reportdefinition_t ),	offsetof( pcad_reportdefinitions_t, vioreportdefinitions ),	&ReportDefinition_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	ReportDefinitions_ParseStruct	=
@@ -1805,8 +1800,8 @@ static const listhead_t	GridDfns_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	GridDfns_Fields[]	=
 	{
-	/*	Flags			TagString	ParseFunction	Size					Offset									ParseStruct */
-		{ FLAG_WRAPPED, "grid",		ParseGeneric,	sizeof( pcad_grid_t ),	offsetof( pcad_griddfns_t, viogrids ),	&Grid_ParseStruct }
+	/*	Flags						TagString	ParseFunction	Size					Offset									ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "grid",		ParseGeneric,	sizeof( pcad_grid_t ),	offsetof( pcad_griddfns_t, viogrids ),	&Grid_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	GridDfns_ParseStruct	=
@@ -1903,10 +1898,10 @@ static const parsefield_t	FieldSet_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	FieldSet_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction	Size							Offset											ParseStruct */
-		{ FLAG_WRAPPED, "fieldDef",		ParseGeneric,	sizeof( pcad_fielddef_t ),		offsetof( pcad_fieldset_t, viofielddefs ),		&FieldDef_ParseStruct },
-		{ FLAG_WRAPPED, "note",			ParseGeneric,	sizeof( pcad_note_t ),			offsetof( pcad_fieldset_t, vionotes ),			&Note_ParseStruct },
-		{ FLAG_WRAPPED, "revisionNote",	ParseGeneric,	sizeof( pcad_revisionnote_t ),	offsetof( pcad_fieldset_t, viorevisionnotes ),	&RevisionNote_ParseStruct }
+	/*	Flags						TagString		ParseFunction	Size							Offset											ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "fieldDef",		ParseGeneric,	sizeof( pcad_fielddef_t ),		offsetof( pcad_fieldset_t, viofielddefs ),		&FieldDef_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "note",			ParseGeneric,	sizeof( pcad_note_t ),			offsetof( pcad_fieldset_t, vionotes ),			&Note_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST, "revisionNote",	ParseGeneric,	sizeof( pcad_revisionnote_t ),	offsetof( pcad_fieldset_t, viorevisionnotes ),	&RevisionNote_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	FieldSet_ParseStruct	=
@@ -1928,8 +1923,8 @@ static const listhead_t	DesignInfo_Lists[]		=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	DesignInfo_Fields[]	=
 	{
-	/*	Flags			TagString		ParseFunction	Size						Offset											ParseStruct */
-		{ FLAG_WRAPPED, "fieldSet",		ParseGeneric,	sizeof( pcad_fieldset_t ),	offsetof( pcad_designinfo_t, viofieldsets ),	&FieldSet_ParseStruct }
+	/*	Flags						TagString		ParseFunction	Size						Offset											ParseStruct */
+		{ FLAG_WRAPPED | FLAG_LIST, "fieldSet",		ParseGeneric,	sizeof( pcad_fieldset_t ),	offsetof( pcad_designinfo_t, viofieldsets ),	&FieldSet_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	DesignInfo_ParseStruct	=
@@ -1984,12 +1979,12 @@ static const parsefield_t	SchematicDesign_FixedFields[]	=
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	SchematicDesign_Fields[]	=
 	{
-	/*	Flags			TagString					ParseFunction			Size					Offset														ParseStruct */
-		{ FLAG_WRAPPED,	"titleSheet",				ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, titlesheet ),				&TitleSheet_ParseStruct },
-		{ FLAG_WRAPPED,	"sheet",					ParseGeneric,			sizeof( pcad_sheet_t ), offsetof( pcad_schematicdesign_t, viosheets ),				&Sheet_ParseStruct },
-		{ FLAG_WRAPPED,	"schematicPrintSettings",	ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, schematicPrintSettings ),	&PrintSettings_ParseStruct },
-		{ FLAG_WRAPPED,	"programState",				ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, programstate ),			&ProgramState_ParseStruct },
-		{ FLAG_WRAPPED,	"reportSettings",			ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, reportsettings ),			&ReportSettings_ParseStruct }
+	/*	Flags						TagString					ParseFunction			Size					Offset														ParseStruct */
+		{ FLAG_WRAPPED,				"titleSheet",				ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, titlesheet ),				&TitleSheet_ParseStruct },
+		{ FLAG_WRAPPED | FLAG_LIST,	"sheet",					ParseGeneric,			sizeof( pcad_sheet_t ), offsetof( pcad_schematicdesign_t, viosheets ),				&Sheet_ParseStruct },
+		{ FLAG_WRAPPED,				"schematicPrintSettings",	ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, schematicPrintSettings ),	&PrintSettings_ParseStruct },
+		{ FLAG_WRAPPED,				"programState",				ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, programstate ),			&ProgramState_ParseStruct },
+		{ FLAG_WRAPPED,				"reportSettings",			ParseGeneric,			0,						offsetof( pcad_schematicdesign_t, reportsettings ),			&ReportSettings_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	SchematicDesign_ParseStruct	=
@@ -2010,12 +2005,7 @@ static const parsefield_t	SchematicFile_FixedFields[]	=
 		{ FLAG_NAKED,	"ACCEL_ASCII",		ParseName,		0,		-1,													NULL },
 		{ FLAG_NAKED,	NULL,				ParseString,	0,		offsetof( pcad_schematicfile_t, name ),				NULL },
 		{ FLAG_WRAPPED, "asciiHeader",		ParseGeneric,	0,		offsetof( pcad_schematicfile_t, asciiheader ),		&ASCIIHeader_ParseStruct },
-		{ FLAG_WRAPPED, "library",			ParseGeneric,	0,		offsetof( pcad_schematicfile_t, library ),			&Library_ParseStruct }
-	};
-/*----------------------------------------------------------------------------*/
-static const parsefield_t	SchematicFile_Fields[]	=
-	{
-	/*	Flags			TagString			ParseFunction	Size	Offset												ParseStruct */
+		{ FLAG_WRAPPED, "library",			ParseGeneric,	0,		offsetof( pcad_schematicfile_t, library ),			&Library_ParseStruct },
 		{ FLAG_WRAPPED, "netlist",			ParseGeneric,	0,		offsetof( pcad_schematicfile_t, netlist ),			&NetList_ParseStruct },
 		{ FLAG_WRAPPED, "schematicDesign",	ParseGeneric,	0,		offsetof( pcad_schematicfile_t, schematicdesign ),	&SchematicDesign_ParseStruct }
 	};
@@ -2025,8 +2015,8 @@ static const parsestruct_t	SchematicFile_ParseStruct	=
 	.Flags			= PARSE_FLAGS_OMMIT_CLOSE_PAR | PARSE_FLAGS_REQUIRE_EOF,
 	.NumFixedFields = LENGTH( SchematicFile_FixedFields ),
 	.FixedFields	= SchematicFile_FixedFields,
-	.NumFields		= LENGTH( SchematicFile_Fields ),
-	.Fields			= SchematicFile_Fields,
+	.NumFields		=  0,
+	.Fields			= NULL,
 	.NumLists		=  0,
 	.Lists			= NULL,
 	.OffsetNext		= -1

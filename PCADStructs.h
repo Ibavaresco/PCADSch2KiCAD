@@ -530,7 +530,6 @@ typedef struct pcad_bus_tag
 	pcad_point_t							pt2;
 	pcad_boolean_t							dispname;
 	pcad_text_t								*text;
-	pcad_text_t								**viotexts;
 	struct pcad_bus_tag						*next;
 	} pcad_bus_t;
 /*=============================================================================*/

@@ -32,6 +32,8 @@
 #define FLAG_NAKED			0
 #define FLAG_WRAPPED		1
 #define FLAG_CASESENSITIVE	2
+#define	FLAG_LIST			4
+#define	FLAG_OPTIONAL		8
 /*============================================================================*/
 typedef struct parsefield_tag		parsefield_t;
 typedef struct parsestruct_tag		parsestruct_t;
