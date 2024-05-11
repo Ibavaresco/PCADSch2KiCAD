@@ -645,6 +645,38 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, pcad_schema
 	return 0;
 	}
 /*=============================================================================*/
+static int OutputBus( const parameters_t *Params, unsigned Level, pcad_bus_t *Bus )
+	{
+	char	x1[32], y1[32], x2[32], y2[32] /*, Width[32]*/;
+
+	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Bus->pt1.x, x1, sizeof x1 );
+	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Bus->pt1.y, y1, sizeof y1 );
+	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Bus->pt2.x, x2, sizeof x2 );
+	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Bus->pt2.y, y2, sizeof y2 );
+
+/*
+	if( Bus->->width == 0 )
+		FormatReal( Params, 0, 0, 1, Params->DefaultLineWidth, Width, sizeof Width );
+	else
+		FormatReal( Params, 0, 0, 1, Bus->width, Width, sizeof Width );
+*/
+
+	OutputToFile( Params, Level, "(bus (pts (xy %s %s) (xy %s %s)) (stroke (width 0) (type default)))\n", x1, y1, x2, y2 );
+	return 0;
+	}
+/*=============================================================================*/
+static int OutputBusEntry( const parameters_t *Params, unsigned Level, pcad_busentry_t *BusEntry )
+	{
+	char	x[32], y[32] /*, Width[32]*/;
+
+	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, BusEntry->point.x, x, sizeof x );
+	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, BusEntry->point.y, y, sizeof y );
+
+	OutputToFile( Params, Level, "(bus_entry (at %s %s) (size 2.54 2.54) (stroke (width 0) (type default)))\n", x, y );
+
+	return 0;
+	}
+/*=============================================================================*/
 static int OutputSchematic( const parameters_t *Params, unsigned Level, pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
 	{
 	int i;
@@ -652,14 +684,23 @@ static int OutputSchematic( const parameters_t *Params, unsigned Level, pcad_sch
 	for( i = 0; i < Sheet->numsymbols; i++ )
 		OutputSymbol( Params, Level, Schematic, Sheet->viosymbols[i] );
 
+	for( i = 0; i < Sheet->numbuses; i++ )
+		OutputBus( Params, Level, Sheet->viobuses[i] );
+
 	for( i = 0; i < Sheet->numwires; i++ )
 		OutputWire( Params, Level, Sheet->viowires[i] );
+
+	for( i = 0; i < Sheet->numbusentries; i++ )
+		OutputBusEntry( Params, Level, Sheet->viobusentries[i] );
 
 	for( i = 0; i < Sheet->numjunctions; i++ )
 		OutputJunction( Params, Level, Sheet->viojunctions[i] );
 
 	for( i = 0; i < Sheet->numports; i++ )
 		OutputPort( Params, Level, Sheet->vioports[i] );
+
+	for( i = 0; i < Sheet->numlines; i++ )
+		OutputLine( Params, Level, Sheet->violines[i] );
 
 	for( i = 0; i < Sheet->numtexts; i++ )
 		OutputText( Params, Level, Sheet->viotexts[i] );

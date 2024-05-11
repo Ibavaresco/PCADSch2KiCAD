@@ -605,17 +605,17 @@ typedef struct pcad_sheet_tag
 	pcad_point_t							offset;
 	pcad_region_t							printregion;
 	pcad_unsigned_t							sheetordernum;
-	pcad_bus_t								*firstbus;
-	pcad_wire_t								*firstwire;
-	pcad_busentry_t							*firstbusentry;
-	pcad_symbol_t							*firstsymbol;
-	pcad_junction_t							*firstjunction;
-	pcad_port_t								*firstport;
-	pcad_text_t								*firsttext;
-	pcad_triplepointarc_t					*firsttriplepointarc;
+	pcad_symbol_t							*firstsymbol;			// *
+	pcad_bus_t								*firstbus;				// +
+	pcad_wire_t								*firstwire;				// *
+	pcad_busentry_t							*firstbusentry;			// +
+	pcad_junction_t							*firstjunction;			// *
+	pcad_port_t								*firstport;				// *
+	pcad_text_t								*firsttext;				// *
+	pcad_triplepointarc_t					*firsttriplepointarc;	// *
 	pcad_attr_t								*firstattr;
-	pcad_poly_t								*firstpoly;
-	pcad_line_t								*firstline;
+	pcad_poly_t								*firstpoly;				// *
+	pcad_line_t								*firstline;				// *
 	pcad_pin_t								*firstpin;
 	pcad_ieeesymbol_t						*firstieeesymbol;
 	pcad_field_t							*firstfield;
