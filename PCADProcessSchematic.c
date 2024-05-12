@@ -63,7 +63,7 @@ static boundingrect_t *BoundingRectangleAdd( boundingrect_t *Rect, const pcad_po
 	if( pt->y < Rect->Bottom )
 		Rect->Bottom	= pt->y;
 	if( pt->y > Rect->Top )
-		Rect->Bottom	= pt->y;
+		Rect->Top		= pt->y;
 	if( pt->x < Rect->Left )
 		Rect->Left		= pt->x;
 	if( pt->x > Rect->Right )
