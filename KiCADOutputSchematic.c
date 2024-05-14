@@ -39,6 +39,7 @@ typedef struct
 	pcad_dimmension_t	DefaultLineWidth;
 	pcad_dimmension_t	PolygonBorderWidth;
 	int					PolygonExtraVertex;
+	int					StraightBusEntries;
 	pcad_dimmension_t	OriginX;
 	pcad_dimmension_t	OriginY;
 	pcad_real_t			ScaleX;
@@ -164,6 +165,8 @@ static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t 
 		else
 			Warning( Params->Cookie, "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
 		be1->point	= pt1;
+		/* We must copy the style from the wire endpoint to the busentry, because it will be output later and we will need that information. */
+		be1->style	= Wire->endstyle1;
 		}
 
 	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE && ( be2 = FindBusEntry( Sheet, &pt2 )) && be2 != NULL )
@@ -187,6 +190,8 @@ static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t 
 		else
 			Warning( Params->Cookie, "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
 		be2->point	= pt2;
+		/* We must copy the style from the wire endpoint to the busentry, because it will be output later and we will need that information. */
+		be2->style	= Wire->endstyle2;
 		}
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, pt1.x, x1, sizeof x1 );
@@ -729,13 +734,31 @@ static int OutputBus( const parameters_t *Params, unsigned Level, pcad_bus_t *Bu
 /*=============================================================================*/
 static int OutputBusEntry( const parameters_t *Params, unsigned Level, pcad_busentry_t *BusEntry )
 	{
-	static const char	*Orientations[]	= { "0 2.54", "0 -2.54", "2.54 0", "-2.54 0" };
+	static const char	*Orientations[][4]	=
+		{
+			{ "0.0 -2.54",		"0.0 2.54",		"-2.54 0.0",	"2.54 0.0", },
+			{ "-1.27 -2.54",	"1.27 2.54",	"-2.54 1.27",	"2.54 -1.27", },
+			{ "1.27 -2.54",		"-1.27 2.54",	"-2.54 -1.27",	"2.54 1.27", }
+		};
 	char	x[32], y[32] /*, Width[32]*/;
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, BusEntry->point.x, x, sizeof x );
 	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, BusEntry->point.y, y, sizeof y );
 
-	OutputToFile( Params, Level, "(bus_entry (at %s %s) (size %s) (stroke (width 0) (type default)))\n", x, y, Orientations[BusEntry->orient % LENGTH( Orientations )]);
+	if( Params->StraightBusEntries )
+		OutputToFile( Params, Level, "(bus_entry (at %s %s) (size %s) (stroke (width 0) (type default)))\n", x, y, Orientations[0][BusEntry->orient % LENGTH( Orientations[0] )]);
+	else switch( BusEntry->style )
+		{
+		case PCAD_ENDSTYLE_TWOLEADS:
+			OutputToFile( Params, Level, "(bus_entry (at %s %s) (size %s) (stroke (width 0) (type default)))\n", x, y, Orientations[1][BusEntry->orient % LENGTH( Orientations[0] )]);
+		case PCAD_ENDSTYLE_RIGHTLEAD:
+			OutputToFile( Params, Level, "(bus_entry (at %s %s) (size %s) (stroke (width 0) (type default)))\n", x, y, Orientations[2][BusEntry->orient % LENGTH( Orientations[0] )]);
+			break;
+		case PCAD_ENDSTYLE_NONE:
+		case PCAD_ENDSTYLE_LEFTLEAD:
+			OutputToFile( Params, Level, "(bus_entry (at %s %s) (size %s) (stroke (width 0) (type default)))\n", x, y, Orientations[1][BusEntry->orient % LENGTH( Orientations[0] )]);
+			break;
+		}
 
 	return 0;
 	}
@@ -980,6 +1003,7 @@ int OutputKiCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const ch
 	Params.DefaultLineWidth		= 254000;
 	Params.PolygonBorderWidth	=    100;
 	Params.PolygonExtraVertex	=      1;
+	Params.StraightBusEntries	=	   0;
 
 	SplitPath( pName, Path, Name, Ext );
 	if( stricmp( Ext, "" ) == 0 )

@@ -538,6 +538,7 @@ typedef struct pcad_busentry_tag
 	char									*busnameref;
 	pcad_point_t							point;
 	pcad_orient_t							orient;
+	pcad_endstyle_t							style;		/* Busentries don't have an endstyle, but later we will need to copy the associated wire's endstyle to here. */
 	struct pcad_busentry_tag				*next;
 	} pcad_busentry_t;
 /*=============================================================================*/
