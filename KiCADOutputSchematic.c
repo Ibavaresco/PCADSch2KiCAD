@@ -124,13 +124,21 @@ static const char *JustifyKiCAD[]	=
 	" (justify left top)",		" (justify top)",		" (justify right top)"
 	};
 /*=============================================================================*/
-pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p )
+pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p, const pcad_point_t *p2 )
 	{
 	int	i;
 
 	for( i = 0; i < Sheet->numbusentries; i++ )
-		if( p->x == Sheet->viobusentries[i]->point.x && p->y == Sheet->viobusentries[i]->point.y )
+		{
+		const pcad_busentry_t	*be	= Sheet->viobusentries[i];
+
+		if( p->x == be->point.x && p->y == be->point.y && (
+				( be->orient == PCAD_ORIENT_RIGHT && p2->x > p->x ) ||
+				( be->orient == PCAD_ORIENT_LEFT && p2->x < p->x ) ||
+				( be->orient == PCAD_ORIENT_UP && p2->y > p->y ) ||
+				( be->orient == PCAD_ORIENT_DOWN && p2->y < p->y )))
 			return Sheet->viobusentries[i];
+		}
 
 	return NULL;
 	}
@@ -144,16 +152,16 @@ static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t 
 	pt1	= Wire->pt1;
 	pt2	= Wire->pt2;
 
-	if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE && ( be1 = FindBusEntry( Sheet, &pt1 )) && be1 != NULL )
+	if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE && ( be1 = FindBusEntry( Sheet, &pt1, &pt2 )) && be1 != NULL )
 		{
-		if( pt1.x == pt2.x )
+		if( pt2.x == pt1.x )
 			{
 			if( pt2.y > pt1.y + 2540000 )
 				pt1.y += 2540000;
 			else if( pt2.y < pt1.y - 2540000 )
 				pt1.y -= 2540000;
 			}
-		else if( pt1.y == pt2.y )
+		else if( pt2.y == pt1.y )
 			{
 			if( pt2.x > pt1.x + 2540000 )
 				pt1.x += 2540000;
@@ -169,16 +177,16 @@ static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t 
 		be1->style	= Wire->endstyle1;
 		}
 
-	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE && ( be2 = FindBusEntry( Sheet, &pt2 )) && be2 != NULL )
+	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE && ( be2 = FindBusEntry( Sheet, &pt2, &pt1 )) && be2 != NULL )
 		{
-		if( pt2.x == pt1.x )
+		if( pt1.x == pt2.x )
 			{
 			if( pt1.y > pt2.y + 2540000 )
 				pt2.y += 2540000;
 			else if( pt1.y < pt2.y - 2540000 )
 				pt2.y -= 2540000;
 			}
-		else if( pt2.y == pt1.y )
+		else if( pt1.y == pt2.y )
 			{
 			if( pt1.x > pt2.x + 2540000 )
 				pt2.x += 2540000;
@@ -736,9 +744,9 @@ static int OutputBusEntry( const parameters_t *Params, unsigned Level, pcad_buse
 	{
 	static const char	*Orientations[][4]	=
 		{
-			{ "0.0 -2.54",		"0.0 2.54",		"-2.54 0.0",	"2.54 0.0", },
-			{ "-1.27 -2.54",	"1.27 2.54",	"-2.54 1.27",	"2.54 -1.27", },
-			{ "1.27 -2.54",		"-1.27 2.54",	"-2.54 -1.27",	"2.54 1.27", }
+			{ "0.0 2.54",	"0.0 -2.54",	"2.54 0.0",		"-2.54 0.0", },
+			{ "1.27 2.54",	"-1.27 -2.54",	"2.54 -1.27",	"-2.54 1.27", },
+			{ "-1.27 2.54",	"1.27 -2.54",	"2.54 1.27",	"-2.54 -1.27", }
 		};
 	char	x[32], y[32] /*, Width[32]*/;
 
