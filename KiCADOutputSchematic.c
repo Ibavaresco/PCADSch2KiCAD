@@ -123,14 +123,76 @@ static const char *JustifyKiCAD[]	=
 	" (justify left top)",		" (justify top)",		" (justify right top)"
 	};
 /*=============================================================================*/
-static int OutputWire( const parameters_t *Params, unsigned Level, pcad_wire_t *Wire )
+pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p )
 	{
-	char	x1[32], y1[32], x2[32], y2[32];
+	int	i;
 
-	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Wire->pt1.x, x1, sizeof x1 );
-	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Wire->pt1.y, y1, sizeof y1 );
-	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Wire->pt2.x, x2, sizeof x2 );
-	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Wire->pt2.y, y2, sizeof y2 );
+	for( i = 0; i < Sheet->numbusentries; i++ )
+		if( p->x == Sheet->viobusentries[i]->point.x && p->y == Sheet->viobusentries[i]->point.y )
+			return Sheet->viobusentries[i];
+
+	return NULL;
+	}
+/*=============================================================================*/
+static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t *Sheet, pcad_wire_t *Wire )
+	{
+	char			x1[32], y1[32], x2[32], y2[32];
+	pcad_busentry_t	*be1, *be2;
+	pcad_point_t	pt1, pt2;
+
+	pt1	= Wire->pt1;
+	pt2	= Wire->pt2;
+
+	if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE && ( be1 = FindBusEntry( Sheet, &pt1 )) && be1 != NULL )
+		{
+		if( pt1.x == pt2.x )
+			{
+			if( pt2.y > pt1.y + 2540000 )
+				pt1.y += 2540000;
+			else if( pt2.y < pt1.y - 2540000 )
+				pt1.y -= 2540000;
+			}
+		else if( pt1.y == pt2.y )
+			{
+			if( pt2.x > pt1.x + 2540000 )
+				pt1.x += 2540000;
+			else if( pt2.x < pt1.x - 2540000 )
+				pt1.x -= 2540000;
+			else
+				Warning( Params->Cookie, "Wire too short, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
+			}
+		else
+			Warning( Params->Cookie, "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
+		be1->point	= pt1;
+		}
+
+	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE && ( be2 = FindBusEntry( Sheet, &pt2 )) && be2 != NULL )
+		{
+		if( pt2.x == pt1.x )
+			{
+			if( pt1.y > pt2.y + 2540000 )
+				pt2.y += 2540000;
+			else if( pt1.y < pt2.y - 2540000 )
+				pt2.y -= 2540000;
+			}
+		else if( pt2.y == pt1.y )
+			{
+			if( pt1.x > pt2.x + 2540000 )
+				pt2.x += 2540000;
+			else if( pt1.x < pt2.x - 2540000 )
+				pt2.x -= 2540000;
+			else
+				Warning( Params->Cookie, "Wire too short, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
+			}
+		else
+			Warning( Params->Cookie, "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
+		be2->point	= pt2;
+		}
+
+	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, pt1.x, x1, sizeof x1 );
+	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, pt1.y, y1, sizeof y1 );
+	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, pt2.x, x2, sizeof x2 );
+	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, pt2.y, y2, sizeof y2 );
 
 	OutputToFile( Params, Level, "(wire (pts (xy %s %s) (xy %s %s)) (stroke (width 0) (type default)))\n", x1, y1, x2, y2 );
 
@@ -366,7 +428,7 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 	return 0;
 	}
 /*=============================================================================*/
-static pcad_compdef_t *FindCompDef( pcad_schematicfile_t *Schematic, const char *Name )
+static pcad_compdef_t *FindCompDef( const pcad_schematicfile_t *Schematic, const char *Name )
 	{
 	int i;
 
@@ -407,7 +469,7 @@ static int OutputPolygon( const parameters_t *Params, unsigned Level, pcad_poly_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSymbolDef( const parameters_t *Params, unsigned Level, pcad_schematicfile_t *Schematic, pcad_symboldef_t *SymbolDef )
+static int OutputSymbolDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_symboldef_t *SymbolDef )
 	{
 	char			*RefDesPrefix	= NULL;
 	int				IsPower			= 0;
@@ -470,7 +532,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, pcad_sch
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputLibrary( const parameters_t *Params, unsigned Level, pcad_schematicfile_t *Schematic, pcad_library_t *Library )
+static int OutputLibrary( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library )
 	{
 	int i;
 
@@ -483,7 +545,7 @@ static int OutputLibrary( const parameters_t *Params, unsigned Level, pcad_schem
 	return 0;
 	}
 /*=============================================================================*/
-static pcad_symboldef_t *FindSymbolDef( pcad_schematicfile_t *Schematic, const char *Name )
+static pcad_symboldef_t *FindSymbolDef( const pcad_schematicfile_t *Schematic, const char *Name )
 	{
 	int i;
 
@@ -509,7 +571,7 @@ static pcad_attr_t *FindAttr( pcad_attr_t **Attributes, size_t NumAttributes, ch
 	return NULL;
 	}
 /*=============================================================================*/
-static pcad_compinst_t *FindCompInst( pcad_netlist_t *NetList, const char *Name )
+static pcad_compinst_t *FindCompInst( const pcad_netlist_t *NetList, const char *Name )
 	{
 	int i;
 
@@ -526,7 +588,7 @@ static pcad_compinst_t *FindCompInst( pcad_netlist_t *NetList, const char *Name 
 #define MAX(a,b)	((a)>(b)?(a):(b))
 #endif	/*	!defined MAX */
 /*=============================================================================*/
-static int OutputSymbol( const parameters_t *Params, unsigned Level, pcad_schematicfile_t *Schematic, pcad_symbol_t *Symbol )
+static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_symbol_t *Symbol )
 	{
 	pcad_symboldef_t	*SymbolDef;
 	pcad_compinst_t		*CompInst;
@@ -667,17 +729,18 @@ static int OutputBus( const parameters_t *Params, unsigned Level, pcad_bus_t *Bu
 /*=============================================================================*/
 static int OutputBusEntry( const parameters_t *Params, unsigned Level, pcad_busentry_t *BusEntry )
 	{
+	static const char	*Orientations[]	= { "0 2.54", "0 -2.54", "2.54 0", "-2.54 0" };
 	char	x[32], y[32] /*, Width[32]*/;
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, BusEntry->point.x, x, sizeof x );
 	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, BusEntry->point.y, y, sizeof y );
 
-	OutputToFile( Params, Level, "(bus_entry (at %s %s) (size 2.54 2.54) (stroke (width 0) (type default)))\n", x, y );
+	OutputToFile( Params, Level, "(bus_entry (at %s %s) (size %s) (stroke (width 0) (type default)))\n", x, y, Orientations[BusEntry->orient % LENGTH( Orientations )]);
 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSchematic( const parameters_t *Params, unsigned Level, pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
+static int OutputSchematic( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
 	{
 	int i;
 
@@ -688,7 +751,7 @@ static int OutputSchematic( const parameters_t *Params, unsigned Level, pcad_sch
 		OutputBus( Params, Level, Sheet->viobuses[i] );
 
 	for( i = 0; i < Sheet->numwires; i++ )
-		OutputWire( Params, Level, Sheet->viowires[i] );
+		OutputWire( Params, Level, Sheet, Sheet->viowires[i] );
 
 	for( i = 0; i < Sheet->numbusentries; i++ )
 		OutputBusEntry( Params, Level, Sheet->viobusentries[i] );
@@ -840,12 +903,12 @@ static void FindTitleExtents( const pcad_titlesheet_t *TitleSheet, pcad_extent_t
 /*=============================================================================*/
 #define ALIGNMENT_ROUNDING	2540000
 /*=============================================================================*/
-static int OutputSheet( parameters_t *Params, unsigned Level, pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
+static int OutputSheet( parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
 	{
-	char				Buffer[32];
-	pcad_dimmension_t	OriginX, OriginY;
-	pcad_extent_t		TitleExtent = { .extentx = 0, .extenty = 0 };
-	pcad_titlesheet_t	*TitleSheet;
+	char					Buffer[32];
+	pcad_dimmension_t		OriginX, OriginY;
+	pcad_extent_t			TitleExtent = { .extentx = 0, .extenty = 0 };
+	const pcad_titlesheet_t	*TitleSheet;
 
 	/* The sheet has its own border settings... */
 	if( Sheet->titlesheet.border.width != 0 && Sheet->titlesheet.border.height != 0 )
