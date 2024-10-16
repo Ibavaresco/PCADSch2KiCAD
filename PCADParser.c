@@ -27,6 +27,7 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <stddef.h>
 #include "Parser.h"
 #include "PCADParser.h"
 #include "Lexic.h"
@@ -698,7 +699,7 @@ static const parsefield_t	CompPin_Fields[]	=
 		{ FLAG_WRAPPED, "partNum",		ParseUnsigned,	0,		offsetof( pcad_comppin_t, partnum ),	NULL },
 		{ FLAG_WRAPPED, "symPinNum",	ParseUnsigned,	0,		offsetof( pcad_comppin_t, sympinnum ),	NULL },
 		{ FLAG_WRAPPED, "gateEq",		ParseUnsigned,	0,		offsetof( pcad_comppin_t, gateeq ),		NULL },
-		{ FLAG_WRAPPED, "pinEq",		ParseUnsigned,	0,		offsetof( pcad_comppin_t, pineq ),		NULL },
+		{ FLAG_WRAPPED, "pinEq",		ParseSigned,	0,		offsetof( pcad_comppin_t, pineq ),		NULL },
 		{ FLAG_WRAPPED, "pinType",		ParseEnum,		0,		offsetof( pcad_comppin_t, pintype ),	(const parsestruct_t*)&PinType }
 	};
 /*----------------------------------------------------------------------------*/

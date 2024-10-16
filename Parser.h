@@ -25,6 +25,11 @@
 /*============================================================================*/
 #include <stdlib.h>
 #include "PCADParser.h"
+
+#ifdef __GNUC__
+#define stricmp strcasecmp
+#endif
+
 /*============================================================================*/
 #if			!defined __PARSER2_H__
 #define __PARSER2_H__
@@ -83,6 +88,7 @@ int					ParseDimmension		( cookie_t *Cookie, const parsefield_t *ParseField, con
 int					ParseReal			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
 int					ParseBoolean		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
 int					ParseUnsigned		( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
+int					ParseSigned		    ( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
 int					ParseEnum			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
 int					ParseName			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );
 int					ParseString			( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument );

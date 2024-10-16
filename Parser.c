@@ -234,6 +234,36 @@ int ParseUnsigned( cookie_t *Cookie, const parsefield_t *ParseField, const parse
 	return 0;
 	}
 /*============================================================================*/
+int32_t GetSigned( cookie_t *Cookie )
+	{
+	char		Buffer[BUFFER_SIZE], *p = Buffer;
+	int32_t	    Value	= 0;
+    int32_t     Sign    = 1;
+	token_t		Token	= GetToken( Cookie, Buffer, sizeof Buffer );
+
+	if( Token != TOKEN_UNSIGNED && Token != TOKEN_INTEGER )
+		Error( Cookie, -1, "Expecting signed integer number" );
+
+    if (*p == '-') {
+        Sign = -1;
+        p++;
+    }
+
+	while( isdigit( *p ))
+		Value	= Value * 10 + *p++ - '0';
+
+	return Value * Sign;
+	}
+/*============================================================================*/
+int ParseSigned( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
+	{
+	pcad_unsigned_t	*Unsigned	= (pcad_unsigned_t*)Argument;
+
+	*Unsigned	= GetSigned( Cookie );
+
+	return 0;
+	}
+/*============================================================================*/
 int GetName( cookie_t *Cookie, char *Buffer, size_t BufferLength )
 	{
 	if( GetToken( Cookie, Buffer, BufferLength ) != TOKEN_NAME )

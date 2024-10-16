@@ -28,6 +28,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
+#include <limits.h>
 #include "KiCADOutputSchematic.h"
 #include "PCADStructs.h"
 #include "Parser.h"

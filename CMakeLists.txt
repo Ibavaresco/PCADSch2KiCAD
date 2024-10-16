@@ -15,6 +15,9 @@ set(SOURCES
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
+if (UNIX)
+  link_libraries(m)
+endif()
 add_executable(PCADSch2KiCAD ${SOURCES})
 
 if(UNIX AND NOT APPLE)
