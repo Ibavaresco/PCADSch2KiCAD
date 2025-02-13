@@ -696,9 +696,9 @@ static const parsefield_t	CompPin_Fields[]	=
 	{
 	/*	Flags			TagString		ParseFunction	Size	Offset									ParseStruct */
 		{ FLAG_WRAPPED, "pinName",		ParseString,	0,		offsetof( pcad_comppin_t, pinname ),	NULL },
-		{ FLAG_WRAPPED, "partNum",		ParseUnsigned,	0,		offsetof( pcad_comppin_t, partnum ),	NULL },
+		{ FLAG_WRAPPED, "partNum",		ParseSigned,	0,		offsetof( pcad_comppin_t, partnum ),	NULL },
 		{ FLAG_WRAPPED, "symPinNum",	ParseUnsigned,	0,		offsetof( pcad_comppin_t, sympinnum ),	NULL },
-		{ FLAG_WRAPPED, "gateEq",		ParseUnsigned,	0,		offsetof( pcad_comppin_t, gateeq ),		NULL },
+		{ FLAG_WRAPPED, "gateEq",		ParseSigned,	0,		offsetof( pcad_comppin_t, gateeq ),		NULL },
 		{ FLAG_WRAPPED, "pinEq",		ParseSigned,	0,		offsetof( pcad_comppin_t, pineq ),		NULL },
 		{ FLAG_WRAPPED, "pinType",		ParseEnum,		0,		offsetof( pcad_comppin_t, pintype ),	(const parsestruct_t*)&PinType }
 	};

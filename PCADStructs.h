@@ -241,10 +241,10 @@ typedef struct pcad_comppin_tag
 	char									*name;
 	char									*pinnumber;
 	char									*pinname;
-	pcad_unsigned_t							partnum;
+	pcad_integer_t							partnum;
 	pcad_unsigned_t							sympinnum;
-	pcad_unsigned_t							gateeq;
-	pcad_unsigned_t							pineq;
+	pcad_integer_t							gateeq;
+	pcad_integer_t							pineq;
 	pcad_enum_pintype_t						pintype;
 	struct pcad_comppin_tag					*next;
 	} pcad_comppin_t;

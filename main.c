@@ -201,7 +201,11 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 /*============================================================================*/
 void PrintUsage( int OutputFormat )
 	{
+#if			defined __linux__
 	fprintf( stderr,
+#else	/*	defined __linux__ */
+	_fprintf_p( stderr,
+#endif	/*	defined __linux__ */
 		"\n"
 		"%1$s v0.9\n"
 		"Copyright(c) 2024, Isaac Marino Bavaresco\n"
@@ -210,6 +214,10 @@ void PrintUsage( int OutputFormat )
 		"Usage: %1$s [--kicadout|--pcadout] [<pathin>]<filenamein>[.<extin>] [<pathout>][<filenameout|*>[.<extout|*>]]\n\n"
 		"\"--pcadout\"	forces the output file to be in P-CAD format.\n"
 		"\"--kicadout\" forces the output file to be in KiCAD format.\n"
+#if			!defined __linux__
+		"If the executable file name is \"PCADSch2KiCAD.exe\", the default output format is KiCAD.\n"
+		"If it is \"PCADSchSort.exe\", the default output format is P-CAD.\n\n"
+#endif	/*	!defined __linux__ */
 		"If <extin> is omitted, the program will first try to open the file with the name as is, and if\n"
 		"it can't, it will append the extension \".sch\" and try again.\n\n"
 		"If <filenameout> is omitted or it is \'*\', the program will use <filenamein>. If <extout> is\n"
@@ -245,7 +253,22 @@ int main( int ArgC, char *ArgV[] )
 		}
 
 	if( OutputFormat == OUTPUTFORMAT_INVALID )
+#if			defined __linux__
 		OutputFormat = OUTPUTFORMAT_KICAD;
+#else	/*	defined __linux__ */
+		{
+		SplitPath( ArgV[0], NULL, PathIn, NULL );
+		if( stricmp( PathIn, "PCADSch2KiCAD" ) == 0 )
+			OutputFormat = OUTPUTFORMAT_KICAD;
+		else if( stricmp( PathIn, "PCADSchSort" ) == 0 )
+			OutputFormat = OUTPUTFORMAT_PCAD;
+		else
+			{
+			printf( "\nError: The name of this file should be either \"PCADSch2KiCAD.exe\" or \"PCADSchSort.exe\".\n\n" );
+			return -1;
+			}
+		}
+#endif	/*	defined __linux__ */
 
 	if( ArgC - FirstArg < 1 || ArgC - FirstArg > 2 )
 		{

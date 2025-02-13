@@ -341,7 +341,7 @@ static int OutputPoly( const parameters_t *Params, unsigned Level, pcad_poly_t *
 	int		i;
 
 	OutputToFile( Params, Level, "(poly\r\n" );
-	OutputToFile( Params, Level + 1, "" );
+	OutputToFile( Params, Level, "\t" );
 
 	for( i = 0; i < Poly->numpoints; i++ )
 		{
@@ -400,7 +400,7 @@ static int OutputCompPin( parameters_t *Params, int Level, const pcad_comppin_t 
 	if( CompPin->pinname != NULL )
 		OutputToFile( Params, 0, " (pinName \"%s\")", CompPin->pinname );
 
-	OutputToFile( Params, 0, " (partNum %u) (symPinNum %u) (gateEq %u) (pinEq %u)",
+	OutputToFile( Params, 0, " (partNum %d) (symPinNum %u) (gateEq %d) (pinEq %d)",
 		CompPin->partnum, CompPin->sympinnum, CompPin->gateeq, CompPin->pineq );
 
 	if( CompPin->pintype != PCAD_PINTYPE_NONE )
@@ -750,7 +750,8 @@ static int OutputSymbol( parameters_t *Params, int Level, const pcad_symbol_t *S
 		OutputToFile( Params, 0, "\r\n" );
 		for( i = 0; i < Symbol->numattrs; i++ )
 			OutputAttr( 1, Params, Level + 1, Symbol->vioattrs[i] );
-		OutputToFile( Params, Level, "" );
+		if( Level > 0 )
+			OutputToFile( Params, Level - 1, "\t" );
 		}
 
 	OutputToFile( Params, 0,	")\r\n" );
