@@ -35,6 +35,7 @@
 /*=============================================================================*/
 typedef struct
 	{
+	char				*SheetName;
 	cookie_t			*Cookie;
 	FILE				*File;
 	pcad_dimmension_t	DefaultLineWidth;
@@ -714,6 +715,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			}
 		if( Column != 0 )
 			OutputToFile( Params, 0, "\n" );
+		OutputToFile( Params, Level + 1, "(instances (project \"%s\" (path \"/5eab5f85-83b1-44f7-98c0-9af69d3534bc\" (reference \"%s\") (unit 1))))\n", Params->SheetName, Symbol->refdesref );
 		}
 
 	OutputToFile( Params, Level, ")\n" );
@@ -974,6 +976,7 @@ static int OutputSheet( parameters_t *Params, unsigned Level, const pcad_schemat
 	OutputToFile( Params, Level + 1, "(version 20231120)\n" );
 	OutputToFile( Params, Level + 1, "(generator \"eeschema\")\n" );
 	OutputToFile( Params, Level + 1, "(generator_version \"8.0\")\n" );
+	OutputToFile( Params, Level + 1, "(uuid \"5eab5f85-83b1-44f7-98c0-9af69d3534bc\")\n" );
 
 	OutputToFile( Params, Level + 1, "%s\n", Buffer );
 
@@ -1043,6 +1046,8 @@ int OutputKiCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const ch
 			*p	= '_';
 		for( p = SheetName; ( p = strchr( p, '"' )) != NULL; p = SheetName )
 			*p	= '_';
+
+		Params.SheetName	= SheetName;
 
 		strcat( OutPath, SheetName );
 
