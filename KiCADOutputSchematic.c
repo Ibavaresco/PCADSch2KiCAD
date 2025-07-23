@@ -412,10 +412,17 @@ static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepoi
 /*=============================================================================*/
 static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pin, int IsPower )
 	{
-	char		x[32], y[32], Angle[32], Length[32], Buffer[3*strlen( Pin->pinname.value )+1];
-	pcad_real_t	PinRotation = ( Pin->rotation + 180000000 ) % 360000000;
-	pcad_real_t	PinX		= Pin->point.x;
-	pcad_real_t	PinY		= Pin->point.y;
+	static const char	*GraphStyles[2][2]	=
+		{
+			{ "line",	"inverted" },
+			{ "clock",	"inverted_clock" }
+		};
+
+	char				x[32], y[32], Angle[32], Length[32], Buffer[3*strlen( Pin->pinname.value )+1];
+	const char			*GraphStyle;
+	pcad_real_t			PinRotation = ( Pin->rotation + 180000000 ) % 360000000;
+	pcad_real_t			PinX		= Pin->point.x;
+	pcad_real_t			PinY		= Pin->point.y;
 
 	switch( PinRotation )
 		{
@@ -438,7 +445,9 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 	FormatReal( Params, 0, 0,				1,				PinRotation, Angle, sizeof Angle );
 	FormatReal( Params, 0, 0,				1,				Pin->pinlength, Length, sizeof Length );
 
-	OutputToFile( Params, Level, "(pin %s line (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%u\" (effects (font (size 1.27 1.27)))))\n", IsPower ? "power_in" : "passive", x, y, Angle, Length, IsPower ? "" : FormatLabel( Pin->pinname.value, Buffer, sizeof Buffer ), Pin->pinnum );
+	GraphStyle	= GraphStyles[Pin->insideedgestyle == PCAD_INSIDEEDGESTYLE_CLOCK ? 1 : 0][Pin->outsideedgestyle == PCAD_OUTSIDEEDGESTYLE_DOT ? 1 : 0];
+
+	OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%u\" (effects (font (size 1.27 1.27)))))\n", IsPower ? "power_in" : "passive", GraphStyle, x, y, Angle, Length, IsPower ? "" : FormatLabel( Pin->pinname.value, Buffer, sizeof Buffer ), Pin->pinnum );
 
 	return 0;
 	}
