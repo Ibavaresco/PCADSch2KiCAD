@@ -174,13 +174,12 @@ int CompareSymbols( const void *a, const void *b )
 	const pcad_symbol_t *pb = *(const pcad_symbol_t * const *)b;
 	int					Result;
 
-	Result	= CompareNames( pa->symbolref, pb->symbolref );
-	if( Result != 0 )
-		return Result;
 	Result	= CompareNames( pa->refdesref, pb->refdesref );
 	if( Result != 0 )
 		return Result;
-	return pa->partnum - pb->partnum;
+	if( pa->partnum != pb->partnum )
+		return pa->partnum - pb->partnum;
+	return  CompareNames( pa->symbolref, pb->symbolref );
 	}
 /*===========================================================================*/
 int CompareJunctions( const void *a, const void *b )

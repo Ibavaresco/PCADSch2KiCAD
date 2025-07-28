@@ -410,12 +410,32 @@ static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepoi
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pin, int IsPower )
+static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pin, int PinType )
 	{
-	static const char	*GraphStyles[2][2]	=
+	static const char	*GraphStyles[2][4]	=
 		{
-			{ "line",	"inverted" },
-			{ "clock",	"inverted_clock" }
+			{ "line",	"inverted",			"input_low",	"output_low" },
+			{ "clock",	"inverted_clock",	"clock_low",	"output_low" }
+		};
+
+	static const char	*PinTypes[16]		=
+		{
+		"unspecified",
+		"unspecified",
+		"passive",
+		"input",
+		"output",
+		"bidirectional",
+		"open_collector",
+		"open_emitter",
+		"passive",
+		"passive",
+		"tri_state",
+		"power_in",
+		"unspecified",
+		"unspecified",
+		"unspecified",
+		"unspecified"
 		};
 
 	char				x[32], y[32], Angle[32], Length[32], Buffer[3*strlen( Pin->pinname.value )+1];
@@ -445,22 +465,20 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 	FormatReal( Params, 0, 0,				1,				PinRotation, Angle, sizeof Angle );
 	FormatReal( Params, 0, 0,				1,				Pin->pinlength, Length, sizeof Length );
 
-	GraphStyle	= GraphStyles[Pin->insideedgestyle == PCAD_INSIDEEDGESTYLE_CLOCK ? 1 : 0][Pin->outsideedgestyle == PCAD_OUTSIDEEDGESTYLE_DOT ? 1 : 0];
+	GraphStyle	= GraphStyles[Pin->insideedgestyle&1][Pin->outsideedgestyle&3];
 
-	OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%u\" (effects (font (size 1.27 1.27)))))\n", IsPower ? "power_in" : "passive", GraphStyle, x, y, Angle, Length, IsPower ? "" : FormatLabel( Pin->pinname.value, Buffer, sizeof Buffer ), Pin->pinnum );
+	OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%u\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, PinType > PCAD_PINTYPE_POWER ? "" : FormatLabel( Pin->pinname.value, Buffer, sizeof Buffer ), Pin->pinnum );
 
 	return 0;
 	}
 /*=============================================================================*/
-static pcad_compdef_t *FindCompDef( const pcad_schematicfile_t *Schematic, const char *Name )
+static const pcad_compdef_t *FindCompDef( const pcad_schematicfile_t *Schematic, const char *Name )
 	{
 	int i;
 
 	for( i = 0; i < Schematic->library.numcompdefs; i++ )
-		if( stricmp( Name, Schematic->library.viocompdefs[i]->firstattachedsymbol->symbolname ) == 0 )
-			break;
-	if( i < Schematic->library.numcompdefs )
-		return Schematic->library.viocompdefs[i];
+		if( stricmp( Name, Schematic->library.viocompdefs[i]->name ) == 0 )
+			return Schematic->library.viocompdefs[i];
 
 	return NULL;
 	}
@@ -493,19 +511,23 @@ static int OutputPolygon( const parameters_t *Params, unsigned Level, pcad_poly_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSymbolDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_symboldef_t *SymbolDef )
+static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned Index, const pcad_schematicfile_t *Schematic, pcad_symboldef_t *SymbolDef, const pcad_compdef_t *CompDef )
 	{
-	char			*RefDesPrefix	= NULL;
-	int				IsPower			= 0;
-	pcad_compdef_t	*CompDef;
-	int				i;
-	parameters_t	LocalParams		= *Params;
+//	char					*RefDesPrefix	= NULL;
+	int						IsPower			= 0;
+	int						PinType			= 0;
+	int						i;
+	parameters_t			LocalParams		= *Params;
 
 	LocalParams.ScaleX	= 1;
 	LocalParams.OriginX = 0;
 	LocalParams.ScaleY	= 1;
 	LocalParams.OriginY = 0;
 
+	IsPower			= CompDef->compheader.comptype == PCAD_COMPTYPE_POWER;
+//	RefDesPrefix	= CompDef->compheader.refdesprefix;
+
+/*
 	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", SymbolDef->name );
 
 	if(( CompDef = FindCompDef( Schematic, SymbolDef->originalname )) != NULL )
@@ -532,40 +554,28 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, const pc
 
 	OutputAttribute( &LocalParams, Level + 1, "RefDes", "Reference", RefDesPrefix, SymbolDef->vioattrs, SymbolDef->numattrs );
 	OutputAttribute( &LocalParams, Level + 1, "Value", "Value", NULL, SymbolDef->vioattrs, SymbolDef->numattrs );
-
-	OutputToFile( &LocalParams, Level + 1, "(symbol \"%s_0_1\"\n", SymbolDef->name );
+*/
+	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", CompDef->name, Index );
 
 	for( i = 0; i < SymbolDef->numlines; i++ )
-		OutputLine( &LocalParams, Level + 2, SymbolDef->violines[i] );
+		OutputLine( &LocalParams, Level + 1, SymbolDef->violines[i] );
 
 	for( i = 0; i < SymbolDef->numtriplepointarcs; i++ )
-		OutputArc( &LocalParams, Level + 2, SymbolDef->viotriplepointarcs[i] );
+		OutputArc( &LocalParams, Level + 1, SymbolDef->viotriplepointarcs[i] );
 
 	for( i = 0; i < SymbolDef->numpolys; i++ )
-		OutputPolygon( &LocalParams, Level + 2, SymbolDef->viopolys[i] );
+		OutputPolygon( &LocalParams, Level + 1, SymbolDef->viopolys[i] );
 
-	OutputToFile( &LocalParams, Level + 1, ")\n" );
-
-	OutputToFile( &LocalParams, Level + 1, "(symbol \"%s_1_1\"\n", SymbolDef->name );
 	for( i = 0; i < SymbolDef->numpins; i++ )
-		OutputPin( &LocalParams, Level + 2, SymbolDef->viopins[i], IsPower );
-	OutputToFile( &LocalParams, Level + 1, ")\n" );
+		{
+		if( IsPower )
+			PinType	= PCAD_PINTYPE_POWER;
+		else
+			PinType	= 0;	//@@@@
 
-
+		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], PinType );
+		}
 	OutputToFile( &LocalParams, Level, ")\n" );
-	return 0;
-	}
-/*=============================================================================*/
-static int OutputLibrary( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library )
-	{
-	int i;
-
-	OutputToFile( Params, Level, "(lib_symbols\n" );
-
-	for( i = 0; i < Library->numsymboldefs; i++ )
-		OutputSymbolDef( Params, Level + 1, Schematic, Library->viosymboldefs[i] );
-
-	OutputToFile( Params, Level, ")\n" );
 	return 0;
 	}
 /*=============================================================================*/
@@ -580,6 +590,82 @@ static pcad_symboldef_t *FindSymbolDef( const pcad_schematicfile_t *Schematic, c
 		return Schematic->library.viosymboldefs[i];
 
 	return NULL;
+	}
+/*=============================================================================*/
+static pcad_symboldef_t *FindSymbolDefByOriginalName( const pcad_schematicfile_t *Schematic, const char *Name )
+	{
+	int i;
+
+	for( i = 0; i < Schematic->library.numsymboldefs; i++ )
+		if( stricmp( Name, Schematic->library.viosymboldefs[i]->originalname ) == 0 )
+			break;
+	if( i < Schematic->library.numsymboldefs )
+		return Schematic->library.viosymboldefs[i];
+
+	return NULL;
+	}
+/*=============================================================================*/
+static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library, pcad_compdef_t *CompDef )
+	{
+	parameters_t	LocalParams		= *Params;
+	int				i;
+
+	LocalParams.ScaleX	= 1;
+	LocalParams.OriginX = 0;
+	LocalParams.ScaleY	= 1;
+	LocalParams.OriginY = 0;
+
+	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", CompDef->name );
+
+	if( CompDef->compheader.comptype == PCAD_COMPTYPE_POWER )
+		OutputToFile( &LocalParams, Level + 1, "(power) (pin_numbers hide) (pin_names (offset 0.5) hide) (exclude_from_sim no) (in_bom yes) (on_board yes)\n" );
+	else
+		{
+		int HidePinNumbers	= 0;
+		int HidePinNames	= 0;
+/*
+		for( i = 0; i < SymbolDef->numpins; i++ )
+			{
+			if( SymbolDef->viopins[i]->displaypindes != PCAD_BOOLEAN_FALSE )
+				HidePinNumbers	= 0;
+			if( SymbolDef->viopins[i]->displaypinname == PCAD_BOOLEAN_TRUE )
+				HidePinNames	= 0;
+			}
+*/
+		OutputToFile( &LocalParams, Level + 1, "%s(pin_names (offset 0.5)%s) (exclude_from_sim no) (in_bom yes) (on_board yes)\n", HidePinNumbers ? "(pin_numbers hide) " : "", HidePinNames ? " hide" : "" );
+		}
+
+	OutputToFile( &LocalParams, Level + 1, "(property \"Reference\" \"%s\" (at 6.35 -1.27 0)(effects (font (size 1.27 1.27)) (justify left)))\n", CompDef->compheader.refdesprefix );
+	OutputToFile( &LocalParams, Level + 1, "(property \"Value\" \"%s\" (at 6.35 1.27 0)(effects (font (size 1.27 1.27)) (justify left)))\n", CompDef->originalname );
+	if( CompDef->attachedpattern.patternname != NULL )
+		OutputToFile( &LocalParams, Level + 1, "(property \"Footprint\" \"%s\" (at 6.35 -3.81 0)(effects (font (size 1.27 1.27)) (justify left) (hide yes)))\n", CompDef->attachedpattern.patternname );
+
+	for( i = 0; i < CompDef->numattachedsymbols; i++ )
+		{
+		pcad_symboldef_t	*SymbolDef;
+		fprintf( stderr, "\nSymbol %d %s", i, CompDef->vioattachedsymbols[i]->symbolname );
+
+		if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[i]->symbolname )) != NULL )
+			OutputSymbolDef( Params, Level + 1, i + 1, Schematic, SymbolDef, CompDef );
+		}
+	OutputToFile( &LocalParams, Level, ")\n" );
+	return 0;
+	}
+/*=============================================================================*/
+static int OutputLibrary( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library )
+	{
+	int i;
+
+	OutputToFile( Params, Level, "(lib_symbols\n" );
+
+	for( i = 0; i < Library->numcompdefs; i++ )
+		OutputCompDef( Params, Level + 1, Schematic, Library, Library->viocompdefs[i] );
+/*
+	for( i = 0; i < Library->numsymboldefs; i++ )
+		OutputSymbolDef( Params, Level + 1, Schematic, Library->viosymboldefs[i] );
+*/
+	OutputToFile( Params, Level, ")\n" );
+	return 0;
 	}
 /*=============================================================================*/
 static pcad_attr_t *FindAttr( pcad_attr_t **Attributes, size_t NumAttributes, char *Name )
@@ -614,20 +700,30 @@ static pcad_compinst_t *FindCompInst( const pcad_netlist_t *NetList, const char 
 /*=============================================================================*/
 static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_symbol_t *Symbol )
 	{
-	pcad_symboldef_t	*SymbolDef;
-	pcad_compinst_t		*CompInst;
-	char				x[32], y[32], Angle[32];
-	int					IsPower = 0;
+	const pcad_symboldef_t	*SymbolDef	= NULL;
+	const pcad_compdef_t	*CompDef	= NULL;
+	const pcad_compinst_t	*CompInst;
+	char					x[32], y[32], Angle[32];
+	int						IsPower = 0;
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Symbol->pt.x, x, sizeof x );
 	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Symbol->pt.y, y, sizeof y );
 	FormatReal( Params, 0, 0,				1,				Symbol->rotation, Angle, sizeof Angle );
 
-	SymbolDef = FindSymbolDef( Schematic, Symbol->symbolref );
+	if(( SymbolDef = FindSymbolDef( Schematic, Symbol->symbolref )) == NULL )
+		Error( Params->Cookie, -1, "SymbolDef \"%s\" not found", Symbol->symbolref );
+
+	if(( CompInst = FindCompInst( &Schematic->netlist, Symbol->refdesref )) == NULL )
+		Error( Params->Cookie, -1, "CompInst \"%s\" not found", Symbol->refdesref );
+
+	if(( CompDef = FindCompDef( Schematic, CompInst->compref )) == NULL )
+		Error( Params->Cookie, -1, "CompDef \"%s\" not found", CompInst->compref );
+
+	IsPower = CompDef->compheader.comptype == PCAD_COMPTYPE_POWER;
 
 	OutputToFile( Params, Level, "(symbol\n" );
 
-	OutputToFile( Params, Level + 1, "(lib_id \"%s\")\n", Symbol->symbolref );
+	OutputToFile( Params, Level + 1, "(lib_id \"%s\")\n", CompDef->name );
 	OutputToFile( Params, Level + 1, "(at %s %s %s)\n", x, y, Angle );
 	if( Symbol->isflipped )
 		OutputToFile( Params, Level + 1, "(mirror y)\n" );
@@ -643,11 +739,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 		pcad_dimmension_t	dx = 0, dy = 0, dAngle = 0;
 		pcad_attr_t			*Attr;
 		pcad_enum_justify_t	jf	= 0;
-		pcad_compdef_t		*CompDef;
 		int					RefDesVisible	= 0;
-
-		if(( CompDef = FindCompDef( Schematic, SymbolDef->originalname )) != NULL )
-			IsPower = CompDef->compheader.comptype == PCAD_COMPTYPE_POWER;
 
 		if(( Attr = FindAttr( SymbolDef->vioattrs, SymbolDef->numattrs, "RefDes" )) != NULL )
 			{
@@ -674,7 +766,6 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 
 		OutputToFile( Params, Level + 1, "(property \"Reference\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s%s))\n", Symbol->refdesref, x, y, Angle, JustifyKiCAD[jf % LENGTH( JustifyKiCAD )], RefDesVisible ? "" : " (hide yes)" );
 
-		CompInst	= FindCompInst( &Schematic->netlist, Symbol->refdesref );
 		if( CompInst != NULL )
 			{
 			char	*CompValue		= CompInst->compvalue != NULL ? CompInst->compvalue : "";
@@ -724,7 +815,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			}
 		if( Column != 0 )
 			OutputToFile( Params, 0, "\n" );
-		OutputToFile( Params, Level + 1, "(instances (project \"%s\" (path \"/5eab5f85-83b1-44f7-98c0-9af69d3534bc\" (reference \"%s\") (unit 1))))\n", Params->SheetName, Symbol->refdesref );
+		OutputToFile( Params, Level + 1, "(instances (project \"%s\" (path \"/5eab5f85-83b1-44f7-98c0-9af69d3534bc\" (reference \"%s\") (unit %u))))\n", Params->SheetName, Symbol->refdesref, Symbol->partnum );
 		}
 
 	OutputToFile( Params, Level, ")\n" );
