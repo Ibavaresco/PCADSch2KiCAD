@@ -578,7 +578,9 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	OutputAttribute( &LocalParams, Level + 1, "RefDes", "Reference", RefDesPrefix, SymbolDef->vioattrs, SymbolDef->numattrs );
 	OutputAttribute( &LocalParams, Level + 1, "Value", "Value", NULL, SymbolDef->vioattrs, SymbolDef->numattrs );
 */
+
 	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", CompDef->name, Index + 1 );
+
 
 	for( i = 0; i < SymbolDef->numlines; i++ )
 		OutputLine( &LocalParams, Level + 1, SymbolDef->violines[i] );
@@ -638,7 +640,16 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 	LocalParams.ScaleY	= 1;
 	LocalParams.OriginY = 0;
 
-	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", CompDef->name );
+	if( CompDef->compheader.sourcelibrary != NULL && CompDef->compheader.sourcelibrary[0] != '\0' && CompDef->compheader.sourcelibrary[0] != '.' )
+		{
+		const char	*p;
+		if(( p = strrchr( CompDef->compheader.sourcelibrary, '.' )) != NULL )
+			OutputToFile( &LocalParams, Level, "(symbol \"%.*s:%s\"\n", p - CompDef->compheader.sourcelibrary, CompDef->compheader.sourcelibrary, CompDef->name );
+		else
+			OutputToFile( &LocalParams, Level, "(symbol \"%s:%s\"\n", CompDef->compheader.sourcelibrary, CompDef->name );
+		}
+	else
+		OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", CompDef->name );
 
 	if( CompDef->compheader.comptype == PCAD_COMPTYPE_POWER )
 		OutputToFile( &LocalParams, Level + 1, "(power) (pin_numbers hide) (pin_names (offset 0.5) hide) (exclude_from_sim no) (in_bom yes) (on_board yes)\n" );
@@ -666,7 +677,7 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 	for( i = 0; i < CompDef->numattachedsymbols; i++ )
 		{
 		pcad_symboldef_t	*SymbolDef;
-		fprintf( stderr, "\nSymbol %d %s", i, CompDef->vioattachedsymbols[i]->symbolname );
+//		fprintf( stderr, "\nSymbol %d %s", i, CompDef->vioattachedsymbols[i]->symbolname );
 
 		if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[i]->symbolname )) != NULL )
 			OutputSymbolDef( Params, Level + 1, i, Schematic, SymbolDef, CompDef );
@@ -746,7 +757,17 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 
 	OutputToFile( Params, Level, "(symbol\n" );
 
-	OutputToFile( Params, Level + 1, "(lib_id \"%s\")\n", CompDef->name );
+	if( CompDef->compheader.sourcelibrary != NULL && CompDef->compheader.sourcelibrary[0] != '\0' && CompDef->compheader.sourcelibrary[0] != '.' )
+		{
+		const char	*p;
+		if(( p = strrchr( CompDef->compheader.sourcelibrary, '.' )) != NULL )
+			OutputToFile( Params, Level + 1, "(lib_id \"%.*s:%s\")\n", p - CompDef->compheader.sourcelibrary, CompDef->compheader.sourcelibrary, CompDef->name );
+		else
+			OutputToFile( Params, Level + 1, "(lib_id \"%s:%s\")\n", CompDef->compheader.sourcelibrary, CompDef->name );
+		}
+	else
+		OutputToFile( Params, Level + 1, "(lib_id \"%s\")\n", CompDef->name );
+
 	OutputToFile( Params, Level + 1, "(at %s %s %s)\n", x, y, Angle );
 	if( Symbol->isflipped )
 		OutputToFile( Params, Level + 1, "(mirror y)\n" );
