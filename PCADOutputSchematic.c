@@ -395,7 +395,7 @@ static int OutputSymbolDef( parameters_t *Params, int Level, const pcad_symbolde
 /*=============================================================================*/
 static int OutputCompPin( parameters_t *Params, int Level, const pcad_comppin_t *CompPin )
 	{
-	OutputToFile( Params, Level, "(compPin \"%s\"", CompPin->name );
+	OutputToFile( Params, Level, "(compPin \"%s\"", CompPin->pinnumber );
 
 	if( CompPin->pinname != NULL )
 		OutputToFile( Params, 0, " (pinName \"%s\")", CompPin->pinname );

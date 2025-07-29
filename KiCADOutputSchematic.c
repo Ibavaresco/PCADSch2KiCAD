@@ -48,11 +48,14 @@ typedef struct
 	pcad_real_t			ScaleY;
 	} parameters_t;
 /*=============================================================================*/
-static char *FormatLabel( const char *Label, char *Buffer, size_t BufferSize )
+static const char *FormatLabel( const char *Label, char *Buffer, size_t BufferSize )
 	{
 	const char	*p	= Label;
 	char		*q	= Buffer;
 	int			Negated;
+
+	if( Label == NULL )
+		return "";
 
 	for( Negated = 0; *p != 0 && BufferSize > 3; p++, BufferSize-- )
 		{
@@ -286,6 +289,7 @@ static int OutputText( const parameters_t *Params, unsigned Level, pcad_text_t *
 	return 0;
 	}
 /*=============================================================================*/
+/*
 static int OutputAttribute( const parameters_t *Params, unsigned Level, const char *NamePCAD, const char *NameKiCAD, const char *Value, pcad_attr_t **Attributes, size_t NumAttributes )
 	{
 	int i;
@@ -307,6 +311,7 @@ static int OutputAttribute( const parameters_t *Params, unsigned Level, const ch
 	OutputToFile( Params, Level, "(property \"%s\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))))\n", NameKiCAD, FormatLabel( Value != NULL ? Value : Attr->value, Buffer, sizeof Buffer ), x, y, Angle );
 	return 1;
 	}
+*/
 /*=============================================================================*/
 static int OutputLine( const parameters_t *Params, unsigned Level, pcad_line_t	*Line )
 	{
@@ -410,7 +415,18 @@ static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepoi
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pin, int PinType )
+static pcad_comppin_t *FindPin( const parameters_t *Params, unsigned PartNumber, unsigned PinNumber, const pcad_compdef_t *CompDef )
+	{
+	int	i;
+
+	for( i = 0; i < CompDef->numcomppins; i++ )
+		if( CompDef->viocomppins[i]->partnum == PartNumber && CompDef->viocomppins[i]->sympinnum == PinNumber )
+			return CompDef->viocomppins[i];
+
+	return NULL;
+	}
+/*=============================================================================*/
+static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pin, int PinType, unsigned PartNumber, unsigned PinNumber, const pcad_compdef_t *CompDef )
 	{
 	static const char	*GraphStyles[2][4]	=
 		{
@@ -438,11 +454,12 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 		"unspecified"
 		};
 
-	char				x[32], y[32], Angle[32], Length[32], Buffer[3*strlen( Pin->pinname.value )+1];
-	const char			*GraphStyle;
-	pcad_real_t			PinRotation = ( Pin->rotation + 180000000 ) % 360000000;
-	pcad_real_t			PinX		= Pin->point.x;
-	pcad_real_t			PinY		= Pin->point.y;
+	char					x[32], y[32], Angle[32], Length[32], Buffer[3*strlen( Pin->pinname.value )+1];
+	const char				*GraphStyle;
+	pcad_real_t				PinRotation = ( Pin->rotation + 180000000 ) % 360000000;
+	pcad_real_t				PinX		= Pin->point.x;
+	pcad_real_t				PinY		= Pin->point.y;
+	const pcad_comppin_t	*CompPin;
 
 	switch( PinRotation )
 		{
@@ -467,7 +484,13 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 
 	GraphStyle	= GraphStyles[Pin->insideedgestyle&1][Pin->outsideedgestyle&3];
 
-	OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%u\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, PinType > PCAD_PINTYPE_POWER ? "" : FormatLabel( Pin->pinname.value, Buffer, sizeof Buffer ), Pin->pinnum );
+	if(( CompPin = FindPin( Params, PartNumber, PinNumber, CompDef )) == NULL )
+		Error( Params->Cookie, -1, "CompPin not found" );
+
+	if( CompPin->pinname == NULL )
+		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, CompPin->pinnumber );
+	else
+		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, FormatLabel( CompPin->pinname, Buffer, sizeof Buffer ), CompPin->pinnumber );
 
 	return 0;
 	}
@@ -555,7 +578,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	OutputAttribute( &LocalParams, Level + 1, "RefDes", "Reference", RefDesPrefix, SymbolDef->vioattrs, SymbolDef->numattrs );
 	OutputAttribute( &LocalParams, Level + 1, "Value", "Value", NULL, SymbolDef->vioattrs, SymbolDef->numattrs );
 */
-	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", CompDef->name, Index );
+	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", CompDef->name, Index + 1 );
 
 	for( i = 0; i < SymbolDef->numlines; i++ )
 		OutputLine( &LocalParams, Level + 1, SymbolDef->violines[i] );
@@ -573,7 +596,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 		else
 			PinType	= 0;	//@@@@
 
-		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], PinType );
+		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], PinType, Index + 1, i + 1, CompDef );
 		}
 	OutputToFile( &LocalParams, Level, ")\n" );
 	return 0;
@@ -646,7 +669,7 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 		fprintf( stderr, "\nSymbol %d %s", i, CompDef->vioattachedsymbols[i]->symbolname );
 
 		if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[i]->symbolname )) != NULL )
-			OutputSymbolDef( Params, Level + 1, i + 1, Schematic, SymbolDef, CompDef );
+			OutputSymbolDef( Params, Level + 1, i, Schematic, SymbolDef, CompDef );
 		}
 	OutputToFile( &LocalParams, Level, ")\n" );
 	return 0;

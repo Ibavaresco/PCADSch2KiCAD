@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters='--kicadout &quot;\Lixao\Teste.sch&quot;' />
+				<Option parameters='--kicadout &quot;C:\Trabalho\80C32\80C32-3-Sort.sch&quot;' />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

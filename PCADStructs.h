@@ -238,7 +238,6 @@ typedef struct pcad_symboldef_tag
 /*=============================================================================*/
 typedef struct pcad_comppin_tag
 	{
-	char									*name;
 	char									*pinnumber;
 	char									*pinname;
 	pcad_integer_t							partnum;

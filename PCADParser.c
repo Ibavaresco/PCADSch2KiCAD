@@ -689,7 +689,7 @@ static const parsestruct_t	CompHeader_ParseStruct	=
 static const parsefield_t	CompPin_FixedFields[]	=
 	{
 	/*	Flags			TagString		ParseFunction	Size	Offset									ParseStruct */
-		{ FLAG_NAKED,	NULL,			ParseString,	0,		offsetof( pcad_comppin_t, name ),		NULL }
+		{ FLAG_NAKED,	NULL,			ParseString,	0,		offsetof( pcad_comppin_t, pinnumber ),	NULL }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	CompPin_Fields[]	=

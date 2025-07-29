@@ -1451,7 +1451,7 @@ static int CompareCompPins( const void *a, const void *b )
 	const pcad_comppin_t	*pa = *(const pcad_comppin_t * const *)a;
 	const pcad_comppin_t	*pb = *(const pcad_comppin_t * const *)b;
 
-	return CompareNames( pa->name, pb->name );
+	return CompareNames( pa->pinnumber, pb->pinnumber );
 	}
 /*===========================================================================*/
 static int CompareAttachedSymbols( const void *a, const void *b )
