@@ -4,5 +4,3 @@ The schematic file is read, parsed and converted to an internal representation, 
 
 Usually P-CAD rearranges the order of elements in the file each time it is saved, so it is impossible to used diff to see what has really changed.
 If the output format is P-CAD, the result is very useful to help with version control, because only real changes will reflect in the resulting file.
-
-For now, KiCAD output is not completely correct for components with multiple parts/gates and components that have the numbering of the pins different in symbol and footprint.
