@@ -52,18 +52,18 @@ typedef enum
 /*============================================================================*/
 typedef struct
 	{
-	jmp_buf			JumpBuffer;
-	FILE			*File;
-	unsigned		LineNumber;
-	unsigned		Column;
-	unsigned		TabSize;
-	size_t			HeapSize;
-	size_t			HeapTop;
-	uint8_t			*Heap;
-	pcad_units_t	FileUnits;
-	token_t			UngettedToken;
-	char			UngetBuffer[BUFFER_SIZE];
-	int				Sort;
+	jmp_buf				JumpBuffer;
+	FILE				*File;
+	unsigned			LineNumber;
+	unsigned			Column;
+	unsigned			TabSize;
+	size_t				HeapSize;
+	size_t				HeapTop;
+	uint8_t				*Heap;
+	pcad_enum_units_t	FileUnits;
+	token_t				UngettedToken;
+	char				UngetBuffer[BUFFER_SIZE];
+	int					Sort;
 	} cookie_t;
 /*===========================================================================*/
 pcad_schematicfile_t	*ParsePCAD	( cookie_t *Cookie, const char *pNameIn, const char *pNameOut );

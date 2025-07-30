@@ -151,6 +151,17 @@ const parseenum_t	EndStyles	=
 		}
 	};
 /*============================================================================*/
+const parseenum_t	AltTypes	=
+	{
+	.numitems	= 3,
+	.items		=
+		{
+		[PCAD_ALTTYPE_NORMAL]					= "Normal",			/* Note: "Normal" doesn't exist, it is the default by omission. */
+		[PCAD_ALTTYPE_DEMORGAN]					= "DeMorgan",
+		[PCAD_ALTTYPE_IEEE]						= "IEEE"
+		}
+	};
+/*============================================================================*/
 const parseenum_t PortTypes	=
 	{
 	.numitems	= 24,

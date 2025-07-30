@@ -30,7 +30,7 @@
 #include "Lexic.h"
 #include "PCADEnums.h"
 /*============================================================================*/
-pcad_dimmension_t ProcessDimmension( cookie_t *Cookie, const char *Buffer, pcad_units_t Unit )
+pcad_dimmension_t ProcessDimmension( cookie_t *Cookie, const char *Buffer, pcad_enum_units_t Unit )
 	{
 	pcad_dimmension_t	Value	= 0;
 	int					Sign	= 0;
@@ -83,7 +83,7 @@ pcad_dimmension_t ProcessDimmension( cookie_t *Cookie, const char *Buffer, pcad_
 	return Value;
 	}
 /*============================================================================*/
-pcad_units_t TranslateUnits( cookie_t *Cookie, const char *Buffer )
+pcad_enum_units_t TranslateUnits( cookie_t *Cookie, const char *Buffer )
 	{
 	static const char	*Units[]	= { [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
 	int					i;
@@ -105,7 +105,12 @@ int ExpectName( cookie_t *Cookie, const char *Name )
 	char	Buffer[BUFFER_SIZE];
 
 	if( GetToken( Cookie, Buffer, sizeof Buffer ) != TOKEN_NAME )
-		Error( Cookie, -1, "Expecting name" );
+		{
+		if( Name != NULL )
+			Error( Cookie, -1, "Expecting name %s", Name );
+		else
+			Error( Cookie, -1, "Expecting name" );
+		}
 
 	if( Name != NULL && stricmp( Buffer, Name ) != 0 )
 		Error( Cookie, -1, "Expecting name \"%s\"", Name );
@@ -187,7 +192,7 @@ int ParseDimmension( cookie_t *Cookie, const parsefield_t *ParseField, const par
 	return 0;
 	}
 /*============================================================================*/
-pcad_boolean_t GetBoolean( cookie_t *Cookie )
+pcad_enum_boolean_t GetBoolean( cookie_t *Cookie )
 	{
 	char	Buffer[BUFFER_SIZE];
 
@@ -203,7 +208,7 @@ pcad_boolean_t GetBoolean( cookie_t *Cookie )
 /*============================================================================*/
 int ParseBoolean( cookie_t *Cookie, const parsefield_t *ParseField, const parsestruct_t *ParseStruct, void *Argument )
 	{
-	pcad_boolean_t	*Boolean	= (pcad_unsigned_t*)Argument;
+	pcad_enum_boolean_t	*Boolean	= (pcad_unsigned_t*)Argument;
 
 	*Boolean	= GetBoolean( Cookie );
 

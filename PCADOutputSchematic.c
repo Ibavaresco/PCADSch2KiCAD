@@ -414,7 +414,7 @@ static int OutputCompPin( parameters_t *Params, int Level, const pcad_comppin_t 
 static int OutputAttachedSymbol( parameters_t *Params, int Level, const pcad_attachedsymbol_t *AttachedSymbol )
 	{
 	OutputToFile( Params, Level, "(attachedSymbol (partNum %u) (altType %s) (symbolName \"%s\"))\r\n",
-		AttachedSymbol->partnum, AttachedSymbol->alttype, AttachedSymbol->symbolname );
+		AttachedSymbol->partnum, AltTypes.items[AttachedSymbol->alttype], AttachedSymbol->symbolname );
 
 	return 0;
 	}

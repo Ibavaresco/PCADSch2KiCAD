@@ -82,7 +82,7 @@ typedef struct pcad_asciiheader_tag
 	char									*copyright;
 	char									*fileauthor;
 	char									*headerstring;
-	pcad_units_t							fileunits;
+	pcad_enum_units_t						fileunits;
 	char									*guidstring;
 	} pcad_asciiheader_t;
 /*===========================================================================*/
@@ -112,8 +112,8 @@ typedef struct pcad_textstyledef_tag
 	{
 	char									*name;
 	pcad_font_t								*firstfont;
-	pcad_boolean_t							allowttype;
-	pcad_boolean_t							displayttype;
+	pcad_enum_boolean_t						allowttype;
+	pcad_enum_boolean_t						displayttype;
 	struct pcad_textstyledef_tag			*next;
 	size_t									numfonts;
 	pcad_font_t								**viofonts;
@@ -131,7 +131,7 @@ typedef struct pcad_text_tag
 	char									*value;
 	char									*textstyleref;
 	pcad_real_t								rotation;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						isflipped;
 	pcad_enum_justify_t						justify;
 	pcad_extent_t							extent;
 	struct pcad_text_tag					*next;
@@ -147,9 +147,9 @@ typedef struct pcad_pin_tag
 	pcad_enum_insideedgestyle_t				insideedgestyle;
 	pcad_enum_outsidestyle_t				outsidestyle;
 	pcad_enum_insidestyle_t					insidestyle;
-	pcad_boolean_t							displaypindes;
-	pcad_boolean_t							displaypinname;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						displaypindes;
+	pcad_enum_boolean_t						displaypinname;
+	pcad_enum_boolean_t						isflipped;
 	pcad_text_t								pindes;
 	pcad_text_t								pinname;
 	char									*defaultpindes;
@@ -171,7 +171,7 @@ typedef struct pcad_ieeesymbol_tag
 	pcad_enum_ieeesymbol_t					type;
 	pcad_point_t							point;
 	pcad_dimmension_t						height;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						isflipped;
 	struct pcad_ieeesymbol_tag				*next;
 	} pcad_ieeesymbol_t;
 /*=============================================================================*/
@@ -181,11 +181,11 @@ typedef struct pcad_attr_tag
 	char									*value;
 	pcad_point_t							point;
 	pcad_real_t								rotation;
-	pcad_boolean_t							isvisible;
+	pcad_enum_boolean_t						isvisible;
 	pcad_enum_justify_t						justify;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						isflipped;
 	char									*textstyleref;
-	pcad_units_t							constraintunits;
+	pcad_enum_units_t						constraintunits;
 	struct pcad_attr_tag					*next;
 	} pcad_attr_t;
 /*=============================================================================*/
@@ -250,8 +250,8 @@ typedef struct pcad_comppin_tag
 /*=============================================================================*/
 typedef struct pcad_alts_tag
 	{
-	pcad_boolean_t							ieeealt;
-	pcad_boolean_t							demorganalt;
+	pcad_enum_boolean_t						ieeealt;
+	pcad_enum_boolean_t						demorganalt;
 	} pcad_alts_t;
 /*=============================================================================*/
 typedef struct pcad_compheader_tag
@@ -269,7 +269,7 @@ typedef struct pcad_compheader_tag
 typedef struct pcad_attachedsymbol_tag
 	{
 	pcad_unsigned_t							partnum;
-	char									*alttype;
+	pcad_enum_alttype_t						alttype;
 	char									*symbolname;
 	struct pcad_attachedsymbol_tag			*next;
 	} pcad_attachedsymbol_t;
@@ -406,7 +406,7 @@ typedef struct pcad_note_tag
 	{
 	pcad_unsigned_t							number;
 	char									*value;
-	pcad_noteannotation_t					noteannotation;
+	pcad_enum_noteannotation_t				noteannotation;
 	struct pcad_note_tag					*next;
 	} pcad_note_t;
 /*===========================================================================*/
@@ -464,7 +464,7 @@ typedef struct
 /*===========================================================================*/
 typedef struct pcad_border_tag
 	{
-	pcad_boolean_t							isvisible;
+	pcad_enum_boolean_t						isvisible;
 	pcad_dimmension_t						height;
 	pcad_dimmension_t						width;
 	pcad_offset_t							offset;
@@ -479,7 +479,7 @@ typedef struct pcad_hvzones_tag
 /*===========================================================================*/
 typedef struct pcad_zones_tag
 	{
-	pcad_boolean_t							isvisible;
+	pcad_enum_boolean_t						isvisible;
 
 	pcad_hvzones_t							horizontalzones;
 	pcad_hvzones_t							verticalzones;
@@ -490,7 +490,7 @@ typedef struct pcad_titlesheet_tag
 	{
 	char									*name;
 	pcad_real_t								scale;
-	pcad_boolean_t							isvisible;
+	pcad_enum_boolean_t						isvisible;
 	pcad_offset_t							offset;
 	pcad_border_t							border;
 	pcad_zones_t							zones;
@@ -512,12 +512,12 @@ typedef struct pcad_region_tag
 typedef struct pcad_wire_tag
 	{
 	pcad_point_t							pt1;
-	pcad_endstyle_t							endstyle1;
+	pcad_enum_endstyle_t					endstyle1;
 	pcad_point_t							pt2;
-	pcad_endstyle_t							endstyle2;
+	pcad_enum_endstyle_t					endstyle2;
 	pcad_dimmension_t						width;
 	char									*netnameref;
-	pcad_boolean_t							dispname;
+	pcad_enum_boolean_t						dispname;
 	pcad_text_t								text;
 	struct pcad_wire_tag					*next;
 	} pcad_wire_t;
@@ -527,7 +527,7 @@ typedef struct pcad_bus_tag
 	char									*name;
 	pcad_point_t							pt1;
 	pcad_point_t							pt2;
-	pcad_boolean_t							dispname;
+	pcad_enum_boolean_t						dispname;
 	pcad_text_t								*text;
 	struct pcad_bus_tag						*next;
 	} pcad_bus_t;
@@ -536,8 +536,8 @@ typedef struct pcad_busentry_tag
 	{
 	char									*busnameref;
 	pcad_point_t							point;
-	pcad_orient_t							orient;
-	pcad_endstyle_t							style;		/* Busentries don't have an endstyle, but later we will need to copy the associated wire's endstyle to here. */
+	pcad_enum_orient_t						orient;
+	pcad_enum_endstyle_t					style;		/* Busentries don't have an endstyle, but later we will need to copy the associated wire's endstyle to here. */
 	struct pcad_busentry_tag				*next;
 	} pcad_busentry_t;
 /*=============================================================================*/
@@ -546,9 +546,10 @@ typedef struct	pcad_symbol_tag
 	char									*symbolref;
 	char									*refdesref;
 	pcad_unsigned_t							partnum;
+	pcad_enum_alttype_t						alttype;
 	pcad_point_t							pt;
 	pcad_real_t								rotation;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						isflipped;
 	pcad_attr_t								*firstattr;
 
 	size_t									numattrs;
@@ -571,7 +572,7 @@ typedef struct pcad_port_tag
 	pcad_enum_portpinlength_t				portpinlength;
 	char									*netnameref;
 	pcad_real_t								rotation;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						isflipped;
 	struct pcad_port_tag					*next;
 	} pcad_port_t;
 /*=============================================================================*/
@@ -579,7 +580,7 @@ typedef struct pcad_field_tag
 	{
 	char									*name;
 	pcad_point_t							point;
-	pcad_boolean_t							isflipped;
+	pcad_enum_boolean_t						isflipped;
 	pcad_enum_justify_t						justify;
 	char									*textstyleref;
 	struct pcad_field_tag					*next;
@@ -597,9 +598,9 @@ typedef struct pcad_sheet_tag
 	pcad_titlesheet_t						titlesheet;
 	pcad_unsigned_t							sheetnum;
 	char									*fieldsetref;
-	pcad_boolean_t							drawborder;
-	pcad_boolean_t							entiredesign;
-	pcad_boolean_t							isrotated;
+	pcad_enum_boolean_t						drawborder;
+	pcad_enum_boolean_t						entiredesign;
+	pcad_enum_boolean_t						isrotated;
 	pcad_enum_pagesize_t					pagesize;
 	pcad_real_t								scalefactor;
 	pcad_point_t							offset;
@@ -687,15 +688,15 @@ typedef struct pcad_gridstate_tag
 	{
 	pcad_dimmension_t						currentabsgrid;
 	pcad_dimmension_t						currentrelgrid;
-	pcad_boolean_t							isabsolutegrid;
-	pcad_boolean_t							isdottedgrid;
-	pcad_boolean_t							isvisiblegrid;
-	pcad_boolean_t							ispromptforrel;
+	pcad_enum_boolean_t						isabsolutegrid;
+	pcad_enum_boolean_t						isdottedgrid;
+	pcad_enum_boolean_t						isvisiblegrid;
+	pcad_enum_boolean_t						ispromptforrel;
 	} pcad_gridstate_t;
 /*===========================================================================*/
 typedef struct pcad_ecostate_tag
 	{
-	pcad_boolean_t							ecorecording;
+	pcad_enum_boolean_t						ecorecording;
 	} pcad_ecostate_t;
 /*===========================================================================*/
 typedef struct pcad_programstate_tag
@@ -726,7 +727,7 @@ typedef struct pcad_reportfield_tag
 	pcad_fieldtypes_t						reportfieldtype;
 	pcad_unsigned_t							reportfieldsortorder;
 	pcad_enum_numdirection_t				reportfieldsorttype;
-	pcad_boolean_t							reportfieldshowflag;
+	pcad_enum_boolean_t						reportfieldshowflag;
 	pcad_unsigned_t							reportfieldcolumnwidth;
 	pcad_reportfieldconditions_t			reportfieldconditions;
 	struct pcad_reportfield_tag				*next;
@@ -754,20 +755,20 @@ typedef struct pcad_reportdefinition_tag
 	{
 	char									*reportname;
 	char									*reportextension;
-	pcad_boolean_t							reportshowflag;
+	pcad_enum_boolean_t						reportshowflag;
 	pcad_reporttypes_t						reporttype;
-	pcad_boolean_t							reportuserdefined;
+	pcad_enum_boolean_t						reportuserdefined;
 	pcad_unsigned_t							reportlinesperpage;
 	pcad_unsigned_t							reportcolumnwidth;
-	pcad_boolean_t							reportuseheader;
+	pcad_enum_boolean_t						reportuseheader;
 	char									*reportheader;
-	pcad_boolean_t							reportusefooter;
+	pcad_enum_boolean_t						reportusefooter;
 	char									*reportfooter;
-	pcad_boolean_t							reportusedesigninfo;
-	pcad_boolean_t							reportshowdate;
-	pcad_boolean_t							reportpaginateflag;
-	pcad_boolean_t							reportshowcdfpreface;
-	pcad_boolean_t							reportshowcolumnnames;
+	pcad_enum_boolean_t						reportusedesigninfo;
+	pcad_enum_boolean_t						reportshowdate;
+	pcad_enum_boolean_t						reportpaginateflag;
+	pcad_enum_boolean_t						reportshowcdfpreface;
+	pcad_enum_boolean_t						reportshowcolumnnames;
 	pcad_reportfieldssection_t				reportfieldssections;
 	struct pcad_reportdefinition_tag		*next;
 	} pcad_reportdefinition_t;

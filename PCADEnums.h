@@ -41,7 +41,7 @@ typedef enum
 	PCAD_BOOLEAN_ABSENT,
 	PCAD_BOOLEAN_FALSE,
 	PCAD_BOOLEAN_TRUE
-	} pcad_boolean_t;
+	} pcad_enum_boolean_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -49,7 +49,7 @@ typedef enum
 	PCAD_UNITS_MM,
 	PCAD_UNITS_MIL,
 	PCAD_UNITS_IN
-	} pcad_units_t;
+	} pcad_enum_units_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -57,7 +57,7 @@ typedef enum
 	PCAD_NOTEANNOTATION_BOX,
 	PCAD_NOTEANNOTATION_CIRCLE,
 	PCAD_NOTEANNOTATION_TRIANGLE
-	} pcad_noteannotation_t;
+	} pcad_enum_noteannotation_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -71,7 +71,7 @@ typedef enum
 	PCAD_CONSTRAINTUNITS_QUANTITY,
 	PCAD_CONSTRAINTUNITS_STRING,
 	PCAD_CONSTRAINTUNITS_VIASTYLE
-	} pcad_constraintunits_t;
+	} pcad_enum_constraintunits_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -79,7 +79,7 @@ typedef enum
 	PCAD_ORIENT_DOWN,
 	PCAD_ORIENT_LEFT,
 	PCAD_ORIENT_RIGHT
-	} pcad_orient_t;
+	} pcad_enum_orient_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -118,7 +118,14 @@ typedef enum
 	PCAD_ENDSTYLE_LEFTLEAD,
 	PCAD_ENDSTYLE_RIGHTLEAD,
 	PCAD_ENDSTYLE_TWOLEADS
-	} pcad_endstyle_t;
+	} pcad_enum_endstyle_t;
+/*============================================================================*/
+typedef enum
+	{
+	PCAD_ALTTYPE_NORMAL,
+	PCAD_ALTTYPE_DEMORGAN,
+	PCAD_ALTTYPE_IEEE
+	} pcad_enum_alttype_t;
 /*============================================================================*/
 typedef enum
 	{
@@ -329,6 +336,8 @@ extern const parseenum_t	Justify;
 /*----------------------------------------------------------------------------*/
 extern const parseenum_t	LineStyles;
 extern const parseenum_t	EndStyles;
+/*----------------------------------------------------------------------------*/
+extern const parseenum_t	AltTypes;
 /*----------------------------------------------------------------------------*/
 extern const parseenum_t	PortTypes;
 extern const parseenum_t	PortPinLengths;

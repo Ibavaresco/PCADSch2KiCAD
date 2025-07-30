@@ -50,7 +50,7 @@ static int Parse_FileUnits( cookie_t *Cookie, const parsefield_t *ParseField, co
 	{
 	ParseEnum( Cookie, ParseField, ParseStruct, Argument );
 
-	Cookie->FileUnits	= *(pcad_units_t*)Argument;
+	Cookie->FileUnits	= *(pcad_enum_units_t*)Argument;
 
 	return 0;
 	}
@@ -718,8 +718,8 @@ static const parsestruct_t	CompPin_ParseStruct	=
 static const parsefield_t	AttachedSymbol_Fields[]	=
 	{
 	/*	Flags			TagString		ParseFunction	Size	Offset											ParseStruct */
-		{ FLAG_WRAPPED, "partNum",		ParseUnsigned,	0,		offsetof( pcad_attachedsymbol_t, partnum ),		NULL },
-		{ FLAG_WRAPPED, "altType",		ParseName,		0,		offsetof( pcad_attachedsymbol_t, alttype ),		NULL },
+		{ FLAG_WRAPPED, "partNum",		ParseUnsigned,	0,		offsetof( pcad_attachedsymbol_t, partnum ),		NULL },//
+		{ FLAG_WRAPPED, "altType",		ParseEnum,		0,		offsetof( pcad_attachedsymbol_t, alttype ),		(const parsestruct_t*)&AltTypes },
 		{ FLAG_WRAPPED, "symbolName",	ParseString,	0,		offsetof( pcad_attachedsymbol_t, symbolname ),	NULL }
 	};
 /*----------------------------------------------------------------------------*/
@@ -1138,16 +1138,17 @@ static const parsefield_t	Symbol_FixedFields[]	=
 	/*	Flags			TagString		ParseFunction		Size	Offset									ParseStruct */
 		{ FLAG_WRAPPED,	"symbolRef",	ParseString,		0,		offsetof( pcad_symbol_t, symbolref ),	NULL },
 		{ FLAG_WRAPPED,	"refDesRef",	ParseString,		0,		offsetof( pcad_symbol_t, refdesref ),	NULL },
-		{ FLAG_WRAPPED,	"partNum",		ParseUnsigned,		0,		offsetof( pcad_symbol_t, partnum ),		NULL },
-		{ FLAG_WRAPPED,	"pt",			ParseGeneric,		0,		offsetof( pcad_symbol_t, pt ),			&Point_ParseStruct }
+		{ FLAG_WRAPPED,	"partNum",		ParseUnsigned,		0,		offsetof( pcad_symbol_t, partnum ),		NULL }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsefield_t	Symbol_Fields[]	=
 	{
-	/*	Flags						TagString		ParseFunction		Size					Offset									ParseStruct */
-		{ FLAG_WRAPPED,				"rotation",		ParseReal,			0,						offsetof( pcad_symbol_t, rotation ),	NULL },
-		{ FLAG_WRAPPED,				"isFlipped",	ParseBoolean,		0,						offsetof( pcad_symbol_t, isflipped ),	NULL },
-		{ FLAG_WRAPPED | FLAG_LIST,	"attr",			ParseGeneric,		sizeof( pcad_attr_t ),	offsetof( pcad_symbol_t, vioattrs ),	&Attr_ParseStruct }
+	/*	Flags						TagString		ParseFunction		Size					Offset										ParseStruct */
+		{ FLAG_WRAPPED, 			"altType",		ParseEnum,			0,						offsetof( pcad_attachedsymbol_t, alttype ),	(const parsestruct_t*)&AltTypes },
+		{ FLAG_WRAPPED,				"pt",			ParseGeneric,		0,						offsetof( pcad_symbol_t, pt ),				&Point_ParseStruct },
+		{ FLAG_WRAPPED,				"rotation",		ParseReal,			0,						offsetof( pcad_symbol_t, rotation ),		NULL },
+		{ FLAG_WRAPPED,				"isFlipped",	ParseBoolean,		0,						offsetof( pcad_symbol_t, isflipped ),		NULL },
+		{ FLAG_WRAPPED | FLAG_LIST,	"attr",			ParseGeneric,		sizeof( pcad_attr_t ),	offsetof( pcad_symbol_t, vioattrs ),		&Attr_ParseStruct }
 	};
 /*----------------------------------------------------------------------------*/
 static const parsestruct_t	Symbol_ParseStruct	=
