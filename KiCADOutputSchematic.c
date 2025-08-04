@@ -102,7 +102,7 @@ static int FormatReal( const parameters_t *Params, unsigned FracDigs, pcad_dimme
 
 	Res	= snprintf( Buffer, BufferSize, "%s%u.%0*u", Sign ? "-" : "", Int, Dig, Frac );
 	if( Res <= 0 || Res >= BufferSize )
-		Error( Params->Cookie, -1, "Invalid number" );
+		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "Invalid number" );
 
 	return Res;
 	}
@@ -485,7 +485,7 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 	GraphStyle	= GraphStyles[Pin->insideedgestyle&1][Pin->outsideedgestyle&3];
 
 	if(( CompPin = FindPin( Params, PartNumber, PinNumber, CompDef )) == NULL )
-		Error( Params->Cookie, -1, "CompPin not found" );
+		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "CompPin not found" );
 
 	if( CompPin->pinname == NULL )
 		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, CompPin->pinnumber );
@@ -632,7 +632,7 @@ static pcad_symboldef_t *FindSymbolDefByOriginalName( const pcad_schematicfile_t
 /*=============================================================================*/
 static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library, pcad_compdef_t *CompDef )
 	{
-	parameters_t	LocalParams		= *Params;
+	parameters_t		LocalParams		= *Params;
 	int				i;
 
 	LocalParams.ScaleX	= 1;
@@ -649,23 +649,30 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 			OutputToFile( &LocalParams, Level, "(symbol \"%s:%s\"\n", CompDef->compheader.sourcelibrary, CompDef->name );
 		}
 	else
-		OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", CompDef->name );
+	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", CompDef->name );
 
 	if( CompDef->compheader.comptype == PCAD_COMPTYPE_POWER )
 		OutputToFile( &LocalParams, Level + 1, "(power) (pin_numbers hide) (pin_names (offset 0.5) hide) (exclude_from_sim no) (in_bom yes) (on_board yes)\n" );
 	else
 		{
-		int HidePinNumbers	= 0;
-		int HidePinNames	= 0;
-/*
-		for( i = 0; i < SymbolDef->numpins; i++ )
+		int HidePinNumbers	= 1;
+		int HidePinNames	= 1;
+		int	j;
+
+		for( j = 0; j < CompDef->numattachedsymbols; j++ )
 			{
-			if( SymbolDef->viopins[i]->displaypindes != PCAD_BOOLEAN_FALSE )
-				HidePinNumbers	= 0;
-			if( SymbolDef->viopins[i]->displaypinname == PCAD_BOOLEAN_TRUE )
-				HidePinNames	= 0;
+			pcad_symboldef_t	*SymbolDef;
+
+			if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[j]->symbolname )) != NULL )
+				for( i = 0; i < SymbolDef->numpins; i++ )
+					{
+					if( SymbolDef->viopins[i]->displaypindes != PCAD_BOOLEAN_FALSE )
+						HidePinNumbers	= 0;
+					if( SymbolDef->viopins[i]->displaypinname == PCAD_BOOLEAN_TRUE )
+						HidePinNames	= 0;
+					}
 			}
-*/
+
 		OutputToFile( &LocalParams, Level + 1, "%s(pin_names (offset 0.5)%s) (exclude_from_sim no) (in_bom yes) (on_board yes)\n", HidePinNumbers ? "(pin_numbers hide) " : "", HidePinNames ? " hide" : "" );
 		}
 
@@ -745,13 +752,13 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 	FormatReal( Params, 0, 0,				1,				Symbol->rotation, Angle, sizeof Angle );
 
 	if(( SymbolDef = FindSymbolDef( Schematic, Symbol->symbolref )) == NULL )
-		Error( Params->Cookie, -1, "SymbolDef \"%s\" not found", Symbol->symbolref );
+		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "SymbolDef \"%s\" not found", Symbol->symbolref );
 
 	if(( CompInst = FindCompInst( &Schematic->netlist, Symbol->refdesref )) == NULL )
-		Error( Params->Cookie, -1, "CompInst \"%s\" not found", Symbol->refdesref );
+		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "CompInst \"%s\" not found", Symbol->refdesref );
 
 	if(( CompDef = FindCompDef( Schematic, CompInst->compref )) == NULL )
-		Error( Params->Cookie, -1, "CompDef \"%s\" not found", CompInst->compref );
+		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "CompDef \"%s\" not found", CompInst->compref );
 
 	IsPower = CompDef->compheader.comptype == PCAD_COMPTYPE_POWER;
 
@@ -1201,7 +1208,7 @@ int OutputKiCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const ch
 		remove( TmpPath );
 
 		if(( Params.File = fopen( TmpPath, "wb" )) == NULL )
-			Error( Cookie, -1, "Error creating file" );
+			fclose( Params.Cookie->File ), ErrorOutput( Cookie, -1, "Error creating file" );
 
 		OutputSheet( &Params, 0, PCADSchematic, PCADSchematic->schematicdesign.viosheets[i] );
 

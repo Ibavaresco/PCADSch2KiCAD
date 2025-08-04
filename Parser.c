@@ -536,6 +536,21 @@ int Error( cookie_t *Cookie, int ErrorCode, const char *Message, ... )
 	longjmp( Cookie->JumpBuffer, ErrorCode );
 	}
 /*============================================================================*/
+int ErrorOutput( cookie_t *Cookie, int ErrorCode, const char *Message, ... )
+	{
+	va_list ap;
+
+	va_start( ap, Message );
+
+	fprintf( stderr, "Error: " );
+	vfprintf( stderr, Message, ap );
+	fprintf( stderr, "\n" );
+
+	va_end( ap );
+
+	longjmp( Cookie->JumpBuffer, ErrorCode );
+	}
+/*============================================================================*/
 int Warning( cookie_t *Cookie, const char *Message, ... )
 	{
 	va_list ap;

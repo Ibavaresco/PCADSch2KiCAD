@@ -98,6 +98,7 @@ pcad_enum_units_t	TranslateUnits		( cookie_t *Cookie, const char *Buffer );
 pcad_dimmension_t	ProcessDimmension	( cookie_t *Cookie, const char *Buffer, pcad_enum_units_t Unit );
 /*============================================================================*/
 int __attribute__((format(printf, 3, 4),noreturn))	Error		( cookie_t *Cookie, int ErrorCode, const char *Message, ... );
+int __attribute__((format(printf, 3, 4),noreturn))	ErrorOutput	( cookie_t *Cookie, int ErrorCode, const char *Message, ... );
 int __attribute__((format(printf, 2, 3)))			Warning		( cookie_t *Cookie, const char *Message, ... );
 /*============================================================================*/
 #endif	/*	!defined __PARSER2_H__ */
