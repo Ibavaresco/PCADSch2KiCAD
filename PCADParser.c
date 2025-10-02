@@ -116,7 +116,17 @@ static int Parse_PadPinMap( cookie_t *Cookie, const parsefield_t *ParseField, co
 	token_t				Token;
 	void				***Parent	= Argument;
 
-	ExpectToken( Cookie, TOKEN_OPEN_PAR );
+	Token = GetToken( Cookie, NULL, 0 );
+	if (Token == TOKEN_CLOSE_PAR)
+	{
+		UngetToken( Cookie, Token, Buffer );
+		// Ok, empty pin map, i.e. numPads can be 0
+		return 0;
+	}
+
+	// expect open par
+	if( Token != TOKEN_OPEN_PAR )
+		Error( Cookie, -1, "Expecting \"%s\"", Tokens.items[TOKEN_OPEN_PAR%Tokens.numitems] );
 
 	do
 		{
