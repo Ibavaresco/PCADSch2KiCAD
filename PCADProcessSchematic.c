@@ -72,7 +72,7 @@ static boundingrect_t *BoundingRectangleAdd( boundingrect_t *Rect, const pcad_po
 	return Rect;
 	}
 /*===========================================================================*/
-static int CompareBoundingRectangleTLtoBR( boundingrect_t *RectA, boundingrect_t *RectB )
+static int CompareBoundingRectangleTLtoBR( const boundingrect_t *RectA, const boundingrect_t *RectB )
 	{
 	if( RectA->Top != RectB->Top )
 		return RectB->Top - RectA->Top;
@@ -84,7 +84,7 @@ static int CompareBoundingRectangleTLtoBR( boundingrect_t *RectA, boundingrect_t
 		return RectA->Right - RectB->Right;
 	}
 /*===========================================================================*/
-int CompareNames( const char *a, const char *b )
+static int CompareNames( const char *a, const char *b )
 	{
 	char	Num1[256], Num2[256];
 	int		Len1, Len2, Zeros1, Zeros2, i;
@@ -168,7 +168,7 @@ static int CompareBuses( const void *a, const void *b )
 	return CompareBoundingRectangleTLtoBR( &RectA, &RectB );
 	}
 /*===========================================================================*/
-int CompareSymbols( const void *a, const void *b )
+static int CompareSymbols( const void *a, const void *b )
 	{
 	const pcad_symbol_t *pa = *(const pcad_symbol_t * const *)a;
 	const pcad_symbol_t *pb = *(const pcad_symbol_t * const *)b;
@@ -182,7 +182,7 @@ int CompareSymbols( const void *a, const void *b )
 	return  CompareNames( pa->symbolref, pb->symbolref );
 	}
 /*===========================================================================*/
-int CompareJunctions( const void *a, const void *b )
+static int CompareJunctions( const void *a, const void *b )
 	{
 	const pcad_junction_t	*pa = *(const pcad_junction_t * const *)a;
 	const pcad_junction_t	*pb = *(const pcad_junction_t * const *)b;
@@ -195,7 +195,7 @@ int CompareJunctions( const void *a, const void *b )
 	return pa->point.y != pb->point.y ? pb->point.y - pa->point.y : pa->point.x - pb->point.x;
 	}
 /*===========================================================================*/
-int CompareBusEntries( const void *a, const void *b )
+static int CompareBusEntries( const void *a, const void *b )
 	{
 	const pcad_busentry_t	*pa = *(const pcad_busentry_t * const *)a;
 	const pcad_busentry_t	*pb = *(const pcad_busentry_t * const *)b;
@@ -212,7 +212,7 @@ int CompareBusEntries( const void *a, const void *b )
 	return pa->orient - pb->orient;
 	}
 /*===========================================================================*/
-int ComparePorts( const void *a, const void *b )
+static int ComparePorts( const void *a, const void *b )
 	{
 	const pcad_port_t	*pa = *(const pcad_port_t * const *)a;
 	const pcad_port_t	*pb = *(const pcad_port_t * const *)b;
@@ -313,13 +313,13 @@ static int ComparePins( const void *a, const void *b )
 	{
 	const pcad_pin_t	*pa = *(const pcad_pin_t * const *)a;
 	const pcad_pin_t	*pb = *(const pcad_pin_t * const *)b;
-	int					Result;
 
 	if( pa->pinnum != pb->pinnum)
 		return pa->pinnum - pb->pinnum;
 
 	if( pa->defaultpindes != NULL && pb->defaultpindes != NULL )
 		{
+		int	Result;
 		Result	= CompareNames( pa->defaultpindes, pb->defaultpindes );
 		if( Result != 0 )
 			return Result;
@@ -340,7 +340,7 @@ static int CompareIEEESymbols( const void *a, const void *b )
 	return pa->point.y != pb->point.y ? pb->point.y - pa->point.y : pa->point.x - pb->point.x;
 	}
 /*===========================================================================*/
-int CompareFields( const void *a, const void *b )
+static int CompareFields( const void *a, const void *b )
 	{
 	const pcad_field_t	*pa = *(const pcad_field_t * const *)a;
 	const pcad_field_t	*pb = *(const pcad_field_t * const *)b;
@@ -348,7 +348,7 @@ int CompareFields( const void *a, const void *b )
 	return strcmp( pa->name, pb->name );
 	}
 /*===========================================================================*/
-int CompareRefPoints( const void *a, const void *b )
+static int CompareRefPoints( const void *a, const void *b )
 	{
 	const pcad_refpoint_t	*pa = *(const pcad_refpoint_t * const *)a;
 	const pcad_refpoint_t	*pb = *(const pcad_refpoint_t * const *)b;
@@ -356,7 +356,7 @@ int CompareRefPoints( const void *a, const void *b )
 	return pa->point.y != pb->point.y ? pb->point.y - pa->point.y : pa->point.x - pb->point.x;
 	}
 /*===========================================================================*/
-int ProcessPoly( cookie_t *Cookie, pcad_poly_t *Poly )
+static int ProcessPoly( cookie_t *Cookie, pcad_poly_t *Poly )
 	{
 	int				i;
 
@@ -377,7 +377,7 @@ int ProcessPoly( cookie_t *Cookie, pcad_poly_t *Poly )
 	return 0;
 	}
 /*===========================================================================*/
-int ProcessTitleSheet( cookie_t *Cookie, pcad_titlesheet_t *TitleSheet )
+static int ProcessTitleSheet( cookie_t *Cookie, pcad_titlesheet_t *TitleSheet )
 	{
 	int				i;
 
@@ -423,7 +423,7 @@ int ProcessTitleSheet( cookie_t *Cookie, pcad_titlesheet_t *TitleSheet )
 	return 0;
 	}
 /*===========================================================================*/
-int ProcessSymbol( cookie_t *Cookie, pcad_symbol_t *Symbol )
+static int ProcessSymbol( cookie_t *Cookie, pcad_symbol_t *Symbol )
 	{
 	int				i;
 
@@ -447,7 +447,7 @@ int ProcessSymbol( cookie_t *Cookie, pcad_symbol_t *Symbol )
 	return 0;
 	}
 /*===========================================================================*/
-int ProcessSheet( cookie_t *Cookie, pcad_sheet_t *Sheet )
+static int ProcessSheet( cookie_t *Cookie, pcad_sheet_t *Sheet )
 	{
 	int				i;
 
@@ -750,7 +750,7 @@ int ProcessSheet( cookie_t *Cookie, pcad_sheet_t *Sheet )
 /*===========================================================================*/
 /*===========================================================================*/
 /*===========================================================================*/
-int CompareFieldDefs( const void *a, const void *b )
+static int CompareFieldDefs( const void *a, const void *b )
 	{
 	const pcad_fielddef_t	*pa = *(const pcad_fielddef_t * const *)a;
 	const pcad_fielddef_t	*pb = *(const pcad_fielddef_t * const *)b;
@@ -774,7 +774,7 @@ static int CompareRevisionNotes( const void *a, const void *b )
 	return pa->number - pb->number;
 	}
 /*===========================================================================*/
-int ProcessFieldSet( cookie_t *Cookie, pcad_fieldset_t *FieldSet )
+static int ProcessFieldSet( cookie_t *Cookie, pcad_fieldset_t *FieldSet )
 	{
 	int				i;
 
@@ -864,7 +864,7 @@ static int CompareReportFieldss( const void *a, const void *b )
 	}
 #endif
 /*===========================================================================*/
-int ProcessReportField( cookie_t *Cookie, pcad_reportfield_t *ReportField )
+static int ProcessReportField( cookie_t *Cookie, pcad_reportfield_t *ReportField )
 	{
 	pcad_reportfieldcondition_t *pReportFieldCondition;
 	int						i;
@@ -889,7 +889,7 @@ int ProcessReportField( cookie_t *Cookie, pcad_reportfield_t *ReportField )
 	return 0;
 	}
 /*===========================================================================*/
-int ProcessReportFields( cookie_t *Cookie, pcad_reportfields_t *ReportFields )
+static int ProcessReportFields( cookie_t *Cookie, pcad_reportfields_t *ReportFields )
 	{
 	int					i;
 	pcad_reportfield_t	*pReportField;
@@ -914,7 +914,7 @@ int ProcessReportFields( cookie_t *Cookie, pcad_reportfields_t *ReportFields )
 	return 0;
 	}
 /*===========================================================================*/
-int ProcessReportDefinition( cookie_t *Cookie, pcad_reportdefinition_t *ReportDefinition )
+static int ProcessReportDefinition( cookie_t *Cookie, pcad_reportdefinition_t *ReportDefinition )
 	{
 	int					i;
 	pcad_reportfields_t *pReportFields;
@@ -942,7 +942,7 @@ int ProcessReportDefinition( cookie_t *Cookie, pcad_reportdefinition_t *ReportDe
 	return 0;
 	}
 /*===========================================================================*/
-int CompareGrids( const void *a, const void *b )
+static int CompareGrids( const void *a, const void *b )
 	{
 	const pcad_grid_t	*pa = *(const pcad_grid_t * const *)a;
 	const pcad_grid_t	*pb = *(const pcad_grid_t * const *)b;
@@ -950,7 +950,7 @@ int CompareGrids( const void *a, const void *b )
 	return pa->grid - pb->grid;
 	}
 /*===========================================================================*/
-int CompareSheets( const void *a, const void *b )
+static int CompareSheets( const void *a, const void *b )
 	{
 	const pcad_sheet_t	*pa = *(const pcad_sheet_t * const *)a;
 	const pcad_sheet_t	*pb = *(const pcad_sheet_t * const *)b;
@@ -958,7 +958,7 @@ int CompareSheets( const void *a, const void *b )
 	return pa->sheetordernum - pb->sheetordernum;
 	}
 /*===========================================================================*/
-int CompareFieldSets( const void *a, const void *b )
+static int CompareFieldSets( const void *a, const void *b )
 	{
 	const pcad_fieldset_t	*pa = *(const pcad_fieldset_t * const *)a;
 	const pcad_fieldset_t	*pb = *(const pcad_fieldset_t * const *)b;
@@ -966,7 +966,7 @@ int CompareFieldSets( const void *a, const void *b )
 	return strcmp( pa->name, pb->name );
 	}
 /*===========================================================================*/
-int CompareSheetRefs( const void *a, const void *b )
+static int CompareSheetRefs( const void *a, const void *b )
 	{
 	const pcad_sheetref_t	*pa = *(const pcad_sheetref_t * const *)a;
 	const pcad_sheetref_t	*pb = *(const pcad_sheetref_t * const *)b;
@@ -974,15 +974,17 @@ int CompareSheetRefs( const void *a, const void *b )
 	return pa->sheetref - pb->sheetref;
 	}
 /*===========================================================================*/
-int CompareReportDefinitions( const void *a, const void *b )
+#if 0
+static int CompareReportDefinitions( const void *a, const void *b )
 	{
 	const pcad_reportdefinition_t	*pa = *(const pcad_reportdefinition_t * const *)a;
 	const pcad_reportdefinition_t	*pb = *(const pcad_reportdefinition_t * const *)b;
 
 	return strcmp( pa->reportname, pb->reportname );
 	}
+#endif
 /*===========================================================================*/
-int ProcessPCADSchematicDesign( cookie_t *Cookie, pcad_schematicdesign_t *SchematicDesign )
+static int ProcessPCADSchematicDesign( cookie_t *Cookie, pcad_schematicdesign_t *SchematicDesign )
 	{
 	int				i;
 
@@ -1139,7 +1141,7 @@ int ProcessPCADSchematicDesign( cookie_t *Cookie, pcad_schematicdesign_t *Schema
 /*===========================================================================*/
 /*===========================================================================*/
 /*===========================================================================*/
-int CompareCompInsts( const void *a, const void *b )
+static int CompareCompInsts( const void *a, const void *b )
 	{
 	const pcad_compinst_t	*pa = *(const pcad_compinst_t * const *)a;
 	const pcad_compinst_t	*pb = *(const pcad_compinst_t * const *)b;
@@ -1223,7 +1225,7 @@ static int ProcessNet( cookie_t *Cookie, pcad_net_t *Net )
 	return 0;
 	}
 /*===========================================================================*/
-int ProcessPCADNetList( cookie_t *Cookie, pcad_netlist_t *NetList )
+static int ProcessPCADNetList( cookie_t *Cookie, pcad_netlist_t *NetList )
 	{
 	int				i;
 

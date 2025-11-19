@@ -98,7 +98,7 @@ static void Rotate( pcad_dimmension_t *xRes, pcad_dimmension_t *yRes, const pcad
 /*=============================================================================*/
 /*=============================================================================*/
 /*=============================================================================*/
-static int OutputFont( parameters_t *Params, int Level, const pcad_font_t *Font )
+static int OutputFont( const parameters_t *Params, int Level, const pcad_font_t *Font )
 	{
 	char	Buffer[32];
 
@@ -129,7 +129,7 @@ static int OutputFont( parameters_t *Params, int Level, const pcad_font_t *Font 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputTextStyleDef( parameters_t *Params, int Level, const pcad_textstyledef_t *TextStyleDef )
+static int OutputTextStyleDef( const parameters_t *Params, int Level, const pcad_textstyledef_t *TextStyleDef )
 	{
 	int	i;
 
@@ -147,7 +147,7 @@ static int OutputTextStyleDef( parameters_t *Params, int Level, const pcad_texts
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputText( parameters_t *Params, int Level, const pcad_text_t *Text )
+static int OutputText( const parameters_t *Params, int Level, const pcad_text_t *Text )
 	{
 	char	x[32], y[32];
 
@@ -175,14 +175,15 @@ static int OutputText( parameters_t *Params, int Level, const pcad_text_t *Text 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputAttr( int OutputPoint, parameters_t *Params, int Level, const pcad_attr_t *Attr )
+static int OutputAttr( int OutputPoint, const parameters_t *Params, int Level, const pcad_attr_t *Attr )
 	{
-	char	x[32], y[32];
+	char	x[32];
 
 	OutputToFile( Params, Level, "(attr \"%s\" \"%s\"", Attr->name, Attr->value );
 
 	if( OutputPoint )
 		{
+		char	y[32];
 		FormatReal( Params, 0, 0, 1, Attr->point.x, x, sizeof x );
 		FormatReal( Params, 0, 0, 1, Attr->point.y, y, sizeof y );
 		OutputToFile( Params, 0, " (pt %s %s)", x, y );
@@ -212,7 +213,7 @@ static int OutputAttr( int OutputPoint, parameters_t *Params, int Level, const p
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPin( parameters_t *Params, int Level, const pcad_pin_t *Pin )
+static int OutputPin( const parameters_t *Params, int Level, const pcad_pin_t *Pin )
 	{
 	char	x[32], y[32];
 
@@ -296,7 +297,7 @@ static int OutputLine( const parameters_t *Params, unsigned Level, pcad_line_t *
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepointarc_t *Arc )
+static int OutputArc( const parameters_t *Params, unsigned Level, const pcad_triplepointarc_t *Arc )
 	{
 	char	x[32], y[32];
 
@@ -335,7 +336,7 @@ static int OutputIEEESymbol( const parameters_t *Params, unsigned Level, pcad_ie
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPoly( const parameters_t *Params, unsigned Level, pcad_poly_t *Poly )
+static int OutputPoly( const parameters_t *Params, unsigned Level, const pcad_poly_t *Poly )
 	{
 	char	x[32], y[32];
 	int		i;
@@ -356,7 +357,7 @@ static int OutputPoly( const parameters_t *Params, unsigned Level, pcad_poly_t *
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSymbolDef( parameters_t *Params, int Level, const pcad_symboldef_t *SymbolDef )
+static int OutputSymbolDef( const parameters_t *Params, int Level, const pcad_symboldef_t *SymbolDef )
 	{
 	int		i;
 
@@ -393,7 +394,7 @@ static int OutputSymbolDef( parameters_t *Params, int Level, const pcad_symbolde
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputCompPin( parameters_t *Params, int Level, const pcad_comppin_t *CompPin )
+static int OutputCompPin( const parameters_t *Params, int Level, const pcad_comppin_t *CompPin )
 	{
 	OutputToFile( Params, Level, "(compPin \"%s\"", CompPin->pinnumber );
 
@@ -411,7 +412,7 @@ static int OutputCompPin( parameters_t *Params, int Level, const pcad_comppin_t 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputAttachedSymbol( parameters_t *Params, int Level, const pcad_attachedsymbol_t *AttachedSymbol )
+static int OutputAttachedSymbol( const parameters_t *Params, int Level, const pcad_attachedsymbol_t *AttachedSymbol )
 	{
 	OutputToFile( Params, Level, "(attachedSymbol (partNum %u) (altType %s) (symbolName \"%s\"))\r\n",
 		AttachedSymbol->partnum, AltTypes.items[AttachedSymbol->alttype], AttachedSymbol->symbolname );
@@ -419,14 +420,14 @@ static int OutputAttachedSymbol( parameters_t *Params, int Level, const pcad_att
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPadPinMap( parameters_t *Params, int Level, const pcad_padpinmap_t *PadPinMap )
+static int OutputPadPinMap( const parameters_t *Params, int Level, const pcad_padpinmap_t *PadPinMap )
 	{
 	OutputToFile( Params, Level, "(padNum %u) (compPinRef \"%s\")\r\n", PadPinMap->padnum, PadPinMap->comppinref );
 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputAttachedPattern( parameters_t *Params, int Level, const pcad_attachedpattern_t *AttachedPattern )
+static int OutputAttachedPattern( const parameters_t *Params, int Level, const pcad_attachedpattern_t *AttachedPattern )
 	{
 	int i;
 
@@ -501,7 +502,7 @@ static int OutputLibrary( parameters_t *Params, int Level, const pcad_library_t 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputASCIIHeader( parameters_t *Params, int Level, const pcad_asciiheader_t *ASCIIHeader )
+static int OutputASCIIHeader( const parameters_t *Params, int Level, const pcad_asciiheader_t *ASCIIHeader )
 	{
 	OutputToFile( Params, 0,		"\r\n" );
 	OutputToFile( Params, Level,	"(asciiHeader\r\n" );
@@ -518,7 +519,7 @@ static int OutputASCIIHeader( parameters_t *Params, int Level, const pcad_asciih
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputCompInst( parameters_t *Params, int Level, const pcad_compinst_t *CompInst )
+static int OutputCompInst( const parameters_t *Params, int Level, const pcad_compinst_t *CompInst )
 	{
 	int	i;
 
@@ -541,14 +542,14 @@ static int OutputCompInst( parameters_t *Params, int Level, const pcad_compinst_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputNode( parameters_t *Params, int Level, const pcad_node_t *Node )
+static int OutputNode( const parameters_t *Params, int Level, const pcad_node_t *Node )
 	{
 	OutputToFile( Params, Level,	"(node \"%s\" \"%s\")\r\n", Node->component, Node->pin );
 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputNet( parameters_t *Params, int Level, const pcad_net_t *Net )
+static int OutputNet( const parameters_t *Params, int Level, const pcad_net_t *Net )
 	{
 	int	i;
 
@@ -588,7 +589,7 @@ static int OutputNetList( parameters_t *Params, int Level, const pcad_netlist_t 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputFieldSet( parameters_t *Params, int Level, const pcad_fieldset_t *FieldSet )
+static int OutputFieldSet( const parameters_t *Params, int Level, const pcad_fieldset_t *FieldSet )
 	{
 	int		i;
 
@@ -613,7 +614,7 @@ static int OutputFieldSet( parameters_t *Params, int Level, const pcad_fieldset_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSchDesignHeader( parameters_t *Params, int Level, const pcad_schdesignheader_t *SchDesignHeader )
+static int OutputSchDesignHeader( const parameters_t *Params, int Level, const pcad_schdesignheader_t *SchDesignHeader )
 	{
 	char	x[32], y[32];
 	int		i;
@@ -671,7 +672,7 @@ static void EscapeString( char *Result, int ResultLength, const char *Original )
 	}
 #endif
 /*=============================================================================*/
-static int OutputTitleSheet( parameters_t *Params, int Level, const pcad_titlesheet_t *TitleSheet )
+static int OutputTitleSheet( const parameters_t *Params, int Level, const pcad_titlesheet_t *TitleSheet )
 	{
 //	char	Buffer[512];
 	char	x[32], y[32];
@@ -726,10 +727,9 @@ static int OutputTitleSheet( parameters_t *Params, int Level, const pcad_titlesh
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSymbol( parameters_t *Params, int Level, const pcad_symbol_t *Symbol )
+static int OutputSymbol( const parameters_t *Params, int Level, const pcad_symbol_t *Symbol )
 	{
 	char	x[32], y[32];
-	int		i;
 
 	FormatReal( Params, 0, 0, 1, Symbol->pt.x, x, sizeof x );
 	FormatReal( Params, 0, 0, 1, Symbol->pt.y, y, sizeof y );
@@ -747,6 +747,8 @@ static int OutputSymbol( parameters_t *Params, int Level, const pcad_symbol_t *S
 
 	if( Symbol->numattrs > 0 )
 		{
+		int		i;
+
 		OutputToFile( Params, 0, "\r\n" );
 		for( i = 0; i < Symbol->numattrs; i++ )
 			OutputAttr( 1, Params, Level + 1, Symbol->vioattrs[i] );
@@ -759,7 +761,7 @@ static int OutputSymbol( parameters_t *Params, int Level, const pcad_symbol_t *S
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputWire( parameters_t *Params, int Level, const pcad_wire_t *Wire )
+static int OutputWire( const parameters_t *Params, int Level, const pcad_wire_t *Wire )
 	{
 	char	x1[32], y1[32], x2[32], y2[32], Width[32];
 
@@ -789,7 +791,7 @@ static int OutputWire( parameters_t *Params, int Level, const pcad_wire_t *Wire 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputBus( parameters_t *Params, int Level, const pcad_bus_t *Bus )
+static int OutputBus( const parameters_t *Params, int Level, const pcad_bus_t *Bus )
 	{
 	char	x1[32], y1[32], x2[32], y2[32];
 
@@ -808,7 +810,7 @@ static int OutputBus( parameters_t *Params, int Level, const pcad_bus_t *Bus )
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputBusEntry( parameters_t *Params, int Level, const pcad_busentry_t *BusEntry )
+static int OutputBusEntry( const parameters_t *Params, int Level, const pcad_busentry_t *BusEntry )
 	{
 	char	x[32], y[32];
 
@@ -820,7 +822,7 @@ static int OutputBusEntry( parameters_t *Params, int Level, const pcad_busentry_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputJunction( parameters_t *Params, int Level, const pcad_junction_t *Junction )
+static int OutputJunction( const parameters_t *Params, int Level, const pcad_junction_t *Junction )
 	{
 	char	x[32], y[32];
 
@@ -832,7 +834,7 @@ static int OutputJunction( parameters_t *Params, int Level, const pcad_junction_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPort( parameters_t *Params, int Level, const pcad_port_t *Port )
+static int OutputPort( const parameters_t *Params, int Level, const pcad_port_t *Port )
 	{
 	char	x[32], y[32];
 
@@ -856,7 +858,7 @@ static int OutputPort( parameters_t *Params, int Level, const pcad_port_t *Port 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputField( parameters_t *Params, int Level, const pcad_field_t *Field )
+static int OutputField( const parameters_t *Params, int Level, const pcad_field_t *Field )
 	{
 	char	x[32], y[32];
 
@@ -875,7 +877,7 @@ static int OutputField( parameters_t *Params, int Level, const pcad_field_t *Fie
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputRefPoint( parameters_t *Params, int Level, const pcad_refpoint_t *RefPoint )
+static int OutputRefPoint( const parameters_t *Params, int Level, const pcad_refpoint_t *RefPoint )
 	{
 	char	x[32], y[32];
 
@@ -887,7 +889,7 @@ static int OutputRefPoint( parameters_t *Params, int Level, const pcad_refpoint_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSheet( parameters_t *Params, int Level, const pcad_sheet_t *Sheet )
+static int OutputSheet( const parameters_t *Params, int Level, const pcad_sheet_t *Sheet )
 	{
 	char	x[32], y[32];
 	int		i;
@@ -1002,7 +1004,7 @@ static int OutputProgramState( parameters_t *Params, int Level, const pcad_progr
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSchematicPrintSettings( parameters_t *Params, int Level, const pcad_schematicprintst_t *SchematicPrintSettings )
+static int OutputSchematicPrintSettings( const parameters_t *Params, int Level, const pcad_schematicprintst_t *SchematicPrintSettings )
 	{
 	if( SchematicPrintSettings->sheetlist.numsheetrefs > 0 )
 		{
@@ -1020,7 +1022,7 @@ static int OutputSchematicPrintSettings( parameters_t *Params, int Level, const 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputReportField( parameters_t *Params, int Level, const pcad_reportfield_t *ReportField )
+static int OutputReportField( const parameters_t *Params, int Level, const pcad_reportfield_t *ReportField )
 	{
 	OutputToFile( Params, Level,	"(reportField\r\n" );
 	OutputToFile( Params, Level + 1,	"(reportFieldName \"%s\")\r\n", ReportField->reportfieldname );
@@ -1045,7 +1047,7 @@ static int OutputReportField( parameters_t *Params, int Level, const pcad_report
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputReportFields( parameters_t *Params, int Level, const pcad_reportfields_t *ReportFields )
+static int OutputReportFields( const parameters_t *Params, int Level, const pcad_reportfields_t *ReportFields )
 	{
 	int	i;
 

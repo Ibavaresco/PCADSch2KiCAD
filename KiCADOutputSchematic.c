@@ -129,7 +129,7 @@ static const char *JustifyKiCAD[]	=
 	" (justify left top)",		" (justify top)",		" (justify right top)"
 	};
 /*=============================================================================*/
-pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p, const pcad_point_t *p2 )
+static pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p, const pcad_point_t *p2 )
 	{
 	int	i;
 
@@ -148,7 +148,7 @@ pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p, const
 	return NULL;
 	}
 /*=============================================================================*/
-static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t *Sheet, pcad_wire_t *Wire )
+static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t *Sheet, const pcad_wire_t *Wire )
 	{
 	char			x1[32], y1[32], x2[32], y2[32];
 	pcad_busentry_t	*be1, *be2;
@@ -217,7 +217,7 @@ static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputJunction( const parameters_t *Params, unsigned Level, pcad_junction_t *Junction )
+static int OutputJunction( const parameters_t *Params, unsigned Level, const pcad_junction_t *Junction )
 	{
 	char	x[32], y[32];
 
@@ -229,13 +229,13 @@ static int OutputJunction( const parameters_t *Params, unsigned Level, pcad_junc
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputPort( const parameters_t *Params, unsigned Level, pcad_port_t *Port )
+static int OutputPort( const parameters_t *Params, unsigned Level, const pcad_port_t *Port )
 	{
 	static const char *PortShapeKiCAD[] = { "passive", "input", "output", "bidirectional" };
 
 	char		x[32], y[32], Angle[32];
 	char		Buffer[3*strlen( Port->netnameref )+1];
-	char		*Justify	= "left";
+	char		*justify	= "left";
 	int			i;
 	pcad_real_t	PortRotation	= Port->rotation;
 	int			PortIsFlipped	= Port->isflipped;
@@ -270,14 +270,14 @@ static int OutputPort( const parameters_t *Params, unsigned Level, pcad_port_t *
 		}
 
 	if( PortRotation == 180000000 || PortRotation == 270000000 )
-		Justify = "right";
+		justify = "right";
 
-	OutputToFile( Params, Level, "(global_label \"%s\" (shape %s) (at %s %s %s) (effects (font (size 1.0 1.0)) (justify %s)))\n", FormatLabel( Port->netnameref, Buffer, sizeof Buffer ), PortShapeKiCAD[i], x, y, Angle, Justify );
+	OutputToFile( Params, Level, "(global_label \"%s\" (shape %s) (at %s %s %s) (effects (font (size 1.0 1.0)) (justify %s)))\n", FormatLabel( Port->netnameref, Buffer, sizeof Buffer ), PortShapeKiCAD[i], x, y, Angle, justify );
 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputText( const parameters_t *Params, unsigned Level, pcad_text_t *Text )
+static int OutputText( const parameters_t *Params, unsigned Level, const pcad_text_t *Text )
 	{
 	char	x[32], y[32], Angle[32], Buffer[3*strlen( Text->value )+1];
 
@@ -313,7 +313,7 @@ static int OutputAttribute( const parameters_t *Params, unsigned Level, const ch
 	}
 */
 /*=============================================================================*/
-static int OutputLine( const parameters_t *Params, unsigned Level, pcad_line_t	*Line )
+static int OutputLine( const parameters_t *Params, unsigned Level, const pcad_line_t *Line )
 	{
 	char	x1[32], y1[32], x2[32], y2[32], Width[32];
 
@@ -348,7 +348,7 @@ static void Rotate( pcad_dimmension_t *x, pcad_dimmension_t *y, pcad_dimmension_
 /*=============================================================================*/
 static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepointarc_t *Arc )
 	{
-	char	x1[32], y1[32], x2[32], y2[32], x3[32], y3[32], Width[32], Radius[32];
+	char	x1[32], y1[32], Width[32];
 
 	if( Arc->width == 0 )
 		FormatReal( Params, 0, 0, 1, Params->DefaultLineWidth, Width, sizeof Width );
@@ -357,6 +357,7 @@ static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepoi
 
 	if( Arc->point2.x == Arc->point3.x && Arc->point2.y == Arc->point3.y )
 		{
+		char				Radius[32];
 		pcad_dimmension_t	r;
 		double				dx, dy;
 
@@ -372,6 +373,7 @@ static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepoi
 		}
 	else
 		{
+		char	x2[32], y2[32], x3[32], y3[32];
 		double	a2, a3, a;
 		double	dx, dy, mx, my;
 		pcad_dimmension_t	ArcPoint1X	= Arc->point1.x;
@@ -506,7 +508,7 @@ static const pcad_compdef_t *FindCompDef( const pcad_schematicfile_t *Schematic,
 	return NULL;
 	}
 /*=============================================================================*/
-static int OutputPolygon( const parameters_t *Params, unsigned Level, pcad_poly_t *Polygon )
+static int OutputPolygon( const parameters_t *Params, unsigned Level, const pcad_poly_t *Polygon )
 	{
 	char	x[32], y[32], Width[32];
 	int		i;
@@ -538,7 +540,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	{
 //	char					*RefDesPrefix	= NULL;
 	int						IsPower			= 0;
-	int						PinType			= 0;
+	int						pinType			= 0;
 	int						i;
 	parameters_t			LocalParams		= *Params;
 
@@ -594,11 +596,11 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	for( i = 0; i < SymbolDef->numpins; i++ )
 		{
 		if( IsPower )
-			PinType	= PCAD_PINTYPE_POWER;
+			pinType	= PCAD_PINTYPE_POWER;
 		else
-			PinType	= 0;	//@@@@
+			pinType	= 0;	//@@@@
 
-		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], PinType, Index + 1, i + 1, CompDef );
+		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], pinType, Index + 1, i + 1, CompDef );
 		}
 	OutputToFile( &LocalParams, Level, ")\n" );
 	return 0;
@@ -661,7 +663,7 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 
 		for( j = 0; j < CompDef->numattachedsymbols; j++ )
 			{
-			pcad_symboldef_t	*SymbolDef;
+			const pcad_symboldef_t	*SymbolDef;
 
 			if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[j]->symbolname )) != NULL )
 				for( i = 0; i < SymbolDef->numpins; i++ )
@@ -752,13 +754,22 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 	FormatReal( Params, 0, 0,				1,				Symbol->rotation, Angle, sizeof Angle );
 
 	if(( SymbolDef = FindSymbolDef( Schematic, Symbol->symbolref )) == NULL )
-		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "SymbolDef \"%s\" not found", Symbol->symbolref );
+		{
+		fclose( Params->Cookie->File );
+		ErrorOutput( Params->Cookie, -1, "SymbolDef \"%s\" not found", Symbol->symbolref );
+		}
 
 	if(( CompInst = FindCompInst( &Schematic->netlist, Symbol->refdesref )) == NULL )
-		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "CompInst \"%s\" not found", Symbol->refdesref );
+		{
+		fclose( Params->Cookie->File );
+		ErrorOutput( Params->Cookie, -1, "CompInst \"%s\" not found", Symbol->refdesref );
+		}
 
 	if(( CompDef = FindCompDef( Schematic, CompInst->compref )) == NULL )
-		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "CompDef \"%s\" not found", CompInst->compref );
+		{
+		fclose( Params->Cookie->File );
+		ErrorOutput( Params->Cookie, -1, "CompDef \"%s\" not found", CompInst->compref );
+		}
 
 	IsPower = CompDef->compheader.comptype == PCAD_COMPTYPE_POWER;
 
@@ -819,10 +830,10 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 
 		if( CompInst != NULL )
 			{
-			char	*CompValue		= CompInst->compvalue != NULL ? CompInst->compvalue : "";
-			char	*Footprint		= CompInst->patternname != NULL ? CompInst->patternname : "";
-			int		ValueVisible	= 0;
-			char	Buffer[3*MAX( strlen( IsPower ? CompInst->originalname : CompValue ), strlen( Footprint ))+1];
+			const char	*CompValue		= CompInst->compvalue != NULL ? CompInst->compvalue : "";
+			const char	*Footprint		= CompInst->patternname != NULL ? CompInst->patternname : "";
+			int			ValueVisible	= 0;
+			char		Buffer[3*MAX( strlen( IsPower ? CompInst->originalname : CompValue ), strlen( Footprint ))+1];
 
 			dx = dy = dAngle			= 0;
 			pcad_attr_t *Value			= FindAttr( SymbolDef->vioattrs, SymbolDef->numattrs, "Value" );
@@ -874,7 +885,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputBus( const parameters_t *Params, unsigned Level, pcad_bus_t *Bus )
+static int OutputBus( const parameters_t *Params, unsigned Level, const pcad_bus_t *Bus )
 	{
 	char	x1[32], y1[32], x2[32], y2[32] /*, Width[32]*/;
 
@@ -894,7 +905,7 @@ static int OutputBus( const parameters_t *Params, unsigned Level, pcad_bus_t *Bu
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputBusEntry( const parameters_t *Params, unsigned Level, pcad_busentry_t *BusEntry )
+static int OutputBusEntry( const parameters_t *Params, unsigned Level, const pcad_busentry_t *BusEntry )
 	{
 	static const char	*Orientations[][4]	=
 		{
@@ -995,9 +1006,8 @@ static papersize_t OtherPapers[]	=
 	[2] = { "USLetter",	 279000000,	216000000 },
 	};
 /*=============================================================================*/
-static int FindPaperSize( parameters_t *Params, pcad_dimmension_t Width, pcad_dimmension_t Height, char *Buffer )
+static int FindPaperSize( const parameters_t *Params, pcad_dimmension_t Width, pcad_dimmension_t Height, char *Buffer )
 	{
-	char	BufferWidth[32], BufferHeight[32];
 	int		i;
 
 	for( i = 0; i < LENGTH( MetricPapers ); i++ )
@@ -1023,6 +1033,8 @@ static int FindPaperSize( parameters_t *Params, pcad_dimmension_t Width, pcad_di
 
 	if(( Width > MetricPapers[0].Width || Height > MetricPapers[0].Height ) && ( Width > AmericanPapers[0].Width || Height > AmericanPapers[0].Height ))
 		{
+		char	BufferWidth[32], BufferHeight[32];
+
 		FormatReal( Params, 0, 0, 1, Width, BufferWidth, sizeof BufferWidth );
 		FormatReal( Params, 0, 0, 1, Height, BufferHeight, sizeof BufferHeight );
 		sprintf( Buffer, "(Paper \"User\" %s %s)", BufferWidth, BufferHeight );

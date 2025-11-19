@@ -85,16 +85,16 @@ pcad_dimmension_t ProcessDimmension( cookie_t *Cookie, const char *Buffer, pcad_
 /*============================================================================*/
 pcad_enum_units_t TranslateUnits( cookie_t *Cookie, const char *Buffer )
 	{
-	static const char	*Units[]	= { [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
+	static const char	*UnitsStr[]	= { [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
 	int					i;
 
 	if( Buffer == NULL || Buffer[0] == '\0' )
 		return Cookie->FileUnits;
 
-	for( i = 0; i < LENGTH( Units ) && stricmp( Buffer, Units[i] ) != 0; i++ )
+	for( i = 0; i < LENGTH( UnitsStr ) && stricmp( Buffer, UnitsStr[i] ) != 0; i++ )
 		{}
 
-	if( i >= LENGTH( Units ))
+	if( i >= LENGTH( UnitsStr ))
 		Error( Cookie, -1, "Unknown unit" );
 
 	return i;
@@ -118,12 +118,12 @@ int ExpectName( cookie_t *Cookie, const char *Name )
 	return TOKEN_NAME;
 	}
 /*============================================================================*/
-pcad_real_t GetReal( cookie_t *Cookie )
+static pcad_real_t GetReal( cookie_t *Cookie )
 	{
 	char	Buffer[BUFFER_SIZE], *p = Buffer;
 	int32_t	Value	= 0;
 	int		Sign	= 0;
-	int		Exp;
+	int		Exp		= 0;
 	token_t	Token	= GetToken( Cookie, Buffer, sizeof Buffer );
 
 	if( Token != TOKEN_INTEGER && Token != TOKEN_UNSIGNED && Token != TOKEN_FLOAT )
@@ -160,7 +160,7 @@ int ParseReal( cookie_t *Cookie, const parsefield_t *ParseField, const parsestru
 	return 0;
 	}
 /*============================================================================*/
-pcad_dimmension_t GetDimmension( cookie_t *Cookie )
+static pcad_dimmension_t GetDimmension( cookie_t *Cookie )
 	{
 	char				Buffer1[BUFFER_SIZE];
 	char				Buffer2[BUFFER_SIZE];
@@ -192,7 +192,7 @@ int ParseDimmension( cookie_t *Cookie, const parsefield_t *ParseField, const par
 	return 0;
 	}
 /*============================================================================*/
-pcad_enum_boolean_t GetBoolean( cookie_t *Cookie )
+static pcad_enum_boolean_t GetBoolean( cookie_t *Cookie )
 	{
 	char	Buffer[BUFFER_SIZE];
 
@@ -239,7 +239,7 @@ int ParseUnsigned( cookie_t *Cookie, const parsefield_t *ParseField, const parse
 	return 0;
 	}
 /*============================================================================*/
-int32_t GetSigned( cookie_t *Cookie )
+static int32_t GetSigned( cookie_t *Cookie )
 	{
 	char		Buffer[BUFFER_SIZE], *p = Buffer;
 	int32_t	    Value	= 0;
@@ -306,7 +306,7 @@ int GetString( cookie_t *Cookie, char *Buffer, size_t BufferLength )
 	return TOKEN_STRING;
 	}
 /*============================================================================*/
-char *StoreString( cookie_t *Cookie, const char *Buffer )
+static char *StoreString( cookie_t *Cookie, const char *Buffer )
 	{
 	void	*Address;
 	size_t	size	= strlen( Buffer ) + 1;
@@ -384,7 +384,7 @@ token_t ExpectToken( cookie_t *Cookie, token_t tk )
 	return tk;
 	}
 /*============================================================================*/
-int SkipAll( cookie_t *Cookie )
+static int SkipAll( cookie_t *Cookie )
 	{
 	char	Buffer[BUFFER_SIZE];
 	token_t Token;
@@ -433,7 +433,7 @@ int ParseGeneric( cookie_t *Cookie, const parsefield_t *ParseField, const parses
 			void	***Parent;
 			Parent		= Argument;
 			**Parent	= Object;
-			if( ParseStruct != NULL && ParseStruct->OffsetNext >= 0 )
+			if( ParseStruct->OffsetNext >= 0 )
 				*Parent = (void*)( (char*)Object + ParseStruct->OffsetNext );
 			}
 		/* This field is a simple pointer to a single element... */
@@ -551,7 +551,7 @@ int ErrorOutput( cookie_t *Cookie, int ErrorCode, const char *Message, ... )
 	longjmp( Cookie->JumpBuffer, ErrorCode );
 	}
 /*============================================================================*/
-int Warning( cookie_t *Cookie, const char *Message, ... )
+int Warning( const cookie_t *Cookie, const char *Message, ... )
 	{
 	va_list ap;
 

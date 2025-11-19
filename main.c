@@ -199,7 +199,7 @@ static int Process( FILE *f, const char *pNameIn, const char *pNameOut, int Outp
 	return 0;
 	}
 /*============================================================================*/
-void PrintUsage( int OutputFormat )
+static void PrintUsage( int OutputFormat )
 	{
 #if			defined __linux__
 	fprintf( stderr,

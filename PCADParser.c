@@ -117,12 +117,12 @@ static int Parse_PadPinMap( cookie_t *Cookie, const parsefield_t *ParseField, co
 	void				***Parent	= Argument;
 
 	Token = GetToken( Cookie, NULL, 0 );
-	if (Token == TOKEN_CLOSE_PAR)
-	{
-		UngetToken( Cookie, Token, Buffer );
+	if( Token == TOKEN_CLOSE_PAR )
+		{
+		UngetToken( Cookie, Token, ")" );
 		// Ok, empty pin map, i.e. numPads can be 0
 		return 0;
-	}
+		}
 
 	// expect open par
 	if( Token != TOKEN_OPEN_PAR )
@@ -163,7 +163,7 @@ static int Parse_Grid( cookie_t *Cookie, const parsefield_t *ParseField, const p
 
 	GetString( Cookie, Buffer, sizeof Buffer );
 
-	for( i = 0; isdigit( Buffer[i] ) && i < sizeof Number - 1; i++ )
+	for( i = 0; i < sizeof Number - 1 && isdigit( Buffer[i] ); i++ )
 		Number[i]	= Buffer[i];
 	if( i >= sizeof Number - 1 )
 		Error( Cookie, -1, "Number too large" );
@@ -173,7 +173,7 @@ static int Parse_Grid( cookie_t *Cookie, const parsefield_t *ParseField, const p
 			Error( Cookie, -1, "Number too large" );
 		Number[i]	= Buffer[i];
 		i++;
-		for( ; isdigit( Buffer[i] ) && i < sizeof Number - 1; i++ )
+		for( ; i < sizeof Number - 1 && isdigit( Buffer[i] ); i++ )
 			Number[i]	= Buffer[i];
 		if( i >= sizeof Number - 1 )
 			Error( Cookie, -1, "Number too large" );
