@@ -85,7 +85,7 @@ pcad_dimmension_t ProcessDimmension( cookie_t *Cookie, const char *Buffer, pcad_
 /*============================================================================*/
 pcad_enum_units_t TranslateUnits( cookie_t *Cookie, const char *Buffer )
 	{
-	static const char	*UnitsStr[]	= { [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
+	static const char	*UnitsStr[]	= { [PCAD_UNITS_NONE]="", [PCAD_UNITS_MM]="mm", [PCAD_UNITS_MIL]="Mil", [PCAD_UNITS_IN]="in" };
 	int					i;
 
 	if( Buffer == NULL || Buffer[0] == '\0' )

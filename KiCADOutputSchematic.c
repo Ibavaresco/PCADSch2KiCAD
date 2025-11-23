@@ -1071,7 +1071,10 @@ static int FindPaperSize( const parameters_t *Params, pcad_dimmension_t Width, p
 /*=============================================================================*/
 static void FindTitleExtents( const pcad_titlesheet_t *TitleSheet, pcad_extent_t *Extent )
 	{
-	pcad_dimmension_t	Left	= LONG_MAX, Right = LONG_MIN, Top	= LONG_MIN, Bottom = LONG_MAX;
+	pcad_dimmension_t	Left	=  (pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 );
+	pcad_dimmension_t	Right   = -(pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ) - 1;
+	pcad_dimmension_t	Top     = -(pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ) - 1;
+	pcad_dimmension_t	Bottom  =  (pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 );
 	int					i;
 
 	for( i = 0; i < TitleSheet->numlines; i++ )
