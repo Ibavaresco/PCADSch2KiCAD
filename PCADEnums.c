@@ -56,7 +56,7 @@ const parseenum_t	Units =
 /*============================================================================*/
 const parseenum_t	NoteAnnotations =
 	{
-	.numitems	= 10,
+	.numitems	= 4,
 	.items		=
 		{
 		[PCAD_NOTEANNOTATION_NONE]				= "",
