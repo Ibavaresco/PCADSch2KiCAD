@@ -48,6 +48,42 @@ typedef struct
 	pcad_real_t			ScaleY;
 	} parameters_t;
 /*=============================================================================*/
+#if			defined __linux__
+#define	FORBIDDEN_CHARACTERS	"/"
+#else	/*	defined __linux__ */
+#define	FORBIDDEN_CHARACTERS	"/\\:<>?*|\""
+#endif	/*	defined __linux__ */
+/*=============================================================================*/
+/*
+KiCAD symbol and footprint names cannot have characters that are invalid in a
+file name, because eventually files will be created with their names.
+*/
+static const char *FormatName( const char *Name, char *Buffer, size_t BufferSize )
+	{
+	const char	*p	= Name;
+	char		*q	= Buffer;
+
+	if( Name == NULL )
+		return "";
+
+#if 0
+	/* Only applicable if we were processing a KiCAD file. */
+
+	const char	*r;
+	/* We have a library name in the beginning... */
+	if(( r = strchr( Name, ':' )) != NULL )
+		/* ...let's copy it unaltered to the result... */
+		for( ; p <= r; p++, q++ )
+			*q = *p;
+#endif
+
+	for( ; *p != 0 && BufferSize > 1; p++, q++, BufferSize-- )
+		*q	= strchr( FORBIDDEN_CHARACTERS, *p ) != NULL ? '-' : *p;
+	*q	= '\0';
+
+	return Buffer;
+	}
+/*=============================================================================*/
 static const char *FormatLabel( const char *Label, char *Buffer, size_t BufferSize )
 	{
 	const char	*p	= Label;
@@ -543,6 +579,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	int						pinType			= 0;
 	int						i;
 	parameters_t			LocalParams		= *Params;
+	char					Buffer[256];
 
 	LocalParams.ScaleX	= 1;
 	LocalParams.OriginX = 0;
@@ -553,7 +590,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 //	RefDesPrefix	= CompDef->compheader.refdesprefix;
 
 /*
-	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", SymbolDef->name );
+	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", FormatName( SymbolDef->name, Buffer, sizeof Buffer ));
 
 	if(( CompDef = FindCompDef( Schematic, SymbolDef->originalname )) != NULL )
 		{
@@ -581,7 +618,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	OutputAttribute( &LocalParams, Level + 1, "Value", "Value", NULL, SymbolDef->vioattrs, SymbolDef->numattrs );
 */
 
-	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", CompDef->name, Index + 1 );
+	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", FormatName( CompDef->name, Buffer, sizeof Buffer ), Index + 1 );
 
 
 	for( i = 0; i < SymbolDef->numlines; i++ )
@@ -634,8 +671,9 @@ static pcad_symboldef_t *FindSymbolDefByOriginalName( const pcad_schematicfile_t
 /*=============================================================================*/
 static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library, pcad_compdef_t *CompDef )
 	{
-	parameters_t		LocalParams		= *Params;
+	parameters_t	LocalParams		= *Params;
 	int				i;
+	char			Buffer[256];
 
 	LocalParams.ScaleX	= 1;
 	LocalParams.OriginX = 0;
@@ -646,12 +684,12 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 		{
 		const char	*p;
 		if(( p = strrchr( CompDef->compheader.sourcelibrary, '.' )) != NULL )
-			OutputToFile( &LocalParams, Level, "(symbol \"%.*s:%s\"\n", p - CompDef->compheader.sourcelibrary, CompDef->compheader.sourcelibrary, CompDef->name );
+			OutputToFile( &LocalParams, Level, "(symbol \"%.*s:%s\"\n", p - CompDef->compheader.sourcelibrary, CompDef->compheader.sourcelibrary, FormatName( CompDef->name, Buffer, sizeof Buffer ));
 		else
-			OutputToFile( &LocalParams, Level, "(symbol \"%s:%s\"\n", CompDef->compheader.sourcelibrary, CompDef->name );
+			OutputToFile( &LocalParams, Level, "(symbol \"%s:%s\"\n", CompDef->compheader.sourcelibrary, FormatName( CompDef->name, Buffer, sizeof Buffer ));
 		}
 	else
-	OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", CompDef->name );
+		OutputToFile( &LocalParams, Level, "(symbol \"%s\"\n", FormatName( CompDef->name, Buffer, sizeof Buffer ));
 
 	if( CompDef->compheader.comptype == PCAD_COMPTYPE_POWER )
 		OutputToFile( &LocalParams, Level + 1, "(power) (pin_numbers hide) (pin_names (offset 0.5) hide) (exclude_from_sim no) (in_bom yes) (on_board yes)\n" );
@@ -748,6 +786,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 	const pcad_compinst_t	*CompInst;
 	char					x[32], y[32], Angle[32];
 	int						IsPower = 0;
+	char					Buffer[256];
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Symbol->pt.x, x, sizeof x );
 	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Symbol->pt.y, y, sizeof y );
@@ -779,12 +818,12 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 		{
 		const char	*p;
 		if(( p = strrchr( CompDef->compheader.sourcelibrary, '.' )) != NULL )
-			OutputToFile( Params, Level + 1, "(lib_id \"%.*s:%s\")\n", p - CompDef->compheader.sourcelibrary, CompDef->compheader.sourcelibrary, CompDef->name );
+			OutputToFile( Params, Level + 1, "(lib_id \"%.*s:%s\")\n", p - CompDef->compheader.sourcelibrary, CompDef->compheader.sourcelibrary, FormatName( CompDef->name, Buffer, sizeof Buffer ));
 		else
-			OutputToFile( Params, Level + 1, "(lib_id \"%s:%s\")\n", CompDef->compheader.sourcelibrary, CompDef->name );
+			OutputToFile( Params, Level + 1, "(lib_id \"%s:%s\")\n", CompDef->compheader.sourcelibrary, FormatName( CompDef->name, Buffer, sizeof Buffer ));
 		}
 	else
-		OutputToFile( Params, Level + 1, "(lib_id \"%s\")\n", CompDef->name );
+		OutputToFile( Params, Level + 1, "(lib_id \"%s\")\n", FormatName( CompDef->name, Buffer, sizeof Buffer ));
 
 	OutputToFile( Params, Level + 1, "(at %s %s %s)\n", x, y, Angle );
 	if( Symbol->isflipped )
