@@ -1170,9 +1170,10 @@ int OutputPCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const cha
 
 	SplitPath( pName, Path, Name, Ext );
 	if( stricmp( Ext, "" ) == 0 )
-		strcpy( Ext, ".kicad_sch" );
+		strcpy( Ext, ".sch" );
 
 	strcat( Path, Name );
+	strcat( Path, ".sort" );
 
 	strcpy( TmpPath, Path );
 	strcat( TmpPath, ".cvt_tmp" );

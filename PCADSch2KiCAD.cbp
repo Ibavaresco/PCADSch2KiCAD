@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters='--kicadout &quot;C:\Trabalho\80C32\80C32-3-Sort.sch&quot;' />
+				<Option parameters='--kicadout &quot;C:\Trabalho\PCAD2KiCAD\Temp\TesteAlt.sch&quot;' />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -21,9 +21,6 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
 				<Linker>
 					<Add option="-s" />
 				</Linker>

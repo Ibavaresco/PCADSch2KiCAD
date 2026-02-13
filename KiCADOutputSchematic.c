@@ -165,7 +165,7 @@ static const char *JustifyKiCAD[]	=
 	" (justify left top)",		" (justify top)",		" (justify right top)"
 	};
 /*=============================================================================*/
-static pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p, const pcad_point_t *p2 )
+static pcad_busentry_t *FindBusEntry( const pcad_sheet_t *Sheet, const pcad_point_t *p, const pcad_point_t *p2 )
 	{
 	int	i;
 
@@ -184,7 +184,7 @@ static pcad_busentry_t *FindBusEntry( pcad_sheet_t *Sheet, const pcad_point_t *p
 	return NULL;
 	}
 /*=============================================================================*/
-static int OutputWire( const parameters_t *Params, unsigned Level, pcad_sheet_t *Sheet, const pcad_wire_t *Wire )
+static int OutputWire( const parameters_t *Params, unsigned Level, const pcad_sheet_t *Sheet, const pcad_wire_t *Wire )
 	{
 	char			x1[32], y1[32], x2[32], y2[32];
 	pcad_busentry_t	*be1, *be2;
@@ -326,7 +326,7 @@ static int OutputText( const parameters_t *Params, unsigned Level, const pcad_te
 	}
 /*=============================================================================*/
 /*
-static int OutputAttribute( const parameters_t *Params, unsigned Level, const char *NamePCAD, const char *NameKiCAD, const char *Value, pcad_attr_t **Attributes, size_t NumAttributes )
+static int OutputAttribute( const parameters_t *Params, unsigned Level, const char *NamePCAD, const char *NameKiCAD, const char *Value, const pcad_attr_t **Attributes, size_t NumAttributes )
 	{
 	int i;
 	char	x[32], y[32], Angle[32];
@@ -382,7 +382,7 @@ static void Rotate( pcad_dimmension_t *x, pcad_dimmension_t *y, pcad_dimmension_
 	}
 #endif
 /*=============================================================================*/
-static int OutputArc( const parameters_t *Params, unsigned Level, pcad_triplepointarc_t *Arc )
+static int OutputArc( const parameters_t *Params, unsigned Level, const pcad_triplepointarc_t *Arc )
 	{
 	char	x1[32], y1[32], Width[32];
 
@@ -464,7 +464,7 @@ static pcad_comppin_t *FindPin( const parameters_t *Params, unsigned PartNumber,
 	return NULL;
 	}
 /*=============================================================================*/
-static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pin, int PinType, unsigned PartNumber, unsigned PinNumber, const pcad_compdef_t *CompDef )
+static int OutputPin( const parameters_t *Params, unsigned Level, const pcad_pin_t *Pin, int PinType, unsigned PartNumber, unsigned PinNumber, const pcad_compdef_t *CompDef )
 	{
 	static const char	*GraphStyles[2][4]	=
 		{
@@ -498,27 +498,31 @@ static int OutputPin( const parameters_t *Params, unsigned Level, pcad_pin_t *Pi
 	pcad_real_t				PinX		= Pin->point.x;
 	pcad_real_t				PinY		= Pin->point.y;
 	const pcad_comppin_t	*CompPin;
+	pcad_dimmension_t		PinLength	= Pin->pinlength;
+
+	if( PinLength == 0 )
+		PinLength	= 2540000;
 
 	switch( PinRotation )
 		{
 		case 0:
-			PinX -= Pin->pinlength;
+			PinX -= PinLength;
 			break;
 		case 90000000:
-			PinY -= Pin->pinlength;
+			PinY -= PinLength;
 			break;
 		case 180000000:
-			PinX += Pin->pinlength;
+			PinX += PinLength;
 			break;
 		case 270000000:
-			PinY += Pin->pinlength;
+			PinY += PinLength;
 			break;
 		}
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, PinX, x, sizeof x );
 	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, PinY, y, sizeof y );
 	FormatReal( Params, 0, 0,				1,				PinRotation, Angle, sizeof Angle );
-	FormatReal( Params, 0, 0,				1,				Pin->pinlength, Length, sizeof Length );
+	FormatReal( Params, 0, 0,				1,				PinLength, Length, sizeof Length );
 
 	GraphStyle	= GraphStyles[Pin->insideedgestyle&1][Pin->outsideedgestyle&3];
 
@@ -572,7 +576,7 @@ static int OutputPolygon( const parameters_t *Params, unsigned Level, const pcad
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned Index, const pcad_schematicfile_t *Schematic, pcad_symboldef_t *SymbolDef, const pcad_compdef_t *CompDef )
+static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned Index, const pcad_schematicfile_t *Schematic, const pcad_symboldef_t *SymbolDef, const pcad_compdef_t *CompDef )
 	{
 //	char					*RefDesPrefix	= NULL;
 	int						IsPower			= 0;
@@ -580,6 +584,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	int						i;
 	parameters_t			LocalParams		= *Params;
 	char					Buffer[256];
+	unsigned				partNum, altType;
 
 	LocalParams.ScaleX	= 1;
 	LocalParams.OriginX = 0;
@@ -618,7 +623,10 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	OutputAttribute( &LocalParams, Level + 1, "Value", "Value", NULL, SymbolDef->vioattrs, SymbolDef->numattrs );
 */
 
-	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_1\"\n", FormatName( CompDef->name, Buffer, sizeof Buffer ), Index + 1 );
+	partNum	= CompDef->vioattachedsymbols[Index]->partnum;
+	altType	= CompDef->vioattachedsymbols[Index]->alttype;
+
+	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_%u\"\n", FormatName( CompDef->name, Buffer, sizeof Buffer ), partNum, altType + 1 );
 
 
 	for( i = 0; i < SymbolDef->numlines; i++ )
@@ -637,7 +645,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 		else
 			pinType	= 0;	//@@@@
 
-		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], pinType, Index + 1, i + 1, CompDef );
+		OutputPin( &LocalParams, Level + 1, SymbolDef->viopins[i], pinType, partNum, i + 1, CompDef );
 		}
 	OutputToFile( &LocalParams, Level, ")\n" );
 	return 0;
@@ -669,7 +677,7 @@ static pcad_symboldef_t *FindSymbolDefByOriginalName( const pcad_schematicfile_t
 	return NULL;
 	}
 /*=============================================================================*/
-static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library, pcad_compdef_t *CompDef )
+static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library, const pcad_compdef_t *CompDef )
 	{
 	parameters_t	LocalParams		= *Params;
 	int				i;
@@ -741,15 +749,12 @@ static int OutputLibrary( const parameters_t *Params, unsigned Level, const pcad
 
 	for( i = 0; i < Library->numcompdefs; i++ )
 		OutputCompDef( Params, Level + 1, Schematic, Library, Library->viocompdefs[i] );
-/*
-	for( i = 0; i < Library->numsymboldefs; i++ )
-		OutputSymbolDef( Params, Level + 1, Schematic, Library->viosymboldefs[i] );
-*/
+
 	OutputToFile( Params, Level, ")\n" );
 	return 0;
 	}
 /*=============================================================================*/
-static pcad_attr_t *FindAttr( pcad_attr_t **Attributes, size_t NumAttributes, char *Name )
+static const pcad_attr_t *FindAttr( const pcad_attr_t **Attributes, size_t NumAttributes, char *Name )
 	{
 	int i;
 
@@ -779,7 +784,7 @@ static pcad_compinst_t *FindCompInst( const pcad_netlist_t *NetList, const char 
 #define MAX(a,b)	((a)>(b)?(a):(b))
 #endif	/*	!defined MAX */
 /*=============================================================================*/
-static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_symbol_t *Symbol )
+static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_symbol_t *Symbol )
 	{
 	const pcad_symboldef_t	*SymbolDef	= NULL;
 	const pcad_compdef_t	*CompDef	= NULL;
@@ -829,6 +834,8 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 	if( Symbol->isflipped )
 		OutputToFile( Params, Level + 1, "(mirror y)\n" );
 	OutputToFile( Params, Level + 1, "(unit %u)\n", Symbol->partnum );
+	if( Symbol->alttype != PCAD_ALTTYPE_NORMAL )
+		OutputToFile( Params, Level + 1, "(convert %u)\n", Symbol->alttype + 1 );
 	OutputToFile( Params, Level + 1, "(exclude_from_sim no)\n" );
 	OutputToFile( Params, Level + 1, "(in_bom yes)\n" );
 	OutputToFile( Params, Level + 1, "(on_board yes)\n" );
@@ -838,7 +845,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 		{
 		int					i, Column;
 		pcad_dimmension_t	dx = 0, dy = 0, dAngle = 0;
-		pcad_attr_t			*Attr;
+		const pcad_attr_t	*Attr;
 		pcad_enum_justify_t	jf	= 0;
 		int					RefDesVisible	= 0;
 
@@ -875,7 +882,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			char		Buffer[3*MAX( strlen( IsPower ? CompInst->originalname : CompValue ), strlen( Footprint ))+1];
 
 			dx = dy = dAngle			= 0;
-			pcad_attr_t *Value			= FindAttr( SymbolDef->vioattrs, SymbolDef->numattrs, "Value" );
+			const pcad_attr_t *Value	= FindAttr( SymbolDef->vioattrs, SymbolDef->numattrs, "Value" );
 			jf	= 0;
 			if( Value != NULL )
 				{
@@ -975,7 +982,7 @@ static int OutputBusEntry( const parameters_t *Params, unsigned Level, const pca
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputSchematic( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
+static int OutputSchematic( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_sheet_t *Sheet )
 	{
 	int i;
 
@@ -1142,7 +1149,7 @@ static void FindTitleExtents( const pcad_titlesheet_t *TitleSheet, pcad_extent_t
 /*=============================================================================*/
 #define ALIGNMENT_ROUNDING	2540000
 /*=============================================================================*/
-static int OutputSheet( parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, pcad_sheet_t *Sheet )
+static int OutputSheet( parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_sheet_t *Sheet )
 	{
 	char					Buffer[32];
 	pcad_dimmension_t		OriginX, OriginY;
@@ -1209,7 +1216,7 @@ static int OutputSheet( parameters_t *Params, unsigned Level, const pcad_schemat
 /*=============================================================================*/
 void SplitPath( const char *pFullPath, char *pPath, char *pName, char *pExt );
 /*=============================================================================*/
-int OutputKiCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const char *pName )
+int OutputKiCAD( cookie_t *Cookie, const pcad_schematicfile_t *PCADSchematic, const char *pName )
 	{
 	parameters_t	Params;
 	char			Path[256], Name[256], Ext[256], OutPath[256], BkpPath[256], TmpPath[256];

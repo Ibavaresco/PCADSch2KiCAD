@@ -1154,7 +1154,7 @@ static const parsefield_t	Symbol_FixedFields[]	=
 static const parsefield_t	Symbol_Fields[]	=
 	{
 	/*	Flags						TagString		ParseFunction		Size					Offset										ParseStruct */
-		{ FLAG_WRAPPED, 			"altType",		ParseEnum,			0,						offsetof( pcad_attachedsymbol_t, alttype ),	(const parsestruct_t*)&AltTypes },
+		{ FLAG_WRAPPED, 			"altType",		ParseEnum,			0,						offsetof( pcad_symbol_t, alttype ),			(const parsestruct_t*)&AltTypes },
 		{ FLAG_WRAPPED,				"pt",			ParseGeneric,		0,						offsetof( pcad_symbol_t, pt ),				&Point_ParseStruct },
 		{ FLAG_WRAPPED,				"rotation",		ParseReal,			0,						offsetof( pcad_symbol_t, rotation ),		NULL },
 		{ FLAG_WRAPPED,				"isFlipped",	ParseBoolean,		0,						offsetof( pcad_symbol_t, isflipped ),		NULL },

@@ -1461,7 +1461,7 @@ static int CompareAttachedSymbols( const void *a, const void *b )
 	const pcad_attachedsymbol_t *pa = *(const pcad_attachedsymbol_t * const *)a;
 	const pcad_attachedsymbol_t *pb = *(const pcad_attachedsymbol_t * const *)b;
 
-	return pa->partnum - pb->partnum;
+	return pa->partnum != pb->partnum ? pa->partnum - pb->partnum : pa->alttype - pb->alttype;
 	}
 /*===========================================================================*/
 static int ProcessCompDef( cookie_t *Cookie, pcad_compdef_t *CompDef )
