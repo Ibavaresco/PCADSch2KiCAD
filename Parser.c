@@ -566,3 +566,18 @@ int Warning( const cookie_t *Cookie, const char *Message, ... )
 	return 0;
 	}
 /*============================================================================*/
+int WarningOutput( const char *Message, ... )
+	{
+	va_list ap;
+
+	va_start( ap, Message );
+
+	fprintf( stderr, "Warning: " );
+	vfprintf( stderr, Message, ap );
+	fprintf( stderr, "\n" );
+
+	va_end( ap );
+
+	return 0;
+	}
+/*============================================================================*/

@@ -60,7 +60,7 @@ static int FormatReal( const parameters_t *Params, unsigned FracDigs, pcad_dimme
 
 	Res		= snprintf( Buffer, BufferSize, "%s%u.%0*u", Sign ? "-" : "", Int, Dig, Frac );
 	if( Res <= 0 || Res >= BufferSize )
-		Error( Params->Cookie, -1, "Invalid number" );
+		ErrorOutput( Params->Cookie, -1, "Invalid number" );
 
 	return Res;
 	}
@@ -1179,7 +1179,7 @@ int OutputPCAD( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const cha
 	strcat( TmpPath, ".cvt_tmp" );
 
 	if(( Params.File = fopen( TmpPath, "wb" )) == NULL )
-		Error( Cookie, -1, "Error creating file %s", TmpPath );
+		ErrorOutput( Cookie, -1, "Error creating file %s", TmpPath );
 
 	OutputToFile( &Params, 0, "ACCEL_ASCII \"%s\"\r\n", PCADSchematic->name );
 

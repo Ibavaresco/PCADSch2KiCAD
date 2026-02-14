@@ -138,7 +138,10 @@ static int FormatReal( const parameters_t *Params, unsigned FracDigs, pcad_dimme
 
 	Res	= snprintf( Buffer, BufferSize, "%s%u.%0*u", Sign ? "-" : "", Int, Dig, Frac );
 	if( Res <= 0 || Res >= BufferSize )
-		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "Invalid number" );
+		{
+		fclose( Params->Cookie->File );
+		ErrorOutput( Params->Cookie, -1, "Invalid number" );
+		}
 
 	return Res;
 	}
@@ -209,10 +212,10 @@ static int OutputWire( const parameters_t *Params, unsigned Level, const pcad_sh
 			else if( pt2.x < pt1.x - 2540000 )
 				pt1.x -= 2540000;
 			else
-				Warning( Params->Cookie, "Wire too short, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
+				WarningOutput( "Wire too short, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
 			}
 		else
-			Warning( Params->Cookie, "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
+			WarningOutput( "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt1.x / 1.0e6, pt1.y / 1.0e6 );
 		be1->point	= pt1;
 		/* We must copy the style from the wire endpoint to the busentry, because it will be output later and we will need that information. */
 		be1->style	= Wire->endstyle1;
@@ -234,10 +237,10 @@ static int OutputWire( const parameters_t *Params, unsigned Level, const pcad_sh
 			else if( pt1.x < pt2.x - 2540000 )
 				pt2.x -= 2540000;
 			else
-				Warning( Params->Cookie, "Wire too short, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
+				WarningOutput( "Wire too short, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
 			}
 		else
-			Warning( Params->Cookie, "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
+			WarningOutput( "Wire meets bus non-perpendicularly, won't adjust endpoint at (%.3f,%.3f) ", pt2.x / 1.0e6, pt2.y / 1.0e6 );
 		be2->point	= pt2;
 		/* We must copy the style from the wire endpoint to the busentry, because it will be output later and we will need that information. */
 		be2->style	= Wire->endstyle2;
@@ -278,11 +281,11 @@ static int OutputPort( const parameters_t *Params, unsigned Level, const pcad_po
 
 	i	= Port->porttype;
 	if( i >= PCAD_PORTTYPE_NOANGLE_DBL_HORZ )
-		fprintf( stderr, "Warning: KiCAD does not support 2-pins port type \"%s\", please review the resulting circuit.\n", PortTypes.items[Port->porttype] );
+		WarningOutput( "KiCAD does not support 2-pins port type \"%s\", please review the resulting circuit.\n", PortTypes.items[Port->porttype] );
 	else if( i >= PCAD_PORTTYPE_NOANGLE_DBL_HORZ )
-		fprintf( stderr, "Warning: KiCAD does not have vertical port \"%s\", horizontal model used.\n", PortTypes.items[Port->porttype] );
+		WarningOutput( "KiCAD does not have vertical port \"%s\", horizontal model used.\n", PortTypes.items[Port->porttype] );
 	else if( i >= PCAD_PORTTYPE_VERTLINE_SGL_HORZ )
-		fprintf( stderr, "Warning: KiCAD does not have port \"%s\", passive model used.\n", PortTypes.items[Port->porttype] );
+		WarningOutput( "KiCAD does not have port \"%s\", passive model used.\n", PortTypes.items[Port->porttype] );
 
 	if(( i %= 6 ) >= LENGTH( PortShapeKiCAD ))
 		i	= 0;
@@ -326,7 +329,7 @@ static int OutputText( const parameters_t *Params, unsigned Level, const pcad_te
 	}
 /*=============================================================================*/
 /*
-static int OutputAttribute( const parameters_t *Params, unsigned Level, const char *NamePCAD, const char *NameKiCAD, const char *Value, const pcad_attr_t **Attributes, size_t NumAttributes )
+static int OutputAttribute( const parameters_t *Params, unsigned Level, const char *NamePCAD, const char *NameKiCAD, const char *Value, const pcad_attr_t * const *Attributes, size_t NumAttributes )
 	{
 	int i;
 	char	x[32], y[32], Angle[32];
@@ -337,7 +340,7 @@ static int OutputAttribute( const parameters_t *Params, unsigned Level, const ch
 	if( i >= NumAttributes )
 		return 0;
 
-	pcad_attr_t *Attr	= Attributes[i];
+	const pcad_attr_t *Attr	= Attributes[i];
 	char		Buffer[3*strlen( Value != NULL ? Value : Attr->value )+1];
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Attr->point.x, x, sizeof x );
@@ -501,7 +504,7 @@ static int OutputPin( const parameters_t *Params, unsigned Level, const pcad_pin
 	pcad_dimmension_t		PinLength	= Pin->pinlength;
 
 	if( PinLength == 0 )
-		PinLength	= 2540000;
+		PinLength	= 7620000;
 
 	switch( PinRotation )
 		{
@@ -527,7 +530,10 @@ static int OutputPin( const parameters_t *Params, unsigned Level, const pcad_pin
 	GraphStyle	= GraphStyles[Pin->insideedgestyle&1][Pin->outsideedgestyle&3];
 
 	if(( CompPin = FindPin( Params, PartNumber, PinNumber, CompDef )) == NULL )
-		fclose( Params->Cookie->File ), ErrorOutput( Params->Cookie, -1, "CompPin not found" );
+		{
+		fclose( Params->Cookie->File );
+		ErrorOutput( Params->Cookie, -1, "CompPin not found" );
+		}
 
 	if( CompPin->pinname == NULL )
 		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, CompPin->pinnumber );
@@ -628,6 +634,8 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 
 	OutputToFile( &LocalParams, Level, "(symbol \"%s_%u_%u\"\n", FormatName( CompDef->name, Buffer, sizeof Buffer ), partNum, altType + 1 );
 
+	if( altType == PCAD_ALTTYPE_IEEE )
+		WarningOutput( "Symbol %s has IEEE alternate, it is not supported by KiCAD.", CompDef->name );
 
 	for( i = 0; i < SymbolDef->numlines; i++ )
 		OutputLine( &LocalParams, Level + 1, SymbolDef->violines[i] );
@@ -727,7 +735,7 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 	OutputToFile( &LocalParams, Level + 1, "(property \"Reference\" \"%s\" (at 6.35 -1.27 0)(effects (font (size 1.27 1.27)) (justify left)))\n", CompDef->compheader.refdesprefix );
 	OutputToFile( &LocalParams, Level + 1, "(property \"Value\" \"%s\" (at 6.35 1.27 0)(effects (font (size 1.27 1.27)) (justify left)))\n", CompDef->originalname );
 	if( CompDef->attachedpattern.patternname != NULL )
-		OutputToFile( &LocalParams, Level + 1, "(property \"Footprint\" \"%s\" (at 6.35 -3.81 0)(effects (font (size 1.27 1.27)) (justify left) (hide yes)))\n", CompDef->attachedpattern.patternname );
+		OutputToFile( &LocalParams, Level + 1, "(property \"Footprint\" \"%s\" (at 6.35 -3.81 0)(effects (font (size 1.27 1.27)) (justify left) (hide yes)))\n", FormatName( CompDef->attachedpattern.patternname, Buffer, sizeof Buffer ));
 
 	for( i = 0; i < CompDef->numattachedsymbols; i++ )
 		{
@@ -754,7 +762,7 @@ static int OutputLibrary( const parameters_t *Params, unsigned Level, const pcad
 	return 0;
 	}
 /*=============================================================================*/
-static const pcad_attr_t *FindAttr( const pcad_attr_t **Attributes, size_t NumAttributes, char *Name )
+static const pcad_attr_t *FindAttr( const pcad_attr_t * const *Attributes, size_t NumAttributes, char *Name )
 	{
 	int i;
 
@@ -849,7 +857,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 		pcad_enum_justify_t	jf	= 0;
 		int					RefDesVisible	= 0;
 
-		if(( Attr = FindAttr( SymbolDef->vioattrs, SymbolDef->numattrs, "RefDes" )) != NULL )
+		if(( Attr = FindAttr( (const pcad_attr_t*const*)SymbolDef->vioattrs, SymbolDef->numattrs, "RefDes" )) != NULL )
 			{
 			RefDesVisible	= Attr->isvisible;
 			dx				= ( Symbol->isflipped && ( Symbol->rotation == 0 || Symbol->rotation == 180000000 ) ? -1 : 1 ) * Attr->point.x;
@@ -882,7 +890,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			char		Buffer[3*MAX( strlen( IsPower ? CompInst->originalname : CompValue ), strlen( Footprint ))+1];
 
 			dx = dy = dAngle			= 0;
-			const pcad_attr_t *Value	= FindAttr( SymbolDef->vioattrs, SymbolDef->numattrs, "Value" );
+			const pcad_attr_t *Value	= FindAttr( (const pcad_attr_t*const*)SymbolDef->vioattrs, SymbolDef->numattrs, "Value" );
 			jf	= 0;
 			if( Value != NULL )
 				{
@@ -908,7 +916,7 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			FormatReal( Params, 0, 0,				1,				dAngle, Angle, sizeof Angle );
 
 			OutputToFile( Params, Level + 1, "(property \"Value\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s%s))\n", FormatLabel( IsPower ? CompInst->originalname : CompValue, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % LENGTH( JustifyKiCAD )], ValueVisible || IsPower ? "" : " (hide yes)"	);
-			OutputToFile( Params, Level + 1, "(property \"Footprint\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s (hide yes)))\n", FormatLabel( Footprint, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % ( LENGTH( JustifyKiCAD ) - 1 )] );
+			OutputToFile( Params, Level + 1, "(property \"Footprint\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s (hide yes)))\n", FormatName( Footprint, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % ( LENGTH( JustifyKiCAD ) - 1 )] );
 			}
 
 		OutputToFile( Params, Level + 1, "" );
@@ -1269,7 +1277,10 @@ int OutputKiCAD( cookie_t *Cookie, const pcad_schematicfile_t *PCADSchematic, co
 		remove( TmpPath );
 
 		if(( Params.File = fopen( TmpPath, "wb" )) == NULL )
-			fclose( Params.Cookie->File ), ErrorOutput( Cookie, -1, "Error creating file" );
+			{
+			fclose( Params.Cookie->File );
+			ErrorOutput( Cookie, -1, "Error creating file" );
+			}
 
 		OutputSheet( &Params, 0, PCADSchematic, PCADSchematic->schematicdesign.viosheets[i] );
 

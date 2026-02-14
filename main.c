@@ -207,8 +207,8 @@ static void PrintUsage( int OutputFormat )
 	_fprintf_p( stderr,
 #endif	/*	defined __linux__ */
 		"\n"
-		"%1$s v0.9\n"
-		"Copyright(c) 2024, Isaac Marino Bavaresco\n"
+		"%1$s v1.0\n"
+		"Copyright(c) 2024-2026, Isaac Marino Bavaresco\n"
 		__DATE__ " " __TIME__ "\n\n"
 		"%2$s.\n\n"
 		"Usage: %1$s [--kicadout|--pcadout] [<pathin>]<filenamein>[.<extin>] [<pathout>][<filenameout|*>[.<extout|*>]]\n\n"
