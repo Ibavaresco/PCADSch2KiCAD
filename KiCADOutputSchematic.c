@@ -685,11 +685,25 @@ static pcad_symboldef_t *FindSymbolDefByOriginalName( const pcad_schematicfile_t
 	return NULL;
 	}
 /*=============================================================================*/
+static const pcad_attr_t *FindAttrInNetList( const pcad_netlist_t *NetList, const char *CompName, const char *Name )
+	{
+	int i, j;
+
+	for( i = 0; i < NetList->numcompinsts; i++ )
+		if( stricmp( CompName, NetList->viocompinsts[i]->originalname ) == 0 )
+			for( j = 0; j < NetList->viocompinsts[i]->numattrs; j++ )
+				if( stricmp( Name, NetList->viocompinsts[i]->vioattrs[j]->name ) == 0 )
+					return NetList->viocompinsts[i]->vioattrs[j];
+
+	return NULL;
+	}
+/*=============================================================================*/
 static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_library_t *Library, const pcad_compdef_t *CompDef )
 	{
-	parameters_t	LocalParams		= *Params;
-	int				i;
-	char			Buffer[256];
+	parameters_t		LocalParams	= *Params;
+	int					i;
+	char				Buffer[256];
+	const pcad_attr_t	*Attr;
 
 	LocalParams.ScaleX	= 1;
 	LocalParams.OriginX = 0;
@@ -737,6 +751,9 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 	if( CompDef->attachedpattern.patternname != NULL )
 		OutputToFile( &LocalParams, Level + 1, "(property \"Footprint\" \"%s\" (at 6.35 -3.81 0)(effects (font (size 1.27 1.27)) (justify left) (hide yes)))\n", FormatName( CompDef->attachedpattern.patternname, Buffer, sizeof Buffer ));
 
+	if(( Attr = FindAttrInNetList( &Schematic->netlist, CompDef->originalname, "Description" )) != NULL )
+		OutputToFile( Params, Level + 1, "(property \"Description\" \"%s\" (at 0 0 0) (effects (font (size 1.27 1.27) ) (hide yes)))\n", Attr->value );
+
 	for( i = 0; i < CompDef->numattachedsymbols; i++ )
 		{
 		pcad_symboldef_t	*SymbolDef;
@@ -762,15 +779,13 @@ static int OutputLibrary( const parameters_t *Params, unsigned Level, const pcad
 	return 0;
 	}
 /*=============================================================================*/
-static const pcad_attr_t *FindAttr( const pcad_attr_t * const *Attributes, size_t NumAttributes, char *Name )
+static const pcad_attr_t *FindAttr( const pcad_attr_t * const *Attributes, size_t NumAttributes, const char *Name )
 	{
 	int i;
 
 	for( i = 0; i < NumAttributes; i++ )
 		if( stricmp( Name, Attributes[i]->name ) == 0 )
-			break;
-	if( i < NumAttributes )
-		return Attributes[i];
+			return Attributes[i];
 
 	return NULL;
 	}
@@ -917,6 +932,8 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 
 			OutputToFile( Params, Level + 1, "(property \"Value\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s%s))\n", FormatLabel( IsPower ? CompInst->originalname : CompValue, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % LENGTH( JustifyKiCAD )], ValueVisible || IsPower ? "" : " (hide yes)"	);
 			OutputToFile( Params, Level + 1, "(property \"Footprint\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s (hide yes)))\n", FormatName( Footprint, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % ( LENGTH( JustifyKiCAD ) - 1 )] );
+			if(( Attr = FindAttr( (const pcad_attr_t*const*)Symbol->vioattrs, Symbol->numattrs, "Description" )) != NULL )
+				OutputToFile( Params, Level + 1, "(property \"Description\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27) ) (hide yes)))\n", Attr->value, x, y, Angle );
 			}
 
 		OutputToFile( Params, Level + 1, "" );
