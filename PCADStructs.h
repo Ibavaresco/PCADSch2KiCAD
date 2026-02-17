@@ -171,6 +171,7 @@ typedef struct pcad_ieeesymbol_tag
 	pcad_enum_ieeesymbol_t					type;
 	pcad_point_t							point;
 	pcad_dimmension_t						height;
+	pcad_real_t								rotation;
 	pcad_enum_boolean_t						isflipped;
 	struct pcad_ieeesymbol_tag				*next;
 	} pcad_ieeesymbol_t;

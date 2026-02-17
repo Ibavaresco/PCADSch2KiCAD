@@ -281,6 +281,7 @@ static const parsefield_t	IEEESymbol_FixedFields[]	=
 static const parsefield_t	IEEESymbol_Fields[]	=
 	{
 	/*	Flags			TagString		ParseFunction		Size	Offset										ParseStruct */
+		{ FLAG_WRAPPED, "rotation",		ParseReal,			0,		offsetof( pcad_ieeesymbol_t, rotation ),	NULL },
 		{ FLAG_WRAPPED, "isflipped",	ParseBoolean,		0,		offsetof( pcad_ieeesymbol_t, isflipped ),	NULL }
 	};
 /*----------------------------------------------------------------------------*/

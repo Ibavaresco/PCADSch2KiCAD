@@ -370,13 +370,13 @@ static int OutputLine( const parameters_t *Params, unsigned Level, const pcad_li
 	return 0;
 	}
 /*=============================================================================*/
-#if 0
-static void Rotate( pcad_dimmension_t *x, pcad_dimmension_t *y, pcad_dimmension_t xc, pcad_dimmension_t yc, float_t angle )
+#if 1
+static void Rotate( pcad_dimmension_t *x, pcad_dimmension_t *y, pcad_dimmension_t xc, pcad_dimmension_t yc, double angle )
 	{
 	double	sinA, cosA;
 	double	dX, dY;
 
-	sincos( angle / 1.0e6, &sinA, &cosA );
+	sincos( angle, &sinA, &cosA );
 	dX	= ( *x - xc ) / 1.0e6;
 	dY	= ( *y - yc ) / 1.0e6;
 
@@ -582,6 +582,170 @@ static int OutputPolygon( const parameters_t *Params, unsigned Level, const pcad
 	return 0;
 	}
 /*=============================================================================*/
+static void OutputIEEESymbol( const parameters_t *Params, unsigned Level, const pcad_ieeesymbol_t *IEEESymbol )
+	{
+	typedef struct
+		{
+		size_t	NumVertices;
+		struct
+			{
+			unsigned	x;
+			unsigned	y;
+			}	Vertices[];
+		} ieeesymbolt_t;
+
+	static const ieeesymbolt_t	IEEEAdder		=
+		{
+		.NumVertices	=  7,
+		.Vertices		=
+			{
+			[0] = { 16,  4 },
+			[1] = { 16,  0 },
+			[2] = {  0,  0 },
+			[3] = {  8,  8 },
+			[4] = {  0, 16 },
+			[5] = { 16, 16 },
+			[6] = { 16, 12 }
+			}
+		 };
+
+	static const ieeesymbolt_t	IEEEAmplifier	=
+		{
+		.NumVertices	=  4,
+		.Vertices		=
+			{
+			[0] = {  0,  0 },
+			[1] = { 16,  8 },
+			[2] = {  0, 16 },
+			[3] = {  0,  0 }
+			}
+		};
+
+	static const ieeesymbolt_t	IEEEAstable		=
+		{
+		.NumVertices	= 10,
+		.Vertices		=
+			{
+			[0] = {  0,  0 },
+			[1] = {  8,  0 },
+			[2] = {  8, 16 },
+			[3] = { 16, 16 },
+			[4] = { 16,  0 },
+			[5] = { 24,  0 },
+			[6] = { 24, 16 },
+			[7] = { 32, 16 },
+			[8] = { 32,  0 },
+			[9] = { 40,  0 }
+			}
+		};
+
+	static const ieeesymbolt_t	IEEEComplex		=
+		{
+		.NumVertices	=  6,
+		.Vertices		=
+			{
+			[0] = {  0,  0 },
+			[1] = { 16,  0 },
+			[2] = {  8,  0 },
+			[3] = {  8, 16 },
+			[4] = {  0, 16 },
+			[5] = { 16, 16 }
+			}
+		};
+
+	static const ieeesymbolt_t	IEEEGenerator	=
+		{
+		.NumVertices	=  6,
+		.Vertices		=
+			{
+			[0] = {  0,  0 },
+			[1] = {  8,  0 },
+			[2] = {  8, 16 },
+			[3] = { 16, 16 },
+			[4] = { 16,  0 },
+			[5] = { 24,  0 }
+			}
+		};
+
+	static const ieeesymbolt_t	IEEEHysteresis	=
+		{
+		.NumVertices	=  6,
+		.Vertices		=
+			{
+			[0] = {  0,  0 },
+			[1] = { 24,  0 },
+			[2] = { 24, 16 },
+			[3] = { 32, 16 },
+			[4] = {  8, 16 },
+			[5] = {  8,  0 }
+			}
+		};
+
+	static const ieeesymbolt_t	IEEEMultiplier	=
+		{
+		.NumVertices	=  6,
+		.Vertices		=
+			{
+			[0] = {  5,  0 },
+			[1] = {  5, 16 },
+			[2] = {  0, 16 },
+			[3] = { 16, 16 },
+			[4] = { 11, 16 },
+			[5] = { 11,  0 }
+			}
+		};
+
+	static const ieeesymbolt_t *IEEESymbols[]	=
+		{
+		[PCAD_IEEESYMBOL_GENERATOR]	= &IEEEGenerator,
+		[PCAD_IEEESYMBOL_AMPLIFIER]	= &IEEEAmplifier,
+		[PCAD_IEEESYMBOL_ADDER]		= &IEEEAdder,
+		[PCAD_IEEESYMBOL_COMPLEX]	= &IEEEComplex,
+		[PCAD_IEEESYMBOL_HYSTERESIS]= &IEEEHysteresis,
+		[PCAD_IEEESYMBOL_MULTIPLIER]= &IEEEMultiplier,
+		[PCAD_IEEESYMBOL_ASTABLE]	= &IEEEAstable
+		};
+	int							i;
+	char						Width[32];
+	pcad_dimmension_t			Module	= IEEESymbol->height / 16;
+	const ieeesymbolt_t			*Symbol	= IEEESymbols[IEEESymbol->type];
+
+	OutputToFile( Params, Level, "(polyline (pts" );
+
+	for( i = 0; i < Symbol->NumVertices; i++ )
+		{
+		char				x[32], y[32];
+		pcad_dimmension_t	X, Y;
+
+		X	= Symbol->Vertices[i].x * Module;
+		Y	= Symbol->Vertices[i].y * Module;
+		Rotate( &X, &Y, 0, 0, IEEESymbol->rotation / 1.0e6 * M_PI / 180 );
+
+		FormatReal( Params, 0, Params->OriginX, Params->ScaleX, IEEESymbol->point.x + X, x, sizeof x );
+		FormatReal( Params, 0, Params->OriginY, Params->ScaleY, IEEESymbol->point.y + Y, y, sizeof y );
+		OutputToFile( Params, 0, " (xy %s %s)", x, y );
+		}
+
+#if 0
+	FormatReal( Params, 0, 0, 1, IEEESymbol->height / 20, Width, sizeof Width );
+#else
+	strcpy( Width, "0.127" );
+
+#endif
+	OutputToFile( Params, 0, ") (stroke (width %s) (type default)) (fill (type none)))\n", Width );
+
+	if( IEEESymbol->type == PCAD_IEEESYMBOL_COMPLEX )
+		{
+		char	x[32], y[32], r[32];
+
+		FormatReal( Params, 0, Params->OriginX, Params->ScaleX, IEEESymbol->point.x + 8 * Module, x, sizeof x );
+		FormatReal( Params, 0, Params->OriginY, Params->ScaleY, IEEESymbol->point.y + 8 * Module, y, sizeof y );
+		FormatReal( Params, 0, 0,			    1,				2 * Module, r, sizeof r );
+
+		OutputToFile( Params, Level, "(circle (center %s %s) (radius %s) (stroke (width %s) (type default)) (fill (type none)))\n", x, y, r, Width );
+		}
+	}
+/*=============================================================================*/
 static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned Index, const pcad_schematicfile_t *Schematic, const pcad_symboldef_t *SymbolDef, const pcad_compdef_t *CompDef )
 	{
 //	char					*RefDesPrefix	= NULL;
@@ -645,6 +809,9 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 
 	for( i = 0; i < SymbolDef->numpolys; i++ )
 		OutputPolygon( &LocalParams, Level + 1, SymbolDef->viopolys[i] );
+
+	for( i = 0; i < SymbolDef->numieeesymbols; i++ )
+		OutputIEEESymbol( &LocalParams, Level + 1, SymbolDef->vioieeesymbols[i] );
 
 	for( i = 0; i < SymbolDef->numpins; i++ )
 		{
@@ -1040,6 +1207,9 @@ static int OutputSchematic( const parameters_t *Params, unsigned Level, const pc
 
 	for( i = 0; i < Sheet->numpolys; i++ )
 		OutputPolygon( Params, Level, Sheet->viopolys[i] );
+
+	for( i = 0; i < Sheet->numieeesymbols; i++ )
+		OutputIEEESymbol( Params, Level, Sheet->vioieeesymbols[i] );
 
 	return 0;
 	}
