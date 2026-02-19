@@ -619,7 +619,7 @@ typedef struct pcad_sheet_tag
 	pcad_poly_t								*firstpoly;				// *
 	pcad_line_t								*firstline;				// *
 	pcad_pin_t								*firstpin;
-	pcad_ieeesymbol_t						*firstieeesymbol;
+	pcad_ieeesymbol_t						*firstieeesymbol;		// *
 	pcad_field_t							*firstfield;
 	pcad_refpoint_t							*firstrefpoint;
 	struct pcad_sheet_tag					*next;

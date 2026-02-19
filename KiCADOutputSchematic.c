@@ -316,15 +316,15 @@ static int OutputPort( const parameters_t *Params, unsigned Level, const pcad_po
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputText( const parameters_t *Params, unsigned Level, const pcad_text_t *Text )
+static int OutputText( const parameters_t *Params, unsigned Level, const pcad_text_t *Text, int InSymboldef )
 	{
 	char	x[32], y[32], Angle[32], Buffer[3*strlen( Text->value )+1];
 
 	FormatReal( Params, 0, Params->OriginX, Params->ScaleX, Text->point.x, x, sizeof x );
 	FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Text->point.y, y, sizeof y );
-	FormatReal( Params, 0, 0,				1,				Text->rotation, Angle, sizeof Angle );
+	FormatReal( Params, 0, 0,				1,				Text->rotation * ( InSymboldef ? 10 : 1 ), Angle, sizeof Angle );
 
-	OutputToFile( Params, Level, "(text \"%s\" (exclude_from_sim no) (at %s %s %s) (effects (font (size 1.27 1.27))%s))\n", FormatLabel( Text->value, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[Text->justify % LENGTH( JustifyKiCAD )] );
+	OutputToFile( Params, Level, "(text \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s))\n", FormatLabel( Text->value, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[Text->justify % LENGTH( JustifyKiCAD )] );
 	return 0;
 	}
 /*=============================================================================*/
@@ -695,7 +695,7 @@ static void OutputIEEESymbol( const parameters_t *Params, unsigned Level, const 
 			}
 		};
 
-	static const ieeesymbolt_t *IEEESymbols[]	=
+	static const ieeesymbolt_t	*IEEESymbols[]	=
 		{
 		[PCAD_IEEESYMBOL_GENERATOR]	= &IEEEGenerator,
 		[PCAD_IEEESYMBOL_AMPLIFIER]	= &IEEEAmplifier,
@@ -812,6 +812,9 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 
 	for( i = 0; i < SymbolDef->numieeesymbols; i++ )
 		OutputIEEESymbol( &LocalParams, Level + 1, SymbolDef->vioieeesymbols[i] );
+
+	for( i = 0; i < SymbolDef->numtexts; i++ )
+		OutputText( &LocalParams, Level + 1, SymbolDef->viotexts[i], 1 );
 
 	for( i = 0; i < SymbolDef->numpins; i++ )
 		{
@@ -1200,7 +1203,7 @@ static int OutputSchematic( const parameters_t *Params, unsigned Level, const pc
 		OutputLine( Params, Level, Sheet->violines[i] );
 
 	for( i = 0; i < Sheet->numtexts; i++ )
-		OutputText( Params, Level, Sheet->viotexts[i] );
+		OutputText( Params, Level, Sheet->viotexts[i], 0 );
 
 	for( i = 0; i < Sheet->numtriplepointarcs; i++ )
 		OutputArc( Params, Level, Sheet->viotriplepointarcs[i] );
