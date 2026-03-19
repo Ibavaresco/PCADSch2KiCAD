@@ -212,13 +212,13 @@ typedef struct pcad_symboldef_tag
 	{
 	char									*name;
 	char									*originalname;
-	pcad_pin_t								*firstpin;
-	pcad_line_t								*firstline;
-	pcad_attr_t								*firstattr;
-	pcad_triplepointarc_t					*firsttriplepointarc;
-	pcad_text_t								*firsttext;
-	pcad_poly_t								*firstpoly;
-	pcad_ieeesymbol_t						*firstieeesymbol;
+	pcad_pin_t								*firstpin;				// *
+	pcad_line_t								*firstline;				// *
+	pcad_attr_t								*firstattr;				// +
+	pcad_triplepointarc_t					*firsttriplepointarc;	// *
+	pcad_text_t								*firsttext;				// *
+	pcad_poly_t								*firstpoly;				// *
+	pcad_ieeesymbol_t						*firstieeesymbol;		// *
 	struct pcad_symboldef_tag				*next;
 
 	size_t									numpins;

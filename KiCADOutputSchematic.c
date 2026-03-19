@@ -927,7 +927,6 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 	for( i = 0; i < CompDef->numattachedsymbols; i++ )
 		{
 		pcad_symboldef_t	*SymbolDef;
-//		fprintf( stderr, "\nSymbol %d %s", i, CompDef->vioattachedsymbols[i]->symbolname );
 
 		if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[i]->symbolname )) != NULL )
 			OutputSymbolDef( Params, Level + 1, i, Schematic, SymbolDef, CompDef );
@@ -1224,7 +1223,7 @@ typedef struct
 	pcad_dimmension_t	Height;
 	} papersize_t;
 /*=============================================================================*/
-static papersize_t MetricPapers[]	=
+static const papersize_t MetricPapers[]	=
 	{
 	[0] = { "A0",		1189000000,	841000000 },
 	[1] = { "A1",		 841000000,	594000000 },
@@ -1234,7 +1233,7 @@ static papersize_t MetricPapers[]	=
 	[5] = { "A5",		 210000000,	148000000 }
 	};
 /*=============================================================================*/
-static papersize_t AmericanPapers[]	=
+static const papersize_t AmericanPapers[]	=
 	{
 	[0] = { "E",		1117600000,	863600000 },
 	[1] = { "D",		 863600000,	558800000 },
@@ -1243,7 +1242,7 @@ static papersize_t AmericanPapers[]	=
 	[4] = { "A",		 279400000,	215900000 }
 	};
 /*=============================================================================*/
-static papersize_t OtherPapers[]	=
+static const papersize_t OtherPapers[]	=
 	{
 	[0] = { "USLedger",	 432000000,	279000000 },
 	[1] = { "USLegal",	 356000000,	216000000 },
