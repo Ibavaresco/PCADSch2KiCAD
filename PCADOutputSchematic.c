@@ -444,7 +444,7 @@ static int OutputAttachedPattern( const parameters_t *Params, int Level, const p
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputCompDef( parameters_t *Params, int Level, const pcad_compdef_t *CompDef )
+static int OutputCompDef( const parameters_t *Params, int Level, const pcad_compdef_t *CompDef )
 	{
 	int		i;
 
@@ -481,7 +481,7 @@ static int OutputCompDef( parameters_t *Params, int Level, const pcad_compdef_t 
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputLibrary( parameters_t *Params, int Level, const pcad_library_t *Library )
+static int OutputLibrary( const parameters_t *Params, int Level, const pcad_library_t *Library )
 	{
 	int	i;
 
@@ -563,7 +563,7 @@ static int OutputNet( const parameters_t *Params, int Level, const pcad_net_t *N
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputNetList( parameters_t *Params, int Level, const pcad_netlist_t *NetList )
+static int OutputNetList( const parameters_t *Params, int Level, const pcad_netlist_t *NetList )
 	{
 	int	i;
 
@@ -1059,7 +1059,7 @@ static int OutputReportFields( const parameters_t *Params, int Level, const pcad
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputReportDefinition( parameters_t *Params, int Level, const pcad_reportdefinition_t *ReportDefinition )
+static int OutputReportDefinition( const parameters_t *Params, int Level, const pcad_reportdefinition_t *ReportDefinition )
 	{
 
 	OutputToFile( Params, Level,	"(reportDefinition\r\n" );
@@ -1112,7 +1112,7 @@ static int OutputReportDefinition( parameters_t *Params, int Level, const pcad_r
 	return 0;
 	}
 /*=============================================================================*/
-static int OutputReportSettings( parameters_t *Params, int Level, const pcad_reportsettings_t *ReportSettings )
+static int OutputReportSettings( const parameters_t *Params, int Level, const pcad_reportsettings_t *ReportSettings )
 	{
 	char	x[32], y[32];
 	int		i;

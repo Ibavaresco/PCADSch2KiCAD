@@ -196,7 +196,7 @@ static int OutputWire( const parameters_t *Params, unsigned Level, const pcad_sh
 	pt1	= Wire->pt1;
 	pt2	= Wire->pt2;
 
-	if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE && ( be1 = FindBusEntry( Sheet, &pt1, &pt2 )) && be1 != NULL )
+	if( Wire->endstyle1 != PCAD_ENDSTYLE_NONE && ( be1 = FindBusEntry( Sheet, &pt1, &pt2 )) != NULL )
 		{
 		if( pt2.x == pt1.x )
 			{
@@ -221,7 +221,7 @@ static int OutputWire( const parameters_t *Params, unsigned Level, const pcad_sh
 		be1->style	= Wire->endstyle1;
 		}
 
-	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE && ( be2 = FindBusEntry( Sheet, &pt2, &pt1 )) && be2 != NULL )
+	if( Wire->endstyle2 != PCAD_ENDSTYLE_NONE && ( be2 = FindBusEntry( Sheet, &pt2, &pt1 )) != NULL )
 		{
 		if( pt1.x == pt2.x )
 			{
@@ -282,7 +282,7 @@ static int OutputPort( const parameters_t *Params, unsigned Level, const pcad_po
 	i	= Port->porttype;
 	if( i >= PCAD_PORTTYPE_NOANGLE_DBL_HORZ )
 		WarningOutput( "KiCAD does not support 2-pins port type \"%s\", please review the resulting circuit.\n", PortTypes.items[Port->porttype] );
-	else if( i >= PCAD_PORTTYPE_NOANGLE_DBL_HORZ )
+	else if( i >= PCAD_PORTTYPE_NOANGLE_SGL_VERT )
 		WarningOutput( "KiCAD does not have vertical port \"%s\", horizontal model used.\n", PortTypes.items[Port->porttype] );
 	else if( i >= PCAD_PORTTYPE_VERTLINE_SGL_HORZ )
 		WarningOutput( "KiCAD does not have port \"%s\", passive model used.\n", PortTypes.items[Port->porttype] );
@@ -305,7 +305,7 @@ static int OutputPort( const parameters_t *Params, unsigned Level, const pcad_po
 				PortRotation	= 0;
 				break;
 			}
-		PortIsFlipped = 0;
+/*		PortIsFlipped = 0; */
 		}
 
 	if( PortRotation == 180000000 || PortRotation == 270000000 )
@@ -467,7 +467,7 @@ static pcad_comppin_t *FindPin( const parameters_t *Params, unsigned PartNumber,
 	return NULL;
 	}
 /*=============================================================================*/
-static int OutputPin( const parameters_t *Params, unsigned Level, const pcad_pin_t *Pin, int PinType, unsigned PartNumber, unsigned PinNumber, const pcad_compdef_t *CompDef )
+static int OutputPin( const parameters_t *Params, unsigned Level, const pcad_pin_t *Pin, int pintype, unsigned PartNumber, unsigned PinNumber, const pcad_compdef_t *CompDef )
 	{
 	static const char	*GraphStyles[2][4]	=
 		{
@@ -536,9 +536,9 @@ static int OutputPin( const parameters_t *Params, unsigned Level, const pcad_pin
 		}
 
 	if( CompPin->pinname == NULL )
-		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, CompPin->pinnumber );
+		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[pintype&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, CompPin->pinnumber );
 	else
-		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[PinType&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, FormatLabel( CompPin->pinname, Buffer, sizeof Buffer ), CompPin->pinnumber );
+		OutputToFile( Params, Level, "(pin %s %s (at %s %s %s) (length %s) (name \"%s\" (effects (font (size 1.27 1.27)))) (number \"%s\" (effects (font (size 1.27 1.27)))))\n", PinTypes[pintype&15] /*IsPower ? "power_out" : "passive"*/, GraphStyle, x, y, Angle, Length, FormatLabel( CompPin->pinname, Buffer, sizeof Buffer ), CompPin->pinnumber );
 
 	return 0;
 	}
@@ -695,7 +695,7 @@ static void OutputIEEESymbol( const parameters_t *Params, unsigned Level, const 
 			}
 		};
 
-	static const ieeesymbolt_t	*IEEESymbols[]	=
+	static const ieeesymbolt_t	*ieeesymbols[]	=
 		{
 		[PCAD_IEEESYMBOL_GENERATOR]	= &IEEEGenerator,
 		[PCAD_IEEESYMBOL_AMPLIFIER]	= &IEEEAmplifier,
@@ -708,7 +708,7 @@ static void OutputIEEESymbol( const parameters_t *Params, unsigned Level, const 
 	int							i;
 	char						Width[32];
 	pcad_dimmension_t			Module	= IEEESymbol->height / 16;
-	const ieeesymbolt_t			*Symbol	= IEEESymbols[IEEESymbol->type];
+	const ieeesymbolt_t			*Symbol	= ieeesymbols[IEEESymbol->type];
 
 	OutputToFile( Params, Level, "(polyline (pts" );
 
@@ -750,7 +750,7 @@ static int OutputSymbolDef( const parameters_t *Params, unsigned Level, unsigned
 	{
 //	char					*RefDesPrefix	= NULL;
 	int						IsPower			= 0;
-	int						pinType			= 0;
+	int						pinType;
 	int						i;
 	parameters_t			LocalParams		= *Params;
 	char					Buffer[256];
@@ -926,7 +926,7 @@ static int OutputCompDef( const parameters_t *Params, unsigned Level, const pcad
 
 	for( i = 0; i < CompDef->numattachedsymbols; i++ )
 		{
-		pcad_symboldef_t	*SymbolDef;
+		const pcad_symboldef_t	*SymbolDef;
 
 		if(( SymbolDef = FindSymbolDefByOriginalName( Schematic, CompDef->vioattachedsymbols[i]->symbolname )) != NULL )
 			OutputSymbolDef( Params, Level + 1, i, Schematic, SymbolDef, CompDef );
@@ -972,9 +972,9 @@ static pcad_compinst_t *FindCompInst( const pcad_netlist_t *NetList, const char 
 	return NULL;
 	}
 /*=============================================================================*/
-#if			!defined MAX
+#if			!defined MAX || defined DOXYGEN
 #define MAX(a,b)	((a)>(b)?(a):(b))
-#endif	/*	!defined MAX */
+#endif	/*	!defined MAX || defined DOXYGEN */
 /*=============================================================================*/
 static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_schematicfile_t *Schematic, const pcad_symbol_t *Symbol )
 	{
@@ -993,18 +993,21 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 		{
 		fclose( Params->Cookie->File );
 		ErrorOutput( Params->Cookie, -1, "SymbolDef \"%s\" not found", Symbol->symbolref );
+		return -1; /* Just to keep CPPCheck happy. */
 		}
 
 	if(( CompInst = FindCompInst( &Schematic->netlist, Symbol->refdesref )) == NULL )
 		{
 		fclose( Params->Cookie->File );
 		ErrorOutput( Params->Cookie, -1, "CompInst \"%s\" not found", Symbol->refdesref );
+		return -1; /* Just to keep CPPCheck happy. */
 		}
 
 	if(( CompDef = FindCompDef( Schematic, CompInst->compref )) == NULL )
 		{
 		fclose( Params->Cookie->File );
 		ErrorOutput( Params->Cookie, -1, "CompDef \"%s\" not found", CompInst->compref );
+		return -1; /* Just to keep CPPCheck happy. */
 		}
 
 	IsPower = CompDef->compheader.comptype == PCAD_COMPTYPE_POWER;
@@ -1071,7 +1074,9 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			const char	*CompValue		= CompInst->compvalue != NULL ? CompInst->compvalue : "";
 			const char	*Footprint		= CompInst->patternname != NULL ? CompInst->patternname : "";
 			int			ValueVisible	= 0;
-			char		Buffer[3*MAX( strlen( IsPower ? CompInst->originalname : CompValue ), strlen( Footprint ))+1];
+			size_t		Len1			= strlen( IsPower ? CompInst->originalname : CompValue );
+			size_t		Len2			= strlen( Footprint );
+			char		buffer[3 * MAX( Len1, Len2 ) + 1];
 
 			dx = dy = dAngle			= 0;
 			const pcad_attr_t *Value	= FindAttr( (const pcad_attr_t*const*)SymbolDef->vioattrs, SymbolDef->numattrs, "Value" );
@@ -1099,8 +1104,8 @@ static int OutputSymbol( const parameters_t *Params, unsigned Level, const pcad_
 			FormatReal( Params, 0, Params->OriginY, Params->ScaleY, Symbol->pt.y + dy, y, sizeof y );
 			FormatReal( Params, 0, 0,				1,				dAngle, Angle, sizeof Angle );
 
-			OutputToFile( Params, Level + 1, "(property \"Value\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s%s))\n", FormatLabel( IsPower ? CompInst->originalname : CompValue, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % LENGTH( JustifyKiCAD )], ValueVisible || IsPower ? "" : " (hide yes)"	);
-			OutputToFile( Params, Level + 1, "(property \"Footprint\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s (hide yes)))\n", FormatName( Footprint, Buffer, sizeof Buffer ), x, y, Angle, JustifyKiCAD[jf % ( LENGTH( JustifyKiCAD ) - 1 )] );
+			OutputToFile( Params, Level + 1, "(property \"Value\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s%s))\n", FormatLabel( IsPower ? CompInst->originalname : CompValue, buffer, sizeof buffer ), x, y, Angle, JustifyKiCAD[jf % LENGTH( JustifyKiCAD )], ValueVisible || IsPower ? "" : " (hide yes)"	);
+			OutputToFile( Params, Level + 1, "(property \"Footprint\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27))%s (hide yes)))\n", FormatName( Footprint, buffer, sizeof buffer ), x, y, Angle, JustifyKiCAD[jf % ( LENGTH( JustifyKiCAD ) - 1 )] );
 			if(( Attr = FindAttr( (const pcad_attr_t*const*)Symbol->vioattrs, Symbol->numattrs, "Description" )) != NULL )
 				OutputToFile( Params, Level + 1, "(property \"Description\" \"%s\" (at %s %s %s) (effects (font (size 1.27 1.27) ) (hide yes)))\n", Attr->value, x, y, Angle );
 			}
@@ -1314,11 +1319,14 @@ static int FindPaperSize( const parameters_t *Params, pcad_dimmension_t Width, p
 /*=============================================================================*/
 static void FindTitleExtents( const pcad_titlesheet_t *TitleSheet, pcad_extent_t *Extent )
 	{
-	pcad_dimmension_t	Left	=  (pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 );
-	pcad_dimmension_t	Right   = -(pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ) - 1;
-	pcad_dimmension_t	Top     = -(pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ) - 1;
-	pcad_dimmension_t	Bottom  =  (pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 );
+	pcad_dimmension_t	Left		=  (pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 );
+	pcad_dimmension_t	Right   	= -(pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ) - 1;
+	pcad_dimmension_t	Top;	/*	= -(pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ) - 1; */
+	pcad_dimmension_t	Bottom;	/*	=  (pcad_dimmension_t)( (pcad_unsigned_t)-1 >> 1 ); */
 	int					i;
+
+	Top		= Right;
+	Bottom	= Left;
 
 	for( i = 0; i < TitleSheet->numlines; i++ )
 		{

@@ -29,7 +29,7 @@
 #include "PCADStructs.h"
 #include "PCADParser.h"
 /*=============================================================================*/
-int	OutputPCAD	( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const char *Name );
+int	OutputPCAD	( cookie_t *Cookie, pcad_schematicfile_t *PCADSchematic, const char *pName );
 /*=============================================================================*/
 #endif	/*	!defined __OUTPUTPCAD_H__ */
 /*=============================================================================*/

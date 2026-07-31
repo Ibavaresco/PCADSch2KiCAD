@@ -298,9 +298,9 @@ int ParseEnum( cookie_t *Cookie, const parsefield_t *ParseField, const parsestru
 	return 0;
 	}
 /*============================================================================*/
-int GetString( cookie_t *Cookie, char *Buffer, size_t BufferLength )
+int GetString( cookie_t *Cookie, char *Buffer, size_t BufferSize )
 	{
-	if( GetToken( Cookie, Buffer, BufferLength ) != TOKEN_STRING )
+	if( GetToken( Cookie, Buffer, BufferSize ) != TOKEN_STRING )
 		Error( Cookie, -1, "Expecting quoted string" );
 
 	return TOKEN_STRING;
