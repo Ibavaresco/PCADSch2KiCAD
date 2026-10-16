@@ -208,10 +208,10 @@ const parseenum_t PinType	=
 		[PCAD_PINTYPE_INPUT]					= "Input",
 		[PCAD_PINTYPE_OUTPUT]					= "Output",
 		[PCAD_PINTYPE_BIDIRECTIONAL]			= "Bidirectional",
-		[PCAD_PINTYPE_OPEN_H]					= "Open-H",
-		[PCAD_PINTYPE_OPEN_L]					= "Open-L",
-		[PCAD_PINTYPE_PASSIVE_H]				= "Passive-H",
-		[PCAD_PINTYPE_PASSIVE_L]				= "Passive-L",
+		[PCAD_PINTYPE_OPEN_H]					= "OpenH",
+		[PCAD_PINTYPE_OPEN_L]					= "OpenL",
+		[PCAD_PINTYPE_PASSIVE_H]				= "PassiveH",
+		[PCAD_PINTYPE_PASSIVE_L]				= "PassiveL",
 		[PCAD_PINTYPE_3_STATE]					= "3-State",
 		[PCAD_PINTYPE_POWER]					= "Power"
 		}
